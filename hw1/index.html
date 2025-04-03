@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>голосование</title>
+</head>
+
+<body>
+    <style>
+        #f1{
+            background-color: cadetblue;
+            border-radius: 5%;
+            line-height: 30px;
+            width: 40%;
+            text-indent: 15%;
+        }
+        div{
+            display: inline-block;
+            width: 40%;
+            background-color: darkseagreen;
+            text-indent: 15%;
+            border-radius: 5%;
+            margin-top: 5%;
+        }
+        #but1{
+            margin-left: 10%;
+        }
+
+    </style>
+    <form method=POST action="http://localhost:3060/service6" id="f1">
+        Какое блюдо предпочитаете?
+        <br>
+        <input type="radio" value="Борщ" id="var1">
+        <label for="var1">Борщ</label>
+        <br>
+        <input type="radio" value="Пельмени" id="var2">
+        <label for="var2">Пельмени</label>
+        <br>
+        <input type="radio" value="Драники" id="var3">
+        <label for="var3">Драники</label>
+        <br>
+        <input type="radio" value="Шашлык" id="var4">
+        <label for="var4">Шашлык</label>
+        <br>
+        <input type="radio" value="Криветки, устрицы"  id="var5">
+        <label for="var5">Криветки, устрицы</label>
+        <br>
+        <input id="but1" type=submit value="Проголосовать">
+    </form>
+    
+    <div>
+        <p>Результаты голосования:</p>
+        <p>Борщ</p>
+        <p>Пельмени</p>
+        <p>Драники</p>
+        <p>Шашлык</p>
+        <p>Криветки, устрицы</p>
+    </div>
+</body>
+</html>
