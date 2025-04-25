@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Голосование</title>
+
+</head>
+<body>
+    <style>
+        #formItems{
+            background-color: cadetblue;
+            border-radius: 5%;
+            line-height: 30px;
+            width: 45%;
+            text-indent: 15%;
+            }
+        #stat_form{
+            display: inline-block;
+            width: 45%;
+            background-color: darkseagreen;
+            text-indent: 15%;
+            border-radius: 5%;
+            margin-top: 5%;
+        }
+        #clickMe{
+            margin-left: 10%;
+        }
+    </style>
+<div name="postForm" id="formItems">
+  <h3>Какое блюдо предпочитаете?</h3>
+</div>
+<div name="stat_form" id="stat_form">
+    <h3>Текущая статистика:</h3>
+</div>
+<div id="divconver"></div>
+</body>
+
+
+<script>
+let itemsDiv;
+let listNames = {'var1':'Борщ', 'var2':'Пельмени', 'var3':'Конфетки, бараночки', 'var4':'Мандарики, апельсинки', 'var5':'Криветки, устрицы'};
+try
+{
+    fetch('/variants',{
+        method: 'GET'
+    })
+    .then(function(response){ return response.json();})
+    .then(function(json) {
+      //  let itemsForm = JSON.parse(json);
+        let itemsForm = json;
+        let myForm = document.getElementById('formItems');
+
+        for(var i = 0; i< itemsForm.length; i++)
+         {
+        let newInput = document.createElement('input');            
+        let newBr = document.createElement('br'); 
+              newInput.type = 'radio';
+              newInput.value = 'var'+itemsForm[i]['code'];
+              newInput.id = 'var'+itemsForm[i]['code'];
+              newInput.name = 'dish';
+        let newLabel = document.createElement('label');  
+              newLabel.for = 'var'+itemsForm[i]['code'];
+              newLabel.innerText = itemsForm[i]['text'];
+              myForm.appendChild(newInput);
+              myForm.appendChild(newLabel);  
+              myForm.appendChild(newBr);
+         }  
+
+        let newBut = document.createElement('input');    
+            newBut.type = 'button';
+            newBut.value = 'Отправить ответ';
+            newBut.id = 'clickMe';        
+        myForm.appendChild(newBut);   
+        document.getElementById('clickMe').addEventListener('click', addnewfetch, false);  
+//stat
+        let myDiv = document.getElementById('stat_form');
+            let newUl = document.createElement('ul');
+            newUl.id = 'UlIems'; 
+            for(var i = 1; i<= itemsForm.length; i++)
+            {
+            let newBrUl = document.createElement('br'); 
+            let newLi = document.createElement('li'); 
+            newLi.name = 'li'+i;
+                newLi.innerHTML = listNames["var" + i] + '- ' + itemsDiv["var" + i];
+                newLi.id = 'li' + i;
+                newUl.appendChild(newLi);  
+            }  
+            myDiv.appendChild(newUl);
+
+            
+    //загрузка файлов        
+            let newBut0 = document.createElement('input');  
+            newBut0.type = 'button';
+            newBut0.value = 'Получить XML';
+            newBut0.id = 'clickXML';     
+            let newBut1 = document.createElement('input');  
+            newBut1.type = 'button';
+            newBut1.value = 'Получить Text';
+            newBut1.id = 'clickText';               
+            let newBut2 = document.createElement('input');  
+            newBut1.type = 'button';
+            newBut1.value = 'Получить HTML';
+            newBut1.id = 'clickHTML';             
+            let divConver = document.getElementById('divconver');
+
+            divConver.appendChild(newBut0);  
+            divConver.appendChild(newBut1);  
+            divConver.appendChild(newBut2);
+
+            document.getElementById('clickText').addEventListener('click', addnewText, false);  
+            document.getElementById('clickXML').addEventListener('click', addnewXML, false);  
+            document.getElementById('clickHTML').addEventListener('click', addnewHTML, false);              
+    }) 
+    }
+    catch{
+        console.log('error variants');
+    }
+
+    try
+{
+    fetch('/stat', {
+        method: 'POST'
+    })
+    .then(function(response){ return response.json();})
+    .then(function(json) {
+        itemsDiv = json;
+           return itemsDiv;
+    }) 
+}
+catch{
+        console.log('error stat');
+    }
+
+
+    
+async function addnewfetch()
+{
+    let newVar = document.getElementsByName('dish');
+    for(var i=0; i<newVar.length; i++)
+    {
+        if(document.getElementsByName('dish')[i].checked)
+        {
+            var itemVar = document.getElementsByName('dish')[i].value;
+            document.getElementsByName('dish')[i].checked = false;
+            console.log(itemVar);    
+        }    
+    }    
+    if(!itemVar)
+        var itemVar = 0;
+let res = await  fetch('/voit',{
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"dish": itemVar})
+    })
+    .then(console.log('Голос принят'))
+    .then(response = await fetch('/stat', {method: 'POST'}))
+    .then(response => response.json())
+    .then(data = await response.json())
+    .then(console.log('Получили со /stat', data))
+    .then(rez = await getStat(data));
+}
+
+async function getStat(data){
+ /*
+ let response = await fetch('/stat', {method: 'POST'});
+ response => response.json();
+ let data = await response.json();
+*/
+ itemsDiv = data;
+ console.log("stat", itemsDiv);
+ var myli = document.getElementsByTagName("li");
+ var j=0;
+     for(var i in itemsDiv)
+        {
+        myli[j].innerHTML =  listNames[i] + ' - ' + JSON.stringify(itemsDiv[i]);
+        j++;
+        }  
+
+  return data;
+}
+
+async function addnewText(){
+    const response=await fetch('/download',{
+        method: 'POST',
+        headers: { "Content-Type": "application/json" }
+    });
+    const data = await response.json();
+    const dataUri = "data:text/json;charset=utf8," + encodeURIComponent(JSON.stringify(data));
+    downloadStat(data,'stat.json', dataUri);
+}
+
+async function addnewXML(){
+    const response=await fetch('/download',{
+        method: 'POST',
+        headers: { "Content-Type": "application/xml" }
+    });
+    const xmlStr = await response.text();
+//in xml
+ //  parser = new DOMParser();
+ //  xmlDoc = parser.parseFromString(xmlStr,"text/xml");
+
+ //from xml
+
+  //  const xmlSerializer = new XMLSerializer();
+//const xmlString2 = xmlSerializer.serializeToString(xmlDoc);
+
+    const dataUri = "data:text/xml; charset=utf8," + encodeURIComponent(xmlStr);
+    downloadStat(xmlStr,'stat.xml', dataUri);
+}
+async function addnewHTML(){
+    const response=await fetch('/download',{
+        method: 'POST',
+        headers: { "Content-Type": "text/html" }
+    });
+    const xmlStr = await response.text();
+
+    const dataUri = "data:text/xml; charset=utf8," + encodeURIComponent(xmlStr);
+    downloadStat(xmlStr,'stat.xml', dataUri);
+}
+
+function downloadStat(data, fileName, dataUri) {
+    const link = document.createElement("a");
+    link.href = dataUri;//URL.createObjectURL(new Blob([data]));
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+</script>
+</html>
