@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Postman</title>
+<!--    <link  href="/css/style.css">
+    <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon.png">-->
+</head>
+<body>
+    <style>
+        #conteiner{
+            display: flex;
+            flex-direction: row;
+        }
+        #leftPart{
+            border: 1px solid cadetblue;
+            border-radius: 5%;
+            width: 35%;
+            margin-right: 20px;
+            margin-top: 20px;
+            }
+        #rightPart{
+            width: 60%;
+            border: 1px solid  darkseagreen;
+            border-radius: 5%;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        #textURL, #reqMethod{
+            width: 95%;
+        }
+        #reqSave, #reqRes, #clearF{
+            background-color: rgb(36, 172, 235);
+            border-radius: 10px;
+            border: none;
+            height: 25px;
+            width: 95%;
+        }
+        #tableParametr tr > td:nth-child(2),
+        #tableParametr tr > td:nth-child(3),
+        #tableHeaders tr > td:nth-child(2),
+        #tableHeaders tr > td:nth-child(3){
+            padding-left: 5%;
+        }
+        #tableParametr tr > td:nth-child(2) input,
+        #tableParametr tr > td:nth-child(3) input,
+        #tableHeaders tr > td:nth-child(2) input,
+        #tableHeaders tr > td:nth-child(3) input{
+            width: 95%;
+        }
+        .for_button{
+            display: block;
+            width: 98%;
+            background-color: rgb(0, 194, 113);
+            border-radius: 15px;
+            margin: 2px;
+            padding: 2px 1px;
+        }
+        input, a, button{
+            cursor: pointer;
+        }
+        #controlConfig{
+            opacity: 0;
+        }
+    </style>
+<div id="conteiner">
+<div name="left_conteiner" id="leftPart">
+  
+</div>
+<div name="right_conteiner" id="rightPart">
+   <table>
+    <tr style="font-weight: bold;">
+        <td style="width: 25%;">Метод</td>
+        <td colspan ='2'>URL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><select name="reqMethod" id="reqMethod">
+            <option value="metGET">GET</option>
+            <option value="metPost">POST</option>
+            <option value="metUpdate">UPDATE</option>
+            <option value="metPatch">PATCH</option>
+            <option value="metOptions">OPTIONS</option>
+        </select></td>
+        <td colspan ='2' style="width: 75%;"><input id="textURL" name="textURL" type="text" placeholder="URL"></td>
+        <td></td>
+    </tr>
+   </table>
+
+   <table>
+    <table id="tableParametr">
+        <tr style="height: 25px;">
+            <td style="font-weight: bold;">Параметр</td>
+            <td></td>
+            <td></td>
+        </tr>    
+      <!--  <tr>
+            <td><input name="newParam" type="text"></td>
+            <td><input name="newParamVal" type="text"></td>
+            <td><a style="color: red;" id="delItem1" href="">Удалить</a></td>
+        </tr> -->   
+    </table>
+    <table id="toAddNewParam">
+        <tr>
+            <td><a style="color: green; line-height: 25px;" id="addParamInTable" onclick="addParams(event);" href="">Добавить параметр</a></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table> 
+ </table>  
+    <table id="req_Body">
+        <tr style="height: 25px;">
+            <td style="font-weight: bold;">Тело запроса</td>
+            <td></td>
+            <td></td>
+        </tr> 
+        <tr style="height: 25px;">
+            <td colspan="3"><textarea name="reqBody" id="reqBody" style="width: 100%;"></textarea></td>
+            <td></td>
+            <td></td>
+        </tr>       
+</table>   
+<table id="tableHeaders">
+    <tr style="height: 25px;">
+        <td style="font-weight: bold;">Заголовки</td>
+        <td></td>
+        <td></td>
+    </tr> 
+ <!--    <tr style="height: 25px;">
+        <td><input name="reqHead" id="reqHead"></td>
+        <td> <input name="reqHeadVal" type="text"></td>
+        <td><a style="color: red;" id="delItem2">Удалить</a></td>
+    </tr> -->      
+</table> 
+<table>
+    <tr>
+        <td><a style="color: green; line-height: 25px;" id="addHeaderInTable" onclick="addHead(event);" href="">Добавить заголовок</a></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div id="controlConfig">
+                <a style="color: dodgerblue; padding-right: 15px;" href="" id="changeItemLeftPart">&#10232; Изменить запрос</a>
+                <a style="color: dodgerblue;" href="" id="delItemLeftPart">&#215; Удалить запрос</a>
+            </div>
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr style="height: 35px;">
+        <td style="width: 33%;"><button id="reqSave" onclick="addnewfetch();">Сохранить запрос</button></td>
+        <td style="width: 33%;"><button id="reqRes" onclick="newReq();">Отправить запрос</button></td>
+        <td style="width: 33%;"><button id="clearF" onclick="clearForm();">Очистить форму</button></td>
+    </tr>
+</table> 
+
+    <div style="width: 98%; border: 1px solid grey;">
+        <h2>Ответ на запрос</h2>
+        <h3>Статус ответа: <span id="statusReq"></span></h3>
+        <h3>Заголовки ответа:</h3>
+        <div id="headsReq"></div>
+        <h3>Тело ответа</h3>
+        <textarea name="bodyReq" id=""></textarea>
+    </div>
+</div>
+</div>    
+</body>
+
+<script>
+    //*** при загрузке страницы устанавливаем обработчики на все кнопки конфиг. листа
+document.addEventListener("DOMContentLoaded", () => {
+   let divLeft = document.getElementById('leftPart');
+   divLeft.onclick = function(event) {
+        let target = event.target; // где был клик?
+  //      console.log(target.tagName);
+        if (target.tagName != 'INPUT') return; // не на INPUT? тогда не интересует
+        configToForm(target); // загрузить форму по нажатию на кнопку
+
+};
+//document.getElementById('delItem1').addEventListener("click", function(e){
+//    this.closest('tr').remove()});
+ 
+//document.getElementById('delItem2').addEventListener("click", function(e){
+//    this.closest('tr').remove()});
+
+  });
+
+  function changeMet(){
+    let method = document.getElementById('reqMethod').value;
+    console.log("method", method);
+    if(method === 'metGET')
+   {
+    document.getElementById('req_Body').style.display = 'none';
+    document.getElementById('toAddNewParam').style.display = 'block';
+    document.getElementById('tableParametr').style.display = 'block';
+   }
+ else if(method === 'metPost')    
+ {
+    document.getElementById('req_Body').style.display = 'block';
+    document.getElementById('toAddNewParam').style.display = 'none';
+    document.getElementById('tableParametr').style.display = 'none';
+ }
+ else if(method === 'metUpdate')   
+ {
+    document.getElementById('req_Body').style.display = 'block';
+    document.getElementById('toAddNewParam').style.display = 'block';
+    document.getElementById('tableParametr').style.display = 'block';
+ }
+ else if(method === 'metPatch') 
+ {
+    document.getElementById('req_Body').style.display = 'block';
+    document.getElementById('toAddNewParam').style.display = 'block';
+    document.getElementById('tableParametr').style.display = 'block';
+ }
+ else if(method === 'metOptions')   
+ {
+    document.getElementById('req_Body').style.display = 'block';
+    document.getElementById('toAddNewParam').style.display = 'block';
+    document.getElementById('tableParametr').style.display = 'block';
+ }  
+ return true;
+}
+ //****Составление новой строки таблицы параметров 
+function addParams(e){
+  e.preventDefault();
+  var tabParam = document.querySelector("#tableParametr > tbody");
+  var addName1 =  "newParam";//document.querySelector("#tableParametr > tbody > tr:nth-child(2) > td:nth-child(1) > input").name; 
+  var addVal1 =  "newParamVal";//document.querySelector("#tableParametr > tbody > tr:nth-child(2) > td:nth-child(2) > input").name; 
+  var tr1 = document.createElement("tr");
+  var new1 = addTdBut(tr1, addName1);
+  var new2 = addTdBut(tr1, addVal1);
+  var new3 = addTdA(tr1);
+  tabParam.appendChild(tr1);  
+}
+//*****Составление и добавление новой строки в таблицу запросов
+function addHead(e){
+  e.preventDefault();
+  var tabParam = document.querySelector("#tableHeaders > tbody");
+  var addName1 =  "reqHead";//document.querySelector("#tableHeaders > tbody > tr:nth-child(2) > td:nth-child(1) > input").name; 
+  var addVal1 =  "reqHeadVal";//document.querySelector("#tableHeaders > tbody > tr:nth-child(2) > td:nth-child(2) > input").name; 
+  var tr1 = document.createElement("tr");
+  var new1 = addTdBut(tr1, addName1);
+  var new2 = addTdBut(tr1, addVal1);
+  var new3 = addTdA(tr1);
+  tabParam.appendChild(tr1);  
+}
+//****Добавление нового инпута в таблицу
+   function addTdBut(newTr, NameEl){
+        var td1 = document.createElement("td");
+        var inp1 = document.createElement("input");
+        inp1.name = NameEl;
+        td1.appendChild(inp1);
+        newTr.appendChild(td1);   
+   }
+//****Добавление ссылки "Удалить" в таблицу   
+   function addTdA(newTr){
+        var td1 = document.createElement("td");
+        var link1 = document.createElement("a");
+        link1.innerHTML = 'Удалить';
+        link1.style.color = 'red';
+        link1.addEventListener("click", function(e){
+            this.closest('tr').remove()});
+        td1.appendChild(link1);   
+        newTr.appendChild(td1);
+   }
+  
+  //*****отстроили левую часть с сохраненными запросами при первом запуске страницы
+ fetch('/leftpartREAD',{
+        method: 'GET'
+    })
+    .then(function(response){ return response.json();})
+    .then(function(json) {
+        addNewButton(json, 0)
+    return json;})
+    .then(function(){
+        let method = document.getElementById('reqMethod');
+        method.addEventListener('change',changeMet ,true);
+    })
+    .then(console.log("Страница отстроена!"));
+          
+//сохранили новый запрос  
+function getUpdateItems(){
+let item0 = document.getElementById('reqMethod');
+var item1 = item0.options[item0.selectedIndex].innerHTML;
+console.log("item1", item1);
+let item2 = document.getElementById('textURL').value;
+let item3= new Array;
+//let item4 = new Array;
+let item6  = new Array;
+//let item7 = new Array;
+for(var i=0;i<document.getElementsByName('newParam').length; i++)
+{
+   // item3[i] = document.getElementsByName('newParam')[i].value;
+   // item4[i] = document.getElementsByName('newParamVal')[i].value;
+    item3[i] ={[document.getElementsByName('newParam')[i].value] : document.getElementsByName('newParamVal')[i].value};
+}
+let item5 = document.getElementById('reqBody').value;
+for(var i=0;i<document.getElementsByName('reqHead').length; i++)
+{
+    item6[i] = {[document.getElementsByName('reqHead')[i].value] : document.getElementsByName('reqHeadVal')[i].value} 
+   // item6[i] = document.getElementsByName('reqHead')[i].value;
+   // item7[i] = document.getElementsByName('reqHeadVal')[i].value;
+} 
+let item8;
+var allItems ={
+    "item1":item1,
+    "item2":item2,
+    "item3":item3,
+    "item4":"item4",
+    "item5":item5,
+    "item6":item6,
+    "item7":"item7",
+    "item8":item8
+}
+return allItems;
+}
+
+async function addnewfetch()
+{
+let newItems = getUpdateItems();
+//console.log(item1, item2, item3, item4, item5, item6, item7);
+let res = await  fetch('/leftpartWRITE',{
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"reqMethod": newItems.item1,
+        "textURL": newItems.item2,
+        "newParam": newItems.item3,
+      //  "newParamVal": newItems.item4,
+        "reqBody": newItems.item5,
+        "reqHead": newItems.item6,
+      //  "reqHeadVal": newItems.item7,
+        "num": newItems.item8
+        })
+    })
+    .then(console.log('Данные отправлены'))
+    .then(response = await fetch('/leftpartREAD', {method: 'GET'}))
+    .then(response => response.json())
+    .then(data = await response.json())
+    .then(console.log('Получили со /stat', data))
+    .then(addNewButton(data, data.length-1));
+}
+
+//****Сохранили новый запрос v конфигурационный лист
+function addNewButton(itemsForm, x){
+let myLeft = document.getElementById('leftPart');
+let butLeft = document.querySelectorAll('#leftPart input');
+
+console.log('butLeft',butLeft);
+console.log('itemsForm',itemsForm);
+for(var i = x; i < itemsForm.length; i++)
+    {
+    let newBut = document.createElement('input');            
+    let newBr = document.createElement('br'); 
+    newBut.type = 'button';
+    newBut.value = 
+   `Метод: ${itemsForm[i]['method']}
+    URL: ${itemsForm[i].url}`;
+    //newBut.innerHTML = itemsForm[i]["method"] + itemsForm[i].url;
+    newBut.className = 'for_button';
+    newBut.id = "idItem" + itemsForm[i]["num"];
+    myLeft.appendChild(newBut);
+    myLeft.appendChild(newBr); 
+   // console.log(newBut.value);
+    }
+    var a = changeMet();
+   // console.log(a);
+}
+//***отстроили настройки из выбранного, ранее сохраненного запроса 
+function configToForm(input){
+    
+    let curID = input.id;
+    curID=curID.slice(6);
+    console.log("curID",curID);
+    fetch('/leftpartREAD',{
+        method: 'GET'
+    })
+    .then(function(response){ return response.json();})
+    .then(function(json) {
+        let itemsForm = json;
+        for(var i=0; i<itemsForm.length; i++)
+           {
+            console.log(itemsForm[i]['num'], parseInt(curID),curID);
+            if(itemsForm[i]['num'] === parseInt(curID)) 
+              var curIdEl = i;
+           }
+   // console.log(itemsForm, curIdEl, itemsForm[curIdEl]);
+    //заполнили форму: метод, урл, боди
+   let selectLen = document.getElementById('reqMethod').options.length;
+   for(var i=0; i < selectLen; i++)
+    {
+    if(document.getElementById('reqMethod').options[i].innerHTML === itemsForm[curIdEl]['method'])
+        document.getElementById('reqMethod').selectedIndex = [i];
+    }
+
+    //document.getElementById('reqMethod').options[document.getElementById('reqMethod').selectedIndex].innerHTML = itemsForm[curIdEl]['method'];
+    document.getElementById('textURL').value = itemsForm[curIdEl]['url'];
+    document.getElementById('reqBody').innerHTML = itemsForm[curIdEl]['body'];
+
+    //подготовили форму под нужное количество параметров и заполнили
+    let param = JSON.parse(itemsForm[curIdEl]['param']);
+    let paramLen = Object.keys(JSON.parse(itemsForm[curIdEl]['param'])).length;
+    let tdLen = document.getElementsByName('newParam').length;
+
+    console.log("paramLen", paramLen, tdLen);
+    if(paramLen > tdLen){
+        let countNewTd = paramLen - tdLen;
+        for(var i = 0; i<countNewTd; i++)
+            document.getElementById('addParamInTable').click();
+    }
+    else if(paramLen < tdLen){
+        for(var i = tdLen; i > paramLen; i--)
+            document.querySelector('#tableParametr>tbody>tr:nth-child('+(tdLen + 1)+')>td:nth-child(3)>a').click();
+    }
+    var i=0;
+    for(var i=0; i<param.length; i++)
+    {
+    for(param[i].key in param[i]){
+        console.log("key", param[i].key, param);
+        document.getElementsByName('newParam')[i].value = param[i].key;
+        document.getElementsByName('newParamVal')[i].value = param[i][param[i].key];
+      //  i++;
+    }}
+//подготовили форму под нужное количество запросов
+    let objHead = JSON.parse(itemsForm[curIdEl]['head']);
+    let objHeadLen = Object.keys(JSON.parse(itemsForm[curIdEl]['head'])).length;
+    let tdHeadLen = document.getElementsByName('reqHead').length;
+    console.log("objHeadLen",objHeadLen);
+    console.log(objHeadLen, tdHeadLen,tdHeadLen);
+    if(objHeadLen > tdHeadLen){
+        let countNewTd = objHeadLen - tdHeadLen;
+        for(var i = 0; i<countNewTd; i++)
+            document.getElementById('addHeaderInTable').click();
+    }
+    else if(objHeadLen < tdHeadLen){
+        for(var i = tdHeadLen; i > objHeadLen; i--)
+            document.querySelector('#tableHeaders>tbody>tr:nth-child('+(tdHeadLen + 1)+')>td:nth-child(3)>a').click();
+    }
+
+    for(var i=0; i<objHead.length; i++)
+    {
+    for(objHead[i].key in objHead[i]){
+        console.log(objHead[i].key, objHead);
+        document.getElementsByName('reqHead')[i].value = objHead[i].key;
+        document.getElementsByName('reqHeadVal')[i].value = objHead[i][objHead[i].key];
+    }}
+    document.getElementById('controlConfig').style.opacity = 1;
+    let linkCh = document.querySelector("#changeItemLeftPart");
+        linkCh.addEventListener("click", (event) => {addFetchChange(curID);});
+    let linkDel = document.querySelector("#delItemLeftPart");
+        linkDel.addEventListener("click", (event) => {addFetchDel(curID);});
+    });
+    var a = changeMet();
+}
+//***внесли изменения в запрос
+async function addFetchChange(num){
+    let newItems = getUpdateItems();
+    //console.log(newItems);
+    //alert(item1);
+    let res = await fetch('/change',{
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"reqMethod": newItems.item1,
+        "textURL": newItems.item2,
+        "newParam": newItems.item3,
+        "newParamVal": newItems.item4,
+        "reqBody": newItems.item5,
+        "reqHead": newItems.item6,
+        "reqHeadVal": newItems.item7,
+        "allItemsForm": newItems,
+        "num": num})
+    })
+    .then(console.log('Внесены изменения в запрос'));
+    document.querySelector("#changeItemLeftPart").removeEventListener('click',addFetchChange);
+}
+//****удалили запрос
+async function addFetchDel(num){
+    let res = await fetch('/delete',{
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"num": num})
+    })
+    .then(console.log('Запрос удален'));
+    document.querySelector("#delItemLeftPart").removeEventListener('click',addFetchDel);
+}
+//****очистка формы
+function clearForm(){
+    fetch('/leftpartREAD',{
+        method: 'GET'
+    })
+    .then(function(response){ return response.json();})
+    .then(function(json) {
+        addNewButton(json, 0)
+    return json;})
+    .then(console.log("Страница отстроена!"));
+}
+
+function newReq(){
+let newItems = getUpdateItems();    
+console.log("newItems",newItems);
+fetch('/run', {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"allItemsForm": newItems})
+})
+.then(function(response){ return response.json();})
+.then(function(json) {console.log(json);});
+}
+</script>
+
+</html>
