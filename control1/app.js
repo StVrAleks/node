@@ -232,5 +232,22 @@ console.log("Удален запрос");
         console.log("resObj",resObj);
         return resObj;
     }   
-
+ function fetchImage(reqUrl) {
+      const apiKey = 'YOUR_API_KEY';
+      fetch(reqUrl, {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': apiKey,
+          "x-rapidapi-host": "any-anime.p.rapidapi.com"
+        }
+      })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const imageUrl = URL.createObjectURL(blob);
+        const imageElement = document.createElement("img");
+        imageElement.src = imageUrl;
+        const container = document.getElementById("image-container");
+        container.appendChild(imageElement);
+      });
+    }
 app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
