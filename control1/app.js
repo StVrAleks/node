@@ -3,14 +3,13 @@ const http = require("http");
 const fs = require("fs");
 const express = require("express"); // получаем модуль express
 const app = express();// создаем приложение express
-const mimeTypes = {
-  '.html' : 'text/html',
-  '.png' : 'image/png',
-  '.css' : 'text/css',
-  '.js' : 'text/javascript'
-}
+const cors = require('cors');
 
-
+var CORSOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200,
+};
+//cors(CORSOptions)
 
 const urlencodedParser = express.urlencoded({extended: true});
 const mime = require('mime');
@@ -18,33 +17,8 @@ const mime = require('mime');
 const jsonParser = express.json();
 app.use(express.urlencoded({ extended: true }));
 
-function staticFile (res, filePath, ext){
-  res.setHeader('Content-type', mimeTypes[ext]);
-  fs.readFile('./public'+filePath, (error, data) =>{
-    if(error){
-      res.statusCode = 404;
-      res.end();
-    }
-  });
-}
-
-http.createServer(function(req, res){
-  const url = req.url;
-  console.log(url);
-  switch (url) {
-    case '/page':
-      staticFile(res, '/page', '.html');
-      break;
-    default:
-      const extname = String(path.extname(url)).toLocaleLowerCase();
-      if (extname in mimeTypes)
-        staticFile(res, url, extname)
-      else{
-        res.statusCode = 404;
-        res.end();
-      }
-  }
-});
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.get("/page", function (_, response) {
