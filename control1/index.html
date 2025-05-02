@@ -115,7 +115,7 @@
             <td></td>
         </tr> 
         <tr style="height: 25px;">
-            <td colspan="3"><textarea name="reqBody" id="reqBody" style="width: 100%;"></textarea></td>
+            <td colspan="3"><textarea name="reqBody" id="reqBody" style="width: 100%;">{}</textarea></td>
             <td></td>
             <td></td>
         </tr>       
@@ -373,19 +373,19 @@ function configToForm(input){
     let curID = input.id;
     curID=curID.slice(6);
 //krasota
- let allButons = document.getElementsByCkassName('for_botton);
+ let allButtons = document.getElementsByClassName('for_button');
     for(var i=0; i< allButtons.length; i++)
      {
-        if(allButons[i].id != "curID)
+        if(allButtons[i].id != input.id)
            {
-            allButons[i].style.backgroundColor = 'rgb(0, 194, 113)';
-            allButons[i].style.color = 'black';
-            allButons[i].style.border = 'none';
+            allButtons[i].style.backgroundColor = 'rgb(0, 194, 113)';
+            allButtons[i].style.color = 'black';
+            allButtons[i].style.border = 'none';
            }
         else {
-            allButons[i].style.backgroundColor = 'grey';
-            allButons[i].style.color = 'white';
-            allButons[i].style.border = '3px solid rgb(0, 194, 113)';
+            allButtons[i].style.backgroundColor = 'grey';
+            allButtons[i].style.color = 'white';
+            allButtons[i].style.border = '3px solid rgb(0, 194, 113)';
         } 
      }
     
@@ -528,3 +528,4 @@ fetch('/run', {
 </script>
 
 </html>
+
