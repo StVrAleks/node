@@ -229,7 +229,7 @@ console.log("Удален запрос");
         //let data = await res.text();
         resObj.st = await res.status;
         resObj.hd = await res.headers;
-        console.log("st",st, "hd",hd);
+        console.log("resObj",resObj);
         return resObj;
     }   
 
