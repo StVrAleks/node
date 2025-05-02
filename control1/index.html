@@ -364,6 +364,7 @@ for(var i = x; i < itemsForm.length; i++)
    // console.log(newBut.value);
     }
     var a = changeMet();
+   
    // console.log(a);
 }
 //***отстроили настройки из выбранного, ранее сохраненного запроса 
@@ -371,6 +372,24 @@ function configToForm(input){
     
     let curID = input.id;
     curID=curID.slice(6);
+//krasota
+ let allButons = document.getElementsByCkassName('for_botton);
+    for(var i=0; i< allButtons.length; i++)
+     {
+        if(allButons[i].id != "curID)
+           {
+            allButons[i].style.backgroundColor = 'rgb(0, 194, 113)';
+            allButons[i].style.color = 'black';
+            allButons[i].style.border = 'none';
+           }
+        else {
+            allButons[i].style.backgroundColor = 'grey';
+            allButons[i].style.color = 'white';
+            allButons[i].style.border = '3px solid rgb(0, 194, 113)';
+        } 
+     }
+    
+    
     console.log("curID",curID);
     fetch('/leftpartREAD',{
         method: 'GET'
@@ -501,7 +520,7 @@ console.log("newItems",newItems);
 fetch('/run', {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({"allItemsForm": newItems})
+    body: JSON.stringify({"allItemsForm": newItems})
 })
 .then(function(response){ return response.json();})
 .then(function(json) {console.log(json);});
