@@ -3,16 +3,17 @@
 <head>
     <meta charset="utf-8" />
     <title>Postman</title>
-    <link  href="/css/style.css">
+    <link rel="stylesheet"  href="/css/style.css">
     <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon.png">
 </head>
 <body>
-  
+ 
 <div id="conteiner">
 <div name="left_conteiner" id="leftPart">
   
 </div>
 <div name="right_conteiner" id="rightPart">
+    <span style="opacity: 0;" id="idDelCen"></span>
    <table>
     <tr style="font-weight: bold;">
         <td style="width: 25%;">Метод</td>
@@ -39,11 +40,7 @@
             <td></td>
             <td></td>
         </tr>    
-      <!--  <tr>
-            <td><input name="newParam" type="text"></td>
-            <td><input name="newParamVal" type="text"></td>
-            <td><a style="color: red;" id="delItem1" href="">Удалить</a></td>
-        </tr> -->   
+  
     </table>
     <table id="toAddNewParam">
         <tr>
@@ -70,12 +67,7 @@
         <td style="font-weight: bold;">Заголовки</td>
         <td></td>
         <td></td>
-    </tr> 
- <!--    <tr style="height: 25px;">
-        <td><input name="reqHead" id="reqHead"></td>
-        <td> <input name="reqHeadVal" type="text"></td>
-        <td><a style="color: red;" id="delItem2">Удалить</a></td>
-    </tr> -->      
+    </tr>  
 </table> 
 <table>
     <tr>
@@ -86,8 +78,8 @@
     <tr>
         <td colspan="3">
             <div id="controlConfig">
-                <a style="color: dodgerblue; padding-right: 15px;" href="" id="changeItemLeftPart">&#10232; Изменить запрос</a>
-                <a style="color: dodgerblue;" href="" id="delItemLeftPart">&#215; Удалить запрос</a>
+                <input type="button" style="color: dodgerblue; padding-right: 15px; border: 0;" href="" id="changeItemLeftPart" value="&#10232; Изменить запрос"></input>
+                <input style="color: dodgerblue; border: 0;" href="" id="delItemLeftPart" value="&#215; Удалить запрос"></input>
             </div>
         </td>
         <td></td>
@@ -100,13 +92,16 @@
     </tr>
 </table> 
 
-    <div style="width: 98%; border: 1px solid grey;">
+    <div style="width: 98%; border: 1px solid grey;" id="resReq">
         <h2>Ответ на запрос</h2>
         <h3>Статус ответа: <span id="statusReq"></span></h3>
-        <h3>Заголовки ответа:</h3>
+        <h3>Ok: <span id="okReq"></span></h3>
+        <h3>Заголовки ответа: <span id="getHeadReq"></span></h3>
         <div id="headsReq"></div>
-        <h3>Тело ответа</h3>
-        <textarea name="bodyReq" id=""></textarea>
+       
+        <h3>Тело ответа: <br> <textarea style="width: 90%; height: 200px;" id="getBodyReq"></textarea></h3>
+        <iframe id="output" srcdoc="" style="width: 90%; height: 200px;"></iframe> 
+        <img src="" alt="preview" id="resPic">
     </div>
 </div>
 </div>    
@@ -121,19 +116,15 @@ document.addEventListener("DOMContentLoaded", () => {
   //      console.log(target.tagName);
         if (target.tagName != 'INPUT') return; // не на INPUT? тогда не интересует
         configToForm(target); // загрузить форму по нажатию на кнопку
-
 };
-//document.getElementById('delItem1').addEventListener("click", function(e){
-//    this.closest('tr').remove()});
- 
-//document.getElementById('delItem2').addEventListener("click", function(e){
-//    this.closest('tr').remove()});
-
-  });
+});
 
   function changeMet(){
+    document.getElementById('resReq').style.display = 'none';
+    document.getElementById('output').style.display = 'none';
+    document.getElementById('resPic').style.display = 'none';
     let method = document.getElementById('reqMethod').value;
-    console.log("method", method);
+  //  console.log("method", method);
     if(method === 'metGET')
    {
     document.getElementById('req_Body').style.display = 'none';
@@ -154,15 +145,15 @@ document.addEventListener("DOMContentLoaded", () => {
  }
  else if(method === 'metPatch') 
  {
-    document.getElementById('req_Body').style.display = 'block';
-    document.getElementById('toAddNewParam').style.display = 'block';
-    document.getElementById('tableParametr').style.display = 'block';
+    document.getElementById('req_Body').style.display = 'none';
+    document.getElementById('toAddNewParam').style.display = 'none';
+    document.getElementById('tableParametr').style.display = 'none';
  }
  else if(method === 'metOptions')   
  {
-    document.getElementById('req_Body').style.display = 'block';
-    document.getElementById('toAddNewParam').style.display = 'block';
-    document.getElementById('tableParametr').style.display = 'block';
+    document.getElementById('req_Body').style.display = 'none';
+    document.getElementById('toAddNewParam').style.display = 'none';
+    document.getElementById('tableParametr').style.display = 'none';
  }  
  return true;
 }
@@ -220,7 +211,7 @@ function addHead(e){
     return json;})
     .then(function(){
         let method = document.getElementById('reqMethod');
-        method.addEventListener('change',changeMet ,true);
+        method.addEventListener('change',changeMet ,false);
     })
     .then(console.log("Страница отстроена!"));
           
@@ -228,26 +219,20 @@ function addHead(e){
 function getUpdateItems(){
 let item0 = document.getElementById('reqMethod');
 var item1 = item0.options[item0.selectedIndex].innerHTML;
-console.log("item1", item1);
 let item2 = document.getElementById('textURL').value;
 let item3= new Array;
-//let item4 = new Array;
 let item6  = new Array;
-//let item7 = new Array;
+let item8 = document.getElementById('idDelCen').value;
 for(var i=0;i<document.getElementsByName('newParam').length; i++)
 {
-   // item3[i] = document.getElementsByName('newParam')[i].value;
-   // item4[i] = document.getElementsByName('newParamVal')[i].value;
     item3[i] ={[document.getElementsByName('newParam')[i].value] : document.getElementsByName('newParamVal')[i].value};
 }
 let item5 = document.getElementById('reqBody').value;
 for(var i=0;i<document.getElementsByName('reqHead').length; i++)
 {
     item6[i] = {[document.getElementsByName('reqHead')[i].value] : document.getElementsByName('reqHeadVal')[i].value} 
-   // item6[i] = document.getElementsByName('reqHead')[i].value;
-   // item7[i] = document.getElementsByName('reqHeadVal')[i].value;
 } 
-let item8;
+
 var allItems ={
     "item1":item1,
     "item2":item2,
@@ -282,7 +267,7 @@ let res = await  fetch('/leftpartWRITE',{
     .then(response = await fetch('/leftpartREAD', {method: 'GET'}))
     .then(response => response.json())
     .then(data = await response.json())
-    .then(console.log('Получили со /stat', data))
+    .then(console.log('Получили данные', data))
     .then(addNewButton(data, data.length-1));
 }
 
@@ -291,8 +276,8 @@ function addNewButton(itemsForm, x){
 let myLeft = document.getElementById('leftPart');
 let butLeft = document.querySelectorAll('#leftPart input');
 
-console.log('butLeft',butLeft);
-console.log('itemsForm',itemsForm);
+//console.log('butLeft',butLeft);
+//console.log('itemsForm',itemsForm);
 for(var i = x; i < itemsForm.length; i++)
     {
     let newBut = document.createElement('input');            
@@ -301,12 +286,10 @@ for(var i = x; i < itemsForm.length; i++)
     newBut.value = 
    `Метод: ${itemsForm[i]['method']}
     URL: ${itemsForm[i].url}`;
-    //newBut.innerHTML = itemsForm[i]["method"] + itemsForm[i].url;
     newBut.className = 'for_button';
     newBut.id = "idItem" + itemsForm[i]["num"];
     myLeft.appendChild(newBut);
     myLeft.appendChild(newBr); 
-   // console.log(newBut.value);
     }
     var a = changeMet();
    
@@ -335,7 +318,7 @@ function configToForm(input){
      }
     
     
-    console.log("curID",curID);
+    
     fetch('/leftpartREAD',{
         method: 'GET'
     })
@@ -344,12 +327,13 @@ function configToForm(input){
         let itemsForm = json;
         for(var i=0; i<itemsForm.length; i++)
            {
-            console.log(itemsForm[i]['num'], parseInt(curID),curID);
+          //  console.log(itemsForm[i]['num'], parseInt(curID),curID);
             if(itemsForm[i]['num'] === parseInt(curID)) 
               var curIdEl = i;
            }
    // console.log(itemsForm, curIdEl, itemsForm[curIdEl]);
     //заполнили форму: метод, урл, боди
+    console.log("curID",curID);
    let selectLen = document.getElementById('reqMethod').options.length;
    for(var i=0; i < selectLen; i++)
     {
@@ -360,13 +344,13 @@ function configToForm(input){
     //document.getElementById('reqMethod').options[document.getElementById('reqMethod').selectedIndex].innerHTML = itemsForm[curIdEl]['method'];
     document.getElementById('textURL').value = itemsForm[curIdEl]['url'];
     document.getElementById('reqBody').innerHTML = itemsForm[curIdEl]['body'];
-
+    document.getElementById('idDelCen').innerHTML = itemsForm[curIdEl]['num'];
     //подготовили форму под нужное количество параметров и заполнили
     let param = JSON.parse(itemsForm[curIdEl]['param']);
     let paramLen = Object.keys(JSON.parse(itemsForm[curIdEl]['param'])).length;
     let tdLen = document.getElementsByName('newParam').length;
 
-    console.log("paramLen", paramLen, tdLen);
+   // console.log("paramLen", paramLen, tdLen);
     if(paramLen > tdLen){
         let countNewTd = paramLen - tdLen;
         for(var i = 0; i<countNewTd; i++)
@@ -380,7 +364,7 @@ function configToForm(input){
     for(var i=0; i<param.length; i++)
     {
     for(param[i].key in param[i]){
-        console.log("key", param[i].key, param);
+     //   console.log("key", param[i].key, param);
         document.getElementsByName('newParam')[i].value = param[i].key;
         document.getElementsByName('newParamVal')[i].value = param[i][param[i].key];
       //  i++;
@@ -389,8 +373,7 @@ function configToForm(input){
     let objHead = JSON.parse(itemsForm[curIdEl]['head']);
     let objHeadLen = Object.keys(JSON.parse(itemsForm[curIdEl]['head'])).length;
     let tdHeadLen = document.getElementsByName('reqHead').length;
-    console.log("objHeadLen",objHeadLen);
-    console.log(objHeadLen, tdHeadLen,tdHeadLen);
+
     if(objHeadLen > tdHeadLen){
         let countNewTd = objHeadLen - tdHeadLen;
         for(var i = 0; i<countNewTd; i++)
@@ -404,23 +387,28 @@ function configToForm(input){
     for(var i=0; i<objHead.length; i++)
     {
     for(objHead[i].key in objHead[i]){
-        console.log(objHead[i].key, objHead);
+     //   console.log(objHead[i].key, objHead);
         document.getElementsByName('reqHead')[i].value = objHead[i].key;
         document.getElementsByName('reqHeadVal')[i].value = objHead[i][objHead[i].key];
     }}
     document.getElementById('controlConfig').style.opacity = 1;
     let linkCh = document.querySelector("#changeItemLeftPart");
-        linkCh.addEventListener("click", (event) => {addFetchChange(curID);});
+        linkCh.addEventListener("click", (event) => {addFetchChange();});
     let linkDel = document.querySelector("#delItemLeftPart");
-        linkDel.addEventListener("click", (event) => {addFetchDel(curID);});
+        linkDel.addEventListener("click", (event) => {addFetchDel();});
     });
     var a = changeMet();
+    //curID=0;
 }
 //***внесли изменения в запрос
-async function addFetchChange(num){
+async function addFetchChange(event){
+   // e.preventDefault;
+         
     let newItems = getUpdateItems();
     //console.log(newItems);
     //alert(item1);
+ 
+    let num = document.getElementById('idDelCen').innerHTML;
     let res = await fetch('/change',{
         method: 'POST',
         headers: { "Content-Type": "application/json" },
@@ -434,43 +422,146 @@ async function addFetchChange(num){
         "allItemsForm": newItems,
         "num": num})
     })
-    .then(console.log('Внесены изменения в запрос'));
-    document.querySelector("#changeItemLeftPart").removeEventListener('click',addFetchChange);
+    .then(console.log('Внесены изменения в запрос v' , num));
+     fetch('/leftpartREAD',{
+        method: 'GET'
+    })
+    .then(function(response){ return response.json();})
+    .then(function(json) {
+        let itemsForm = json;
+        let myLeft = document.getElementById('leftPart');
+        let butLeft = document.querySelectorAll('#leftPart input');
+
+        for(var i = 0; i < butLeft.length; i++)
+            {
+            butLeft[i].value = 
+            `Метод: ${itemsForm[i]['method']}
+            URL: ${itemsForm[i].url}`;
+            butLeft[i].className = 'for_button';
+            butLeft[i].id = "idItem" + itemsForm[i]["num"];
+            }
+            })
 }
 //****удалили запрос
-async function addFetchDel(num){
+async function addFetchDel(){
+
+let num = document.getElementById('idDelCen').innerHTML;
     let res = await fetch('/delete',{
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({"num": num})
     })
-    .then(console.log('Запрос удален'));
-    document.querySelector("#delItemLeftPart").removeEventListener('click',addFetchDel);
-}
-//****очистка формы
-function clearForm(){
+    .then(console.log('Запрос № '+ num +'удален'));
     fetch('/leftpartREAD',{
         method: 'GET'
     })
     .then(function(response){ return response.json();})
     .then(function(json) {
-        addNewButton(json, 0)
-    return json;})
-    .then(console.log("Страница отстроена!"));
+        let itemsForm = json;
+        let myLeft = document.getElementById('leftPart');
+        let butLeft = document.querySelectorAll('#leftPart input');
+        if(itemsForm.length < butLeft.length)
+            butLeft[0].remove();
+        for(var i = 0; i < itemsForm.length; i++)
+            {
+            butLeft[i].value = 
+            `Метод: ${itemsForm[i]['method']}
+            URL: ${itemsForm[i].url}`;
+            butLeft[i].className = 'for_button';
+            butLeft[i].id = "idItem" + itemsForm[i]["num"];
+            }
+            clearForm();
+            })
+}
+
+
+//****очистка формы
+function clearForm(){
+    if(document.querySelector('#rightPart  #textURL').value != '')
+      document.querySelector('#rightPart  #textURL').value = '';
+    if(document.querySelectorAll('#rightPart  #tableParametr  input').length > 0)    
+      {   
+        var a = document.querySelectorAll('#rightPart  #tableParametr  input');
+            if(a.length >0)  
+            {
+            for(var i=0; i<a.length; i++)
+                a[i].value = '';
+       }}
+
+    if(document.querySelector('#rightPart  #req_Body  textarea').value !='')
+        document.querySelector('#rightPart  #req_Body  textarea').value = '';    
+    if(document.querySelectorAll('#rightPart  #tableHeaders  input').length > 0)    
+        {
+        var b = document.querySelectorAll('#rightPart  #tableHeaders  input');
+        if(b.length > 0)  
+        {
+        for(var i=0; i<b.length; i++)
+            b[i].value = '';
+        }}
+
+    if( document.querySelectorAll('#rightPart  #resReq  span').length > 0)
+        {
+        var c = document.querySelectorAll('#rightPart  #resReq  span');
+        if(c.length > 0)  
+        {
+        for(var i=0; i<c.length; i++)
+            c[i].value = '';
+        }}
+
+    if(document.querySelector('#rightPart  #resReq  textarea'))
+        document.querySelector('#rightPart  #resReq  textarea').innerHTML = ''; 
 }
 
 function newReq(){
+    document.getElementById('resReq').style.display = 'block';    
 let newItems = getUpdateItems();    
-console.log("newItems",newItems);
+let fBody = document.getElementById("textBody");
+let newStr='</br>';
+//console.log("newItems",newItems);
 fetch('/run', {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({"allItemsForm": newItems})
 })
-.then(function(response){ return response.json();})
-.then(function(json) {console.log(json);});
+.then(function(response){return response.json();})
+.then(function(json){
+    let getItems = json;
+    //console.log("getItems", getItems['hd'].length, getItems['hd'][0]);
+    document.getElementById('statusReq').innerHTML = getItems['st'];
+    document.getElementById('okReq').innerHTML = getItems['ok'];
+    if(getItems['hd'])
+    for(var i=0;i< getItems['hd'].length; i=i+2){
+        newStr= newStr + getItems['hd'][i] +' - ' + getItems['hd'][i+1] + ';' + '</br>';
+    }
+    document.getElementById('getHeadReq').innerHTML=newStr;
+    document.getElementById('getHeadReq').style.color = 'blue';
+    if(newStr.includes("content-type - text/html")) //HTML? делаем превью страницы
+    {
+        document.getElementById('output').style.display = 'block';
+        document.getElementById('resPic').style.display = 'none';
+        document.getElementById('getBodyReq').innerHTML = getItems['body'];
+        var x = document.getElementById('getBodyReq').value;
+        document.getElementById("output").srcdoc  = "<!doctype html> <html>" + x + "</html>";
+    }    
+    else if(newStr.includes("content-type - image/")) //картинка? делаем превью страницы
+    {
+        document.getElementById('resPic').style.display = 'block';
+        document.getElementById('output').style.display = 'none';
+        document.getElementById('getBodyReq').innerHTML = getItems['body'];
+        document.getElementById('resPic').src = getItems['body'];
+    }    
+    else
+    {
+        document.getElementById('resPic').style.display = 'none';
+        document.getElementById('output').style.display = 'none';
+        document.getElementById('getBodyReq').innerHTML = getItems['body'];
+    }    
+});
+
 }
+
 </script>
 
 </html>
+
 
