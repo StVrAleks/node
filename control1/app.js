@@ -1,4 +1,3 @@
-
 const http = require("http");
 const fs = require("fs");
 const express = require("express"); // получаем модуль express
@@ -204,8 +203,8 @@ app.post("/run", jsonParser, cors(CORSOptions), async function (request, respons
         }  
       response.send(resItem);           
       }    
-      catch{
-        console.log('error /RUN', error);
+      catch(er){
+        console.log('error /RUN', er);
       }
     });      
 
@@ -215,11 +214,11 @@ async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
     let h= new Array, b= new Array;
     var i =0;          
   try{
-      let res = await fetch(reqUrl.replaceAll('"', ""),{
-        method: reqMethod.replaceAll('"', ""),
+      let res = await fetch(reqUrl.replaceAll(/"/g, ""),{
+        method: reqMethod.replaceAll(/"/g, ""),
         redirect: 'manual',
         headers: reqHead,
-        body: reqBody.replaceAll('"', "")
+        body: reqBody.replaceAll(/"/g, "")
       });
       for(header of res.headers)
         {
@@ -244,8 +243,8 @@ async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
       resObj.ok = await res.ok;
       return await resObj; 
   }
-  catch{
-    console.log('postReq error', error);
+  catch(er){
+    console.log('postReq error', er);
   }  
   }
 
@@ -255,8 +254,8 @@ async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
     let resObj = {};
     let h= new Array, b= new Array;
     var i =0;     
-    let reqUrl = freqUrl.replaceAll('"', "");
-    let reqMethod = freqMethod.replaceAll('"', "");
+    let reqUrl = freqUrl.replaceAll(/"/g, "");
+    let reqMethod = freqMethod.replaceAll(/"/g, "");
     let reqHead = freqHead;
   try{
      console.log('for fetch',reqUrl,reqMethod,reqHead);
@@ -294,49 +293,13 @@ async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
         console.log("resObj.hd",resObj.hd);
         return await resObj;
   }
-   catch
+   catch(er)
    {
-    console.log(' getReqerror', error);
+    console.log(' getReqerror', er);
    } 
     
     } 
- /*
- async function sendRes(res) {
-  let resObj = {};
-  let h= new Array, b= new Array;
-  var i =0;  
-  try{   
-      for(header of res.headers)
-        {
-          h[i] = header[0];
-          h[i+1] = header[1];
-          if(h[i] === "content-type")
-            var rT = h[i+1];
-          i= i+2;
-        } 
-    if(rT.includes('image'))   //если возвращается картинка
-     {
-      const arrayBuffer = await res.arrayBuffer();
-      const base64data = Buffer.from(arrayBuffer).toString("base64");
-      const dataUrl = `data:${res.headers.get("content-type")};base64,${base64data}`
-      const pic = JSON.stringify(dataUrl, null, 2);
-      console.log(dataUrl);
-      resObj.body = JSON.parse(pic);
-     }
-     else //если возвращается не картинка
-      resObj.body = await readBody(res.body, res.headers); 
-
-      resObj.st = await res.status;
-      resObj.hd = h;
-      resObj.ok = await res.ok;
-      console.log("resObj.hd",resObj.hd);
-      return await resObj;
- }
- catch{
-  console.log('sendRes error');
-  return resObj;
- }  
- } */  
+ 
 async function readBody(data, hed){
     const reader = data.getReader();//await res.body;
     const contentLength = +hed.get('Content-Length');
@@ -363,4 +326,3 @@ async function readBody(data, hed){
     return result;
     }
 app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
-
