@@ -1,25 +1,29 @@
+
 const http = require("http");
 const fs = require("fs");
 const express = require("express"); // получаем модуль express
 const app = express();// создаем приложение express
-const cors = require('cors');
-
+//const cors = require('cors');
+/*
 var CORSOptions = {
   origin: '*',
   optionsSuccessStatus: 200,
  // AccessControlAllowOrigin: 'No',
-};
+};*/
 //cors(CORSOptions)
 
 const urlencodedParser = express.urlencoded({extended: true});
 const mime = require('mime');
 
-const jsonParser = express.json();
-app.use(express.urlencoded({ extended: true }));
 
 const path = require('path');
-const { forEach } = require("lodash");
+//const { forEach } = require("lodash");
 const { error } = require("console");
+const fetch = require('node-fetch');
+//const Readable = require('node:stream');
+//const fetch = require("fix-esm").require('node-fetch');
+const jsonParser = express.json();
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/page", function (_, response) {
@@ -156,7 +160,7 @@ app.options('/run',(request, response)=>{
   response.send("");
 }
 );
-app.post("/run", jsonParser, cors(CORSOptions), async function (request, response) {
+app.post("/run", jsonParser, async function (request, response) {
   let resItem = '';
       if(!request.body) return response.sendStatus(400);
     try{      
@@ -170,21 +174,21 @@ app.post("/run", jsonParser, cors(CORSOptions), async function (request, respons
       let reqBody = JSON.stringify(reqItems['item5']);
       let reqHead0 = JSON.stringify(reqItems['item6']);
       let reqHead = Object.assign({}, reqHead0);
-      console.log(reqMethod,reqParam );
-      console.log('items', reqItems);
+   //   console.log(reqMethod,reqParam );
+   //   console.log('items', reqItems);
       
       if(reqMethod === '"GET"')
       {
-        console.log('v get');
+     //   console.log('v get');
         if(!reqParam)
         {
           for(key in reqParam)
             var strParam = strParam + key + '=' + reqParam[key] + '&';
           reqUrl= reqUrl + '?'+ strParam;
         }  
-        console.log('reqParam', reqUrl, reqMethod, reqHead);
+      //  console.log('reqParam', reqUrl, reqMethod, reqHead);
         resItem = await getReq(reqUrl, reqMethod, reqHead); 
-        console.log('resItem', resItem);   
+    //    console.log('resItem', resItem);   
       }
       else if(reqMethod === '"POST"')
       {
@@ -209,16 +213,21 @@ app.post("/run", jsonParser, cors(CORSOptions), async function (request, respons
     });      
 
 //*******POST */
-async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
-    let resObj = {};
+async function postReq(freqUrl, freqMethod, freqHead, freqBody) {
+  try{ 
+  let resObj = {};
     let h= new Array, b= new Array;
-    var i =0;          
-  try{
-      let res = await fetch(reqUrl.replaceAll(/"/g, ""),{
-        method: reqMethod.replaceAll(/"/g, ""),
+    var i =0;    
+    let reqUrl = freqUrl.split('"').join("");
+    let reqMethod = freqMethod.split('"').join("");
+    let reqHead = freqHead;    
+    let reqBody = freqBody.split('"').join("");
+ 
+      let res = await fetch(reqUrl, {
+        method: reqMethod,
         redirect: 'manual',
         headers: reqHead,
-        body: reqBody.replaceAll(/"/g, "")
+        body: reqBody
       });
       for(header of res.headers)
         {
@@ -254,17 +263,19 @@ async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
     let resObj = {};
     let h= new Array, b= new Array;
     var i =0;     
-    let reqUrl = freqUrl.replaceAll(/"/g, "");
-    let reqMethod = freqMethod.replaceAll(/"/g, "");
+ try{ 
+    //  let reqUrl = freqUrl.replaceAll(/"/g, "");
+    let reqUrl = freqUrl.split('"').join("");
+  // let reqMethod = freqMethod.replaceAll(/"/g, "");
+    let reqMethod = freqMethod.split('"').join("");
     let reqHead = freqHead;
-  try{
-     console.log('for fetch',reqUrl,reqMethod,reqHead);
-      let res = await fetch(reqUrl,{
+    // console.log('for fetch',reqUrl,reqMethod,reqHead);
+      let res = await fetch(freqUrl.split('"').join(""),{
       method: reqMethod,
       redirect: 'manual',
       headers: reqHead
     });
-    console.log('posle fetch');
+   // console.log('posle fetch');
     for(header of res.headers)
           {
             h[i] = header[0];
@@ -273,7 +284,7 @@ async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
               var rT = h[i+1];
             i= i+2;
           } 
-      console.log('head', h);    
+  //    console.log('head', h);    
       if(rT.includes('image'))   //если возвращается картинка
        {
         console.log('if img');
@@ -282,47 +293,42 @@ async function postReq(reqUrl, reqMethod, reqHead, reqBody) {
         const dataUrl = `data:${res.headers.get("content-type")};base64,${base64data}`
         const pic = JSON.stringify(dataUrl, null, 2);
         resObj.body = JSON.parse(pic);
-        console.log('resObj.body', resObj.body);
+     //   console.log('resObj.body', resObj.body);
        }
        else //если возвращается не картинка
         resObj.body = await readBody(res.body, res.headers); 
-  
         resObj.st = await res.status;
         resObj.hd = h;
         resObj.ok = await res.ok;
-        console.log("resObj.hd",resObj.hd);
         return await resObj;
   }
-   catch(er)
-   {
+  catch(er)
+  {
     console.log(' getReqerror', er);
-   } 
+  } 
     
     } 
  
-async function readBody(data, hed){
-    const reader = data.getReader();//await res.body;
-    const contentLength = +hed.get('Content-Length');
-    let chunks = []; 
-    let receivedLength = 0;
-    while(true) {
-  // done становится true в последнем фрагменте
-  // value - Uint8Array из байтов каждого фрагмента
-  const {done, value} = await reader.read();
-
-    if (done) {
-      break;
+async function readBody(data){
+ try{
+  const chunks = [];
+    const buffers = []; // буфер для получаемых данных
+    for await (const chunk of data) {
+      buffers.push(chunk);        // добавляем в буфер все полученные данные
     }
-    chunks.push(value);
-    receivedLength += value.length;
-    }
-    let chunksAll = new Uint8Array(receivedLength);
+    const chunksAll = Buffer.concat(buffers);
     let position = 0;
     for(let chunk of chunks) {
-      chunksAll.set(chunk, position); // (4.2)
+      chunksAll.set(chunk, position); 
       position += chunk.length;
-    } 
+    }
     let result = new TextDecoder("utf-8").decode(chunksAll);
+
+    console.log("result");
     return result;
+ }
+ catch(er){
+  console.log(' getReqerror', er);
+ }  
     }
 app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
