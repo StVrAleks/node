@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Postman</title>
+    <link rel="stylesheet"  href="/css/style.css">
+    <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon.png">
+   </head>
+<body>
+ 
+<div id="conteiner">
+   
+ <div name="left_conteiner" id="leftPart">
+   {{{leftPart}}}
+</div>
+
+<div name="right_conteiner" id="rightPart">
+    <span style="opacity: 0;" id="idDelCen"></span>
+   <table>
+    <tr style="font-weight: bold;">
+        <td style="width: 25%;">Метод</td>
+        <td colspan ='2'>URL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><select name="reqMethod" id="reqMethod">
+            <option value="metGET">GET</option>
+            <option value="metPost">POST</option>
+            <option value="metUpdate">UPDATE</option>
+            <option value="metPatch">PATCH</option>
+            <option value="metOptions">OPTIONS</option>
+        </select></td>
+        <td colspan ='2' style="width: 75%;"><input id="textURL" name="textURL" type="text" placeholder="URL"></td>
+        <td></td>
+    </tr>
+   </table>
+
+   <table>
+    <table id="tableParametr">
+        <tr style="height: 25px;">
+            <td style="font-weight: bold;">Параметр</td>
+            <td></td>
+            <td></td>
+        </tr>    
+  
+    </table>
+    <table id="toAddNewParam">
+        <tr>
+            <td><a style="color: green; line-height: 25px;" id="addParamInTable" onclick="addParams(event);" href="">Добавить параметр</a></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table> 
+ </table>  
+    <table id="req_Body">
+        <tr style="height: 25px;">
+            <td style="font-weight: bold;">Тело запроса</td>
+            <td></td>
+            <td></td>
+        </tr> 
+        <tr style="height: 25px;">
+            <td colspan="3"><textarea name="reqBody" id="reqBody" style="width: 100%;">{}</textarea></td>
+            <td></td>
+            <td></td>
+        </tr>       
+</table>   
+<table id="tableHeaders">
+    <tr style="height: 25px;">
+        <td style="font-weight: bold;">Заголовки</td>
+        <td></td>
+        <td></td>
+    </tr>  
+</table> 
+<table>
+    <tr>
+        <td><a style="color: green; line-height: 25px;" id="addHeaderInTable" onclick="addHead(event);" href="">Добавить заголовок</a></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div id="controlConfig">
+                <input type="button" style="color: dodgerblue; padding-right: 15px; border: 0;" href="" id="changeItemLeftPart" value="&#10232; Изменить запрос"></input>
+                <input style="color: dodgerblue; border: 0;" href="" id="delItemLeftPart" value="&#215; Удалить запрос"></input>
+            </div>
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr style="height: 35px;">
+        <td style="width: 33%;"><button id="reqSave" onclick="addnewfetch();">Сохранить запрос</button></td>
+        <td style="width: 33%;"><button id="reqRes" onclick="newReq();">Отправить запрос</button></td>
+        <td style="width: 33%;"><button id="clearF" onclick="clearForm();">Очистить форму</button></td>
+    </tr>
+</table> 
+
+    <div style="width: 98%; border: 1px solid grey;" id="resReq">
+        <h2>Ответ на запрос</h2>
+        <h3>Статус ответа: <span id="statusReq"></span></h3>
+        <h3>Ok: <span id="okReq"></span></h3>
+        <h3>Заголовки ответа: <span id="getHeadReq"></span></h3>
+        <div id="headsReq"></div>
+       
+        <h3>Тело ответа: <br> <textarea style="width: 90%; height: 200px;" id="getBodyReq"></textarea></h3>
+        <iframe id="output" srcdoc="" style="width: 90%; height: 200px;"></iframe> 
+        <img src="" alt="preview" id="resPic">
+    </div>
+</div>
+</div>    
+</body>
+ <script src="/mainscript.js"></script>
+</html>
