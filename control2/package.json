@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "cjs-loader": "^0.1.0",
+    "express": "^5.1.0",
+    "lodash": "^4.17.21",
+    "node-events": "0.0.2",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "node-loader": "^2.1.0"
+  }
+}
