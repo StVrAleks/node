@@ -1,27 +1,43 @@
-const http = require("http");
 const fs = require("fs");
 const zlib = require("zlib");
-//const readline = require('readline-sync');
+const readline = require('readline-sync');
 
 
 let filesInfo = {'file':{}, 'stat':{}, 'name':{}, 'format':{}};
-let path = 'C:/Users/Sotnikova_VA.MOGISPIN/Desktop/node/node/node/control2/compres/'; //work
+let path = '';
 letStart();
 
 async function letStart(){
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+  });
+console.log('3');
+rl.question('Укажите путь до папки для автокомпрессора, включая имя папки: ', (answer) => {
+  path = answer;
+  let lastItem = answer.substr(answer.length - 1);
+  if(lastItem === '/')
+    path = answer.substr(0, answer.length - 1);
+  // TODO: Log the answer in a database
+ // console.log(`Thank you for your valuable feedback: ${answer}`);
+
+  rl.close();
+});
+
 await getFiles();
 }
 
 function getFiles(){
- let items ='';
-
  console.log('Я зашел в папку');
     fs.readdir(__dirname + "/compres", function(error,data) {
+    //fs.readdir(path, function(error,data) {
       if (error) throw error; 
       console.log('В папке найдены файлы:', data);
       for(var i=0; i<data.length; i++)
         {
           var file = __dirname + "/compres/" + data[i];
+          //var file = path + "/" + data[i];
           filesInfo['file'][i] = data[i];
           filesInfo['name'][i] = data[i].substring(0, data[i].indexOf("."));
           filesInfo['format'][i] = data[i].slice(data[i].lastIndexOf(".") + 1);
@@ -42,25 +58,47 @@ function generate_callback(file, i, Objlen){
 }
 
 function workWithFiles(){
- console.log('super!', filesInfo['file'].length, filesInfo);
-  let currentName;
  for(var i in filesInfo["file"])
  {
-  console.log('super!', filesInfo["name"][i]);
     if(filesInfo['format'][i] != 'gz')
     {
+     console.log('Работаем с файлом', filesInfo["name"][i]);
       console.log('Есть ли архив у файла '+ filesInfo["name"][i] + "?");
       var step1 = nameInGz(filesInfo["name"][i]);
       if(step1 != false)
         var step2 = dateGz(filesInfo["stat"][i], filesInfo["stat"][step1]);
       if(step2 === true)
-        var step3 = delFiles(filesInfo["file"][step1]);
-        //console.log('Удаляем устаревший архив');
+        var step3 = delFiles(filesInfo["file"][step1]); //Зачем удалять, если он заменится?
       if(step2 === true || step1 === false)
         addInGz(filesInfo["file"][i]);
-       // console.log('делаем новый архив');
     }  
  } 
+//проверка на наличие архивов без исходного файла
+for(var i in filesInfo["file"])
+ {
+    if(filesInfo['format'][i] === 'gz')
+    {
+      for(var j in filesInfo["file"])
+      {
+        if(filesInfo['format'][j] != 'gz' && filesInfo['name'][j] === filesInfo['name'][i])
+            {
+              filesInfo['name'][j] = 'x'; //нашли пары файл - его архив
+              filesInfo['name'][i] = 'x'; //имена проверенных файлов заменили на "х"
+              break;
+            }
+      } 
+      
+    }  
+ } 
+for(var i in filesInfo["file"])
+  {
+    if(filesInfo['name'][i] != 'x')
+    {
+      console.log("Найден архив без исходного файла", filesInfo['file'][i]);
+      delFiles(filesInfo["file"][i]);
+    }  
+  }     
+
 }
 
 function nameInGz(currentName){
@@ -92,9 +130,12 @@ function dateGz(currentStat, step1Stat){
 
 function delFiles(nameFile){
   try{
-  var file = "/compres/" + nameFile;
-  fs.rmЫнтс( __dirname + file);
-  console.log('Устаревший архив ' + nameFile + ' удален.');
+    var file = "/compres/" + nameFile;
+   // fs.unlink(path + '/' + file, (error) => {
+    fs.unlink(__dirname + file, (error) => {
+      if(error) console.log("Ошибка на этапе удаления архива", error);
+    }); 
+    console.log('Устаревший архив ' + nameFile + ' удален.'); 
   }
   catch(err){
     console.log("Возникла ошибка " + err + " на этапе удаления файла " + nameFile);
@@ -103,7 +144,7 @@ function delFiles(nameFile){
 
 function addInGz(nameFile){
 try{
-  console.log('делаем новый архив');
+  console.log('Новый архив создан для файла ', nameFile);
   var file = "/compres/" + nameFile;
   const readableStream = fs.createReadStream(__dirname + file); 
   const writeableStream = fs.createWriteStream(__dirname + file +".gz");
@@ -115,15 +156,4 @@ catch(err){
 }
 }
 
-/*
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-console.log('3');
-rl.question('What do you think of Node.js? ', (answer) => {
-  // TODO: Log the answer in a database
-  console.log(`Thank you for your valuable feedback: ${answer}`);
 
-  rl.close();
-});*/
