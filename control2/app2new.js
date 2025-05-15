@@ -67,6 +67,7 @@ function workWithFiles(){
     }  
  } 
 //проверка на наличие архивов без исходного файла
+let flagok = 0;
 for(var i in filesInfo["file"])
  {
     if(filesInfo['format'][i] === 'gz')
@@ -77,15 +78,17 @@ for(var i in filesInfo["file"])
             {
               filesInfo['name'][j] = 'x'; //нашли пары файл - его архив
               filesInfo['name'][i] = 'x'; //имена проверенных файлов заменили на "х"
+              flagok = 1;
               break;
             }
       } 
       
     }  
  } 
+
 for(var i in filesInfo["file"])
   {
-    if(filesInfo['name'][i] != 'x')
+    if(filesInfo['name'][i] != 'x' && flagok === 1)
     {
       console.log("Найден архив без исходного файла", filesInfo['file'][i]);
       delFiles(filesInfo["file"][i]);
@@ -141,8 +144,8 @@ try{
  // var file = "/compres/" + nameFile;
   //const readableStream = fs.createReadStream(__dirname + file); 
  // const writeableStream = fs.createWriteStream(__dirname + file +".gz");
-  const readableStream = fs.createReadStream(path + '/' + file); 
-  const writeableStream = fs.createWriteStream(path + '/' + file +".gz");
+  const readableStream = fs.createReadStream(path + '/' + nameFile); 
+  const writeableStream = fs.createWriteStream(path + '/' + nameFile +".gz");
   const gzip = zlib.createGzip();
   readableStream.pipe(gzip).pipe(writeableStream);
 }
@@ -150,6 +153,4 @@ catch(err){
   console.log("Возникла ошибка " + err + " на этапе создания архива " + nameFile);
 }
 }
-
-
 
