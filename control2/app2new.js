@@ -4,130 +4,90 @@ const fs = require("fs");
 
 /*let objFiles = {};
 let objArh = {};*/ 
-let filesInfo = {'objFiles':'', 'objArh': ''};
+let filesInfo = {'file':{}, 'stat':{}, 'name':{}, 'format':{}};
 let allItems;
+let flag = 0;
 letStart();
 
 async function letStart(){
-let allF= await getFiles();
+await getFiles();
 }
 
-
-
-async function getFiles(){
+function getFiles(){
  let items ='';
+ let path = 'C:/Users/Sotnikova_VA.MOGISPIN/Desktop/node/node/node/control2/compres/'; //work
  console.log('Я зашел в папку');
- new Promise((resolve, reject) =>{
     fs.readdir(__dirname + "/compres", function(error,data) {
-    if (error) throw error; 
-   // items = data;
-    console.log('В папке найдены файлы:', data);
-    return resolve(data);  
-    })})
-    .then(resolve =>{
-      allItems = resolve;
-      console.log('tyt', allItems);
-      let objInfo = getFilesData(allItems);
-
-    });
+      if (error) throw error; 
+      console.log('В папке найдены файлы:', data);
+      for(var i=0; i<data.length; i++)
+        {
+          var file = __dirname + "/compres/" + data[i];
+          filesInfo['file'][i] = data[i];
+          filesInfo['name'][i] = data[i].substring(0, data[i].indexOf("."));
+          filesInfo['format'][i] = data[i].slice(data[i].lastIndexOf(".") + 1);
+          console.log("Получили сведения о" + file);
+          fs.stat(file, generate_callback(file, i, data.length-1));
+        }
+    })
 }
 
-async function getFilesData(allItems){
-console.log('Hадо обработать следующие файлы', allItems);
-var dateFile = new Array;
- for(i=0; i<allItems.length;i++)
-  { 
-  console.log(i);
-  var nStr = allItems[i]; 
- new Promise((resolve, reject) =>{
-      fs.stat(__dirname + "/compres/" + allItems[i], function(error,stat){
-        if(error) {  return console.log(error);  } // если возникла ошибка 
-        dateFile[i]  = stat.mtime;
-        return resolve(stat.mtime);
-      })})
-      .then(resolve =>  {
-        console.log(dateFile);
-        if(nStr.includes('.gz'))
-          filesInfo.objArh[i] = {[i]:[allItems[i]], [i]:[resolve]};
-        else
-          filesInfo.objFiles[i] = {[i]:[allItems[i]], [i]:[resolve]};
-        console.log('выводим считанные данные',i, resolve);   // выводим считанные данные 
-        console.log('info',filesInfo);
-        });
-//var namePr = namePr +"newName" + i+ ',';
+function generate_callback(file, i, Objlen){
+  return function(err, stats){
+    console.log(file);
+    filesInfo['stat'][i] = stats['mtime'];
+    console.log(filesInfo);    
+    if(Objlen === i) 
+       workWithFiles();
+  }
 }
 
-/*namesPr ='['+ namesPr.substring(0, namesPr.length-1) + "]";
-console.log("namePr", namesPr);
-Promise.all(namesPr).then((values) => {
-  console.log(values);
-}); */
-
+function workWithFiles(){
+ console.log('super!', filesInfo['file'].length, filesInfo);
+  let currentName;
+ for(var i in filesInfo["file"])
+ {
+  console.log('super!', filesInfo["name"][i]);
+    if(filesInfo['format'][i] != 'gz')
+    {
+      console.log('Есть ли архив у файла '+ filesInfo["name"][i] + "?");
+      var step1 = nameInGz(filesInfo["name"][i]);
+      if(step1 != false)
+        var step2 = dateGz(filesInfo["stat"][i], filesInfo["stat"][step1]);
+      if(step2 === true)
+        console.log('Удаляем устаревший архив');
+      if(step2 === true || step1 === false)
+        console.log('делаем новый архив');
+    }  
+ } 
 }
 
-/*const http = require("http");
-const fs = require("fs");
-const readline = require('readline-sync');
-
-let objFiles = {};
-let objArh = {};
-/*fs.readdir(__dirname + "/compres", function(error,data) {
-  if (error) throw error;
-  
-  console.log(data);
- */
-/*let allFiles = getFiles();
-/*fs.readdir(__dirname + "/compres", function(error,data) {
-  if (error) throw error;
-  console.log('ddd',data);  
-   allFiles = data;
-
- //  return items; 
-  });*/
-/*console.log('aaa',allFiles);
-for(var i=0; i< allFiles.length; i++)
-{
-  var nStr = allFiles[i];
-   fs.stat(__dirname + "/compres/" + allFiles[i], function(error,stat){
-    if(error) {  // если возникла ошибка
-        return console.log(error);
-    }
-    if(nStr.includes('gz'))
-     objArh[i] = {[allFiles[i]]:'', [stat.mtime]:''};
-    else
-    objFiles[i] = {[allFiles[i]]:'',  [stat.mtime]:''};
-  console.log(stat.mtime);   // выводим считанные данные 
-  });
+function nameInGz(currentName){
+  for(var i=0; i<filesInfo.length; i++)
+  {
+    if(filesInfo['format'][i] === 'gz' && currentName === filesInfo['name'][i])
+      {
+      console.log('Архив существует');
+      return i;
+      }
+  } 
+ console.log('Архив не найден'); 
+ return false;
 }
-   
-  
- // console.log(nStr);
-/*if(nStr.includes('gz'))
-     objArh[i] = {[data[i]]:''};
-else
-    objFiles[i] = {[data[i]]:''};
-}*/
-/*console.log('objFiles',objFiles); 
-//});
 
-
-async function getFiles(){
-let items ='';
- await fs.readdir(__dirname + "/compres", function(error,data) {
-  if (error) throw error;
-   items = data;
-  console.log('asda',data);
-  // return items; 
-  });
-  return await data;
-
+function dateGz(currentStat, step1Stat){
+ console.log('Сравниваю даты модификации файлов:', currentStat, " ",step1Stat);
+  if(currentStat > step1Stat)
+   {
+    console.log('Архивная версия устарела:');
+    return true;
+   }
+   else
+   {
+    console.log('Архивная версия ok');
+    return false;
+   }
 }
-/*fs.readFile(__dirname + "/compres", function(error,data){
-    if(error) {  // если возникла ошибка
-        return console.log(error);
-    }
-    console.log(data.toString());   // выводим считанные данные
-});*/
 
 /*
 const rl = readline.createInterface({
@@ -141,3 +101,4 @@ rl.question('What do you think of Node.js? ', (answer) => {
 
   rl.close();
 });*/
+
