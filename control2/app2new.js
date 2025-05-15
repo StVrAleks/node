@@ -1,22 +1,22 @@
 const fs = require("fs");
 const zlib = require("zlib");
 const readline = require('readline-sync');
-//var readline = require('linebyline');
 
 let filesInfo = {'file':{}, 'stat':{}, 'name':{}, 'format':{}};
 let path = '';
 letStart();
 
 async function letStart(){
+//Укажите путь до папки для автокомпрессора, включая имя папки:
+const answer = readline.question('Specify the path to the folder for the autocompressor, including the folder name: ',{ encoding: 'utf-8' });//, (answer) => {
 
-readline.question('Specify the path to the folder for the autocompressor, including the folder name: ', (answer) => {
   path = answer;
-console.log("path1", path);  
+console.log("path1", answer);  
   let lastItem = answer.substr(answer.length - 1);
   if(lastItem === '/' || lastItem === '/\/' || lastItem === '|')
     path = answer.substr(0, answer.length - 1);
-  readline.close();
-});
+ // readline.close();
+//});
 console.log("path", path);
 await getFiles();
 }
@@ -150,4 +150,6 @@ catch(err){
   console.log("Возникла ошибка " + err + " на этапе создания архива " + nameFile);
 }
 }
+
+
 
