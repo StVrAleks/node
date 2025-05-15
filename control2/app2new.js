@@ -1,12 +1,11 @@
 const http = require("http");
 const fs = require("fs");
+const zlib = require("zlib");
 //const readline = require('readline-sync');
 
-/*let objFiles = {};
-let objArh = {};*/ 
+
 let filesInfo = {'file':{}, 'stat':{}, 'name':{}, 'format':{}};
-let allItems;
-let flag = 0;
+let path = 'C:/Users/Sotnikova_VA.MOGISPIN/Desktop/node/node/node/control2/compres/'; //work
 letStart();
 
 async function letStart(){
@@ -15,7 +14,7 @@ await getFiles();
 
 function getFiles(){
  let items ='';
- let path = 'C:/Users/Sotnikova_VA.MOGISPIN/Desktop/node/node/node/control2/compres/'; //work
+
  console.log('Я зашел в папку');
     fs.readdir(__dirname + "/compres", function(error,data) {
       if (error) throw error; 
@@ -55,23 +54,25 @@ function workWithFiles(){
       if(step1 != false)
         var step2 = dateGz(filesInfo["stat"][i], filesInfo["stat"][step1]);
       if(step2 === true)
-        console.log('Удаляем устаревший архив');
+        var step3 = delFiles(filesInfo["file"][step1]);
+        //console.log('Удаляем устаревший архив');
       if(step2 === true || step1 === false)
-        console.log('делаем новый архив');
+        addInGz(filesInfo["file"][i]);
+       // console.log('делаем новый архив');
     }  
  } 
 }
 
 function nameInGz(currentName){
-  for(var i=0; i<filesInfo.length; i++)
-  {
+  for(var i in filesInfo["file"])
+ {
     if(filesInfo['format'][i] === 'gz' && currentName === filesInfo['name'][i])
       {
       console.log('Архив существует');
       return i;
       }
   } 
- console.log('Архив не найден'); 
+ console.log("Для файла " + currentName + " архив не найден"); 
  return false;
 }
 
@@ -89,6 +90,31 @@ function dateGz(currentStat, step1Stat){
    }
 }
 
+function delFiles(nameFile){
+  try{
+  var file = "/compres/" + nameFile;
+  fs.rmЫнтс( __dirname + file);
+  console.log('Устаревший архив ' + nameFile + ' удален.');
+  }
+  catch(err){
+    console.log("Возникла ошибка " + err + " на этапе удаления файла " + nameFile);
+  }
+}
+
+function addInGz(nameFile){
+try{
+  console.log('делаем новый архив');
+  var file = "/compres/" + nameFile;
+  const readableStream = fs.createReadStream(__dirname + file); 
+  const writeableStream = fs.createWriteStream(__dirname + file +".gz");
+  const gzip = zlib.createGzip();
+  readableStream.pipe(gzip).pipe(writeableStream);
+}
+catch(err){
+  console.log("Возникла ошибка " + err + " на этапе создания архива " + nameFile);
+}
+}
+
 /*
 const rl = readline.createInterface({
   input: process.stdin,
@@ -101,4 +127,3 @@ rl.question('What do you think of Node.js? ', (answer) => {
 
   rl.close();
 });*/
-
