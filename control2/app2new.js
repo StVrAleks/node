@@ -1,7 +1,7 @@
 const fs = require("fs");
 const zlib = require("zlib");
 const readline = require('readline-sync');
-
+//var readline = require('linebyline');
 
 let filesInfo = {'file':{}, 'stat':{}, 'name':{}, 'format':{}};
 let path = '';
@@ -9,35 +9,28 @@ letStart();
 
 async function letStart(){
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-  });
-console.log('3');
-rl.question('Укажите путь до папки для автокомпрессора, включая имя папки: ', (answer) => {
+readline.question('Specify the path to the folder for the autocompressor, including the folder name: ', (answer) => {
   path = answer;
+console.log("path1", path);  
   let lastItem = answer.substr(answer.length - 1);
-  if(lastItem === '/')
+  if(lastItem === '/' || lastItem === '/\/' || lastItem === '|')
     path = answer.substr(0, answer.length - 1);
-  // TODO: Log the answer in a database
- // console.log(`Thank you for your valuable feedback: ${answer}`);
-
-  rl.close();
+  readline.close();
 });
-
+console.log("path", path);
 await getFiles();
 }
 
 function getFiles(){
- console.log('Я зашел в папку');
-    fs.readdir(__dirname + "/compres", function(error,data) {
-    //fs.readdir(path, function(error,data) {
+ console.log('Я зашел в папку', path);
+  //  fs.readdir(__dirname + "/compres", function(error,data) {
+    fs.readdir(path, function(error,data) {
       if (error) throw error; 
       console.log('В папке найдены файлы:', data);
       for(var i=0; i<data.length; i++)
         {
-          var file = __dirname + "/compres/" + data[i];
-          //var file = path + "/" + data[i];
+         // var file = __dirname + "/compres/" + data[i];
+          var file = path + "/" + data[i];
           filesInfo['file'][i] = data[i];
           filesInfo['name'][i] = data[i].substring(0, data[i].indexOf("."));
           filesInfo['format'][i] = data[i].slice(data[i].lastIndexOf(".") + 1);
@@ -130,9 +123,9 @@ function dateGz(currentStat, step1Stat){
 
 function delFiles(nameFile){
   try{
-    var file = "/compres/" + nameFile;
-   // fs.unlink(path + '/' + file, (error) => {
-    fs.unlink(__dirname + file, (error) => {
+   // var file = "/compres/" + nameFile;
+    fs.unlink(path + '/' + nameFile, (error) => {
+   // fs.unlink(__dirname + file, (error) => {
       if(error) console.log("Ошибка на этапе удаления архива", error);
     }); 
     console.log('Устаревший архив ' + nameFile + ' удален.'); 
@@ -145,9 +138,11 @@ function delFiles(nameFile){
 function addInGz(nameFile){
 try{
   console.log('Новый архив создан для файла ', nameFile);
-  var file = "/compres/" + nameFile;
-  const readableStream = fs.createReadStream(__dirname + file); 
-  const writeableStream = fs.createWriteStream(__dirname + file +".gz");
+ // var file = "/compres/" + nameFile;
+  //const readableStream = fs.createReadStream(__dirname + file); 
+ // const writeableStream = fs.createWriteStream(__dirname + file +".gz");
+  const readableStream = fs.createReadStream(path + '/' + file); 
+  const writeableStream = fs.createWriteStream(path + '/' + file +".gz");
   const gzip = zlib.createGzip();
   readableStream.pipe(gzip).pipe(writeableStream);
 }
@@ -155,5 +150,4 @@ catch(err){
   console.log("Возникла ошибка " + err + " на этапе создания архива " + nameFile);
 }
 }
-
 
