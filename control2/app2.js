@@ -17,28 +17,65 @@ console.log("path1", answer);
     path = answer.substr(0, answer.length - 1);
  // readline.close();
 //});
+
 console.log("path", path);
 await getFiles();
 }
-
-function getFiles(){
+var allData = new Array; 
+async function getFiles(){
  console.log('Я зашел в папку', path);
-  //  fs.readdir(__dirname + "/compres", function(error,data) {
-    fs.readdir(path, function(error,data) {
-      if (error) throw error; 
-      console.log('В папке найдены файлы:', data);
-      for(var i=0; i<data.length; i++)
+  //  fs.readdir(__dirname + "/compres", function(error,data) { 
+  const p3 = new Promise((resolve, reject) => { getFilDirFil(path, '');
+  setTimeout(() => {
+    resolve("ok");
+  }, 100);
+});
+
+     Promise.all([await p3])
+    .then(() =>{
+      let newData = allData;
+      console.log('В папке найдены файлы:', newData);//data
+      for(var i=0; i<newData.length; i++)
         {
          // var file = __dirname + "/compres/" + data[i];
-          var file = path + "/" + data[i];
-          filesInfo['file'][i] = data[i];
-          filesInfo['name'][i] = data[i].substring(0, data[i].indexOf("."));
-          filesInfo['format'][i] = data[i].slice(data[i].lastIndexOf(".") + 1);
+          var file = path + "/" + newData[i];
+          filesInfo['file'][i] = newData[i];
+          filesInfo['name'][i] = newData[i].substring(0, newData[i].indexOf("."));
+          filesInfo['format'][i] = newData[i].slice(newData[i].lastIndexOf(".") + 1);
           console.log("Получили сведения о" + file);
-          fs.stat(file, generate_callback(file, i, data.length-1));
+          fs.stat(file, generate_callback(file, i, newData.length-1));
         }
-    })
+    });
 }
+
+
+
+async function getFilDirFil(newPath, firstToPath){
+  const option = {
+  withFileTypes: true
+}  
+
+   await fs.readdir(newPath , option, (err, files) => {
+    if (err) throw err;
+      console.log('Проверка файл/папка');
+        for (let file of files) {
+       //   console.log(file.name, file.isFile() ? 'Файл' : 'Директория');
+          if(file.isFile())
+            allData.push(firstToPath + file.name);
+          else   
+           {
+            (async () => {
+              var newPath2 = newPath + '/' + file.name;
+              var addToPath = firstToPath + file.name + '/';
+              var dirData = await getFilDirFil(newPath2, addToPath);
+              })();
+              }  
+            }  
+    console.log("end allData", allData);      
+      })
+
+}
+
 
 function generate_callback(file, i, Objlen){
   return function(err, stats){
@@ -80,7 +117,7 @@ for(var i in filesInfo["file"])
               filesInfo['name'][i] = 'x'; //имена проверенных файлов заменили на "х"
               flagok = 1;
               break;
-            }
+              }
       } 
       
     }  
@@ -88,13 +125,13 @@ for(var i in filesInfo["file"])
 
 for(var i in filesInfo["file"])
   {
-    if(filesInfo['name'][i] != 'x' && flagok === 1)
+    if(filesInfo['name'][i] != 'x' && flagok === 1  && filesInfo['format'][i] === 'gz')
     {
       console.log("Найден архив без исходного файла", filesInfo['file'][i]);
       delFiles(filesInfo["file"][i]);
     }  
   }     
-
+console.log('Спасибо за внимание!');
 }
 
 function nameInGz(currentName){
