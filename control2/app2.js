@@ -93,8 +93,8 @@ function workWithFiles(){
     if(filesInfo['format'][i] != 'gz')
     {
      console.log('Работаем с файлом', filesInfo["name"][i]);
-      console.log('Есть ли архив у файла '+ filesInfo["name"][i] + "?");
-      var step1 = nameInGz(filesInfo["name"][i]);
+      console.log('Есть ли архив у файла '+ filesInfo["name"][i]+'.'+filesInfo['format'][i] + "?");
+      var step1 = nameInGz(filesInfo["file"][i]);
       if(step1 != false)
         var step2 = dateGz(filesInfo["stat"][i], filesInfo["stat"][step1]);
       if(step2 === true)
@@ -137,7 +137,7 @@ console.log('Спасибо за внимание!');
 function nameInGz(currentName){
   for(var i in filesInfo["file"])
  {
-    if(filesInfo['format'][i] === 'gz' && currentName === filesInfo['name'][i])
+    if(currentName + '.gz' === filesInfo['file'][i])
       {
       console.log('Архив существует');
       return i;
