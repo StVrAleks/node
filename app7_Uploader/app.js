@@ -1,10 +1,7 @@
-
 const express = require("express"); // получаем модуль express
 const app = express();// создаем приложение express
 
-
 const urlencodedParser = express.urlencoded({extended: true});
-//const mime = require('mime');
 const multer  = require('multer');
 
 const storage = multer.diskStorage({
@@ -17,15 +14,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ dest: storage });
 
+//app.use(multer({dest:"uploads"}).single("file"));
+multer({dest:"uploads"}).single("file");
 const path = require('path');
-//const { forEach } = require("lodash");
-//const { error } = require("console");
-//const fetch = require('node-fetch');
 const jsonParser = express.json();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-//res.logIgnore = true
-
 
 app.get("/page", function (_, response) {
     console.log(__dirname);
@@ -33,13 +27,22 @@ app.get("/page", function (_, response) {
     });
 
 app.post('/upload', upload.single('file'), (req, res) =>{
-    console.log(file);
+    console.log(req.file);
     if(!file)
         res.send("Ошибка при загрузке файла");
     else
         res.json(req.file);
-       //res.send("Файл загружен");
-    
+       //res.send("Файл загружен"); 
 });
+/*app.post("/upload",  (req, res, next) => {
+   
+    let filedata = req.file;
+    console.log(json(filedata));
+    if(!filedata)
+        res.send("Ошибка при загрузке файла");
+    else
+        res.send("Файл загружен");
+    next();
+});*/
 
 app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
