@@ -12,17 +12,27 @@
 <div name="left_conteiner" id="leftPart"></div>
 <div name="right_conteiner" id="rightPart">
     <h1>Загрузка файла</h1>
-    <label>Файл</label><br>
-    <input type="file" name="file" /><br><br>
-    <input type="button" value="Send" onclick="addFile();"/>
+   
+        <label>Файл</label><br>
+        <input type="file" name="file" onclick="showFieldComment();"/><br><br>
+        <input type="text" value="comment" name="comment" id="comment_user"/>
+        <input type="button" value="Send" onclick="addFile();"/>
+   
 </div>
 </div>    
 </body>
 
 <script>
-   function addFile(){
+function showFieldComment(){
+document.getElementById('comment_user').opacity = 1;
+}
+function addFile(){
+document.getElementById('comment_user')
+
     let res = fetch('/upload',{
         method: 'POST',
+        enctype: "multipart/form-data",
+         "num": newItems.item8
         })
     .then(console.log('Данные отправлены'))
    }
