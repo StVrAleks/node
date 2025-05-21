@@ -12,30 +12,26 @@
 <div name="left_conteiner" id="leftPart"></div>
 <div name="right_conteiner" id="rightPart">
     <h1>Загрузка файла</h1>
-   
-        <label>Файл</label><br>
-        <input type="file" name="file" onclick="showFieldComment();"/><br><br>
-        <input type="text" value="comment" name="comment" id="comment_user"/>
-        <input type="button" value="Send" onclick="addFile();"/>
-   
+    <label>Файл</label><br>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="ChoiseFile" /><br><br>
+    <input type="text" value="your comment">
+    <input type="submit" value="Send" onclick="addFile();"/>
+    </form>
 </div>
 </div>    
 </body>
 
 <script>
-function showFieldComment(){
-document.getElementById('comment_user').opacity = 1;
+async function name1() {
+ try{
+   const response = await fetch('/viewFiles',{ method: 'POST'});
+    const data = await response.json();
+    (data) => {console.log('res', data);}
 }
-function addFile(){
-document.getElementById('comment_user')
-
-    let res = fetch('/upload',{
-        method: 'POST',
-        enctype: "multipart/form-data",
-         "num": newItems.item8
-        })
-    .then(console.log('Данные отправлены'))
-   }
+catch(err){console.log(err);}   
+}    
+name1();
 
 </script>
 
