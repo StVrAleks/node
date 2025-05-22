@@ -82,4 +82,16 @@ async function getFilesName() {
        // return newData;
     
 }
+async function getFilesName() {
+    
+    try {
+        let data = await fs.readdir(__dirname + "/uploads");
+        console.log(data);
+        return data;
+    } catch (err) {
+        console.log("гетФиле",err);
+    }
+    return;
+    
+}
 app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
