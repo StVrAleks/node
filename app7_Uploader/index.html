@@ -9,7 +9,7 @@
 <body>
  
 <div id="conteiner">
-<div name="left_conteiner" id="leftPart"></div>
+<div name="left_conteiner" id="leftPart"><h3>Загруженные файлы</h3></div>
 <div name="right_conteiner" id="rightPart">
     <h1>Загрузка файла</h1>
     <label>Файл</label><br>
@@ -26,32 +26,57 @@
 async function name1() {
  try{
    const response = await fetch('/viewFiles',{ method: 'POST'});
-    const data = await response.json();
-    (data) => {console.log('res', data);}
-      (data) => {console.log('res', data);}
-   (data) => {
-                var leftP = document.getElementById('leftPart');
-                let newBut = new Array;
-                for(var i=0; i<data.lenght; i++)
-                    {
-                        newBut[i] = document.createElement('input');  
-                        newBut[i].type = 'button';
-                        newBut[i].value = data[i];
-                        newBut[i].id = 'download_' + i;
-                        newBut[i].style.color = '#66FCF4';
-                        newBut[i].style.backgraundColor = '#474A51';
-                        newBut[i].style.borderBottom = '#66FCF4';
-                    leftP.appendChild(newBut[i]);
-                    document.getElementById('download_' + i).addEventListener('click', addnewText(data[i]), false);     
-                    }
-   };
+   const data = await response.json();
+   console.log(data);
+    var leftP = document.getElementById('leftPart');
+    console.log(leftP);
+    let newBut = new Array;
+    for(var key in data)
+        {
+        newBut[key] = document.createElement('input');  
+        newBut[key].type = 'button';
+        newBut[key].className = 'button_class';
+        newBut[key].value = data[key];
+        newBut[key].id = 'download_' + key;
+       // newBut[key].onclick = 'addnewText('+data[key]+')';
+        leftP.appendChild(newBut[key]);
+        console.log('tut');
+        }
+     for(var key in data)    
+     {
+        var btn = document.getElementById('download_' + key);
+        btn.addEventListener('click', (event) => {addnewText(data[key]);}, false); 
+     }
+        // document.getElementById('download_' + key).addEventListener('click', addnewText(data[key]), false);         
+ 
 }
 catch(err){console.log(err);}   
 }    
 name1();
+async function addnewText(nameF){
+   let a = nameF;
+    console.log(a);
+    const response = await fetch('/download',{
+        method: 'POST',
+        headers: { "Accept": "application/json" },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"item": a})
+    });
+    console.log(response.json());
+    const data = await response.json();
+    console.log(data);
+    const dataUri = "data:text/json;charset=utf8," + encodeURIComponent(JSON.stringify(data));
+    downloadStat(data,nameF, dataUri);
+}
 
+function downloadStat(data, fileName, dataUri) {
+    const link = document.createElement("a");
+    link.href = dataUri;//URL.createObjectURL(new Blob([data]));
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
 </script>
 
 </html>
-
 
