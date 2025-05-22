@@ -28,6 +28,23 @@ async function name1() {
    const response = await fetch('/viewFiles',{ method: 'POST'});
     const data = await response.json();
     (data) => {console.log('res', data);}
+      (data) => {console.log('res', data);}
+   (data) => {
+                var leftP = document.getElementById('leftPart');
+                let newBut = new Array;
+                for(var i=0; i<data.lenght; i++)
+                    {
+                        newBut[i] = document.createElement('input');  
+                        newBut[i].type = 'button';
+                        newBut[i].value = data[i];
+                        newBut[i].id = 'download_' + i;
+                        newBut[i].style.color = '#66FCF4';
+                        newBut[i].style.backgraundColor = '#474A51';
+                        newBut[i].style.borderBottom = '#66FCF4';
+                    leftP.appendChild(newBut[i]);
+                    document.getElementById('download_' + i).addEventListener('click', addnewText(data[i]), false);     
+                    }
+   };
 }
 catch(err){console.log(err);}   
 }    
