@@ -33,10 +33,12 @@ async function name1() {
     let newBut = new Array;
     for(var key in data)
         {
+        var valBtn = encodeURIComponent(data[key]);    
+        valBtn = decodeURIComponent(valBtn);
         newBut[key] = document.createElement('input');  
         newBut[key].type = 'button';
         newBut[key].className = 'button_class';
-        newBut[key].value = data[key];
+        newBut[key].value = valBtn;//data[key];
         newBut[key].id = 'download_' + key;
        // newBut[key].onclick = 'addnewText('+data[key]+')';
         leftP.appendChild(newBut[key]);
@@ -45,7 +47,7 @@ async function name1() {
      for(var key in data)    
      {
         var btn = document.getElementById('download_' + key);
-        btn.addEventListener('click', (event) => {addnewText(data[key]);}, false); 
+        btn.addEventListener('click', (event) => {addnewText(event);}, false); 
      }
         // document.getElementById('download_' + key).addEventListener('click', addnewText(data[key]), false);         
  
@@ -53,25 +55,25 @@ async function name1() {
 catch(err){console.log(err);}   
 }    
 name1();
-async function addnewText(nameF){
-   let a = nameF;
-    console.log(a);
-    const response = await fetch('/download',{
+async function addnewText(event){
+   console.log(event.target.value);    
+   let a = event.target.value;
+   const response = await fetch('/download',{
         method: 'POST',
-        headers: { "Accept": "application/json" },
+        headers: { "Accept": "application/json, */* " },
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({"item": a})
     });
-    console.log(response.json());
-    const data = await response.json();
+    console.log(response);
+    const data = await response;
     console.log(data);
     const dataUri = "data:text/json;charset=utf8," + encodeURIComponent(JSON.stringify(data));
-    downloadStat(data,nameF, dataUri);
+    downloadStat(data,a, dataUri);
 }
 
 function downloadStat(data, fileName, dataUri) {
     const link = document.createElement("a");
-    link.href = dataUri;//URL.createObjectURL(new Blob([data]));
+    link.href = URL.createObjectURL(new Blob([data]));
     link.download = fileName;
     link.click();
     URL.revokeObjectURL(link.href);
@@ -79,4 +81,3 @@ function downloadStat(data, fileName, dataUri) {
 </script>
 
 </html>
-
