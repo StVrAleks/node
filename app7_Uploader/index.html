@@ -9,26 +9,189 @@
 <body>
  
 <div id="conteiner">
-<div name="left_conteiner" id="leftPart"></div>
+<div name="left_conteiner" id="leftPart"><h3>Загруженные файлы</h3></div>
 <div name="right_conteiner" id="rightPart">
     <h1>Загрузка файла</h1>
     <label>Файл</label><br>
-    <input type="file" name="file" /><br><br>
-    <input type="button" value="Send" onclick="addFile();"/>
+<!--    <form action="/upload" method="post" enctype="multipart/form-data">-->
+    <input type="file" name="ChoiseFile" id="newFile"/><br><br>
+    <input type="text" value="your comment" id="newComment">
+    <input type="submit" value="Send" onclick="addFile();"/>
+ <!--    </form>-->
 </div>
 </div>    
 </body>
 
 <script>
-   function addFile(){
-    let res = fetch('/upload',{
-        method: 'POST',
-        })
-    .then(console.log('Данные отправлены'))
-   }
+async function addFile() {
 
+     let comment = document.getElementById('newComment').value;
+     let formData=new FormData();
+     formData.append("comment",comment);
+     formData.append("file",document.getElementById("newFile").files[0]);
+
+     const fetchOptions={
+           method: "post",
+       //    headers: {'Content-Type': 'application/x-www-form-urlencoded',},
+           body: formData,
+           };
+    const response=await fetch('/upload',fetchOptions);
+    const data=await response.text()
+          .then(async()=>{
+            let allOldBut = await allCurBut();
+           // var leftP = document.getElementsByClassName('button_class');
+           
+          });
+    console.log(data-45);
+}
+
+async function allCurBut() {
+ try{
+   const response = await fetch('/viewFiles', {method: 'POST'});
+   const data = await response.json()
+   .then(async (data) =>{
+        console.log('Получили данные и передали-53', data);
+        const res = await fetch('/readInfo',{
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({"data1": data})
+                });
+        const info = await res.json()
+        .then((info) => {
+        console.log('Получили данные2-61',info);  
+        if(info)
+        {
+         var leftPartBut = document.getElementsByClassName('button_class');
+         var readAllFil = info["len"];
+         var cuAllId={};
+          for(var i=0; i<leftPartBut.length; i++)
+            {
+                var curId0 = leftPartBut[i].id;
+                var curId=curId0.replace('download_', '');
+                cuAllId[curId] = curId;
+            }
+           for(var i=0; i<readAllFil.length; i++) 
+           {
+
+            if(readAllFil[i] in cuAllId)
+                console.log('readAllFil[i]', readAllFil[i]);
+            else{
+                var leftP = document.getElementById('leftPart');
+                var newBut = document.createElement('input');  
+                newBut.type = 'button';
+                newBut.className = 'button_class';
+                newBut.value = info["0"][i]; 
+                newBut.id = 'download_' + info["len"][i];
+                newSpan = document.createElement('span'); 
+                newSpan.innerHTML =  info["1"][i];
+                leftP.appendChild(newSpan);                
+                leftP.appendChild(newBut);
+                var btn = document.getElementById('download_' + info["len"][i]);
+                btn.addEventListener('click', (event) => {addnewText(event);}, false); 
+                document.getElementById('newComment').value = '';
+            }
+           }
+        }   
+    });      
+});
+}
+catch(err){console.log(err);}   
+}
+
+async function name1() {
+ try{
+   const response = await fetch('/viewFiles', {method: 'POST'});
+   const data = await response.json()
+   .then(async (data) =>{
+        console.log('Получили данные и передали-106', data);
+        const res = await fetch('/readInfo',{
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({"data1": data})
+                });
+        const info = await res.json()
+        .then((info) => {
+        console.log('Получили данные2-114',info);  
+        if(info)
+        {
+            var leftP = document.getElementById('leftPart');
+            let newBut = new Array;
+            let newSpan = new Array;
+            for(var key=0; key < info["0"].length; key++)
+            {
+                newBut[key] = document.createElement('input');  
+                newBut[key].type = 'button';
+                newBut[key].className = 'button_class';
+                newBut[key].value = info["0"][key]; 
+                newBut[key].id = 'download_' + info["len"][key];
+                console.log('tut');
+                newSpan[key] = document.createElement('span'); 
+                newSpan[key].innerHTML =  info["1"][key];
+                leftP.appendChild(newSpan[key]);                
+                leftP.appendChild(newBut[key]);
+                }
+            for(var key=0; key < info["0"].length; key++)   
+            {
+                var btn = document.getElementById('download_' + info["len"][key]);
+                btn.addEventListener('click', (event) => {addnewText(event);}, false); 
+            } 
+        }    
+        });      
+    });
+}
+catch(err){console.log(err);}   
+}    
+name1();
+async function addnewText(event){
+   console.log(event.target.value);    
+   let getId = event.target.id;
+   let a = getId.replace('download_', '');
+   console.log('need id', a);
+   const response = await fetch('/download',{
+        method: 'POST',
+        headers: { "Accept": "application/json, */* " },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"item": a})
+    });
+    const data = await response;
+    console.log('str159',data);
+    const dataUri = "data:text/json;charset=utf8," + encodeURIComponent(JSON.stringify(data));
+    downloadStat(data,a, dataUri);
+}
+
+function downloadStat(data, fileName, dataUri) {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([data]));
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+
+//socet
+const url = 'ws://localhost:5632';
+let connection = new WebSocket(url);
+
+connection.onopen = (event) =>{
+    connection.send('hello from client to server!');
+};
+connection.onmessage = function (event) {
+    console.log('Клиентом получено сообщение от сервера:' + event.data);
+};
+connection.onerror = error =>{
+    console.log('Websocet error: ', error);
+}
+connection.onclose = () =>{
+    console.log('Соединение закрыто');
+    connection = null;
+    clientInteval(keepAliveTimer);
+};
+let keepAliveTimer=setInterval(()=>{
+    connection.send('KEEP_ME_ALIVE');
+},5000);
 </script>
 
 </html>
+
+
 
 
