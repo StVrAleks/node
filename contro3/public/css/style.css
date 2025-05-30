@@ -1,0 +1,13 @@
+#user_res th,
+   #user_res tr, #user_res tr td
+   {
+    border-collapse: collapse;
+    border: 1px solid black;
+   } 
+   #user_res tr:nth-child(2n + 1){
+    background-color: rgba(8, 218, 71, 0.3);
+   }
+       #user_res{
+        width: auto;
+        border-collapse: collapse;
+    }

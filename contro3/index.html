@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mysql</title>
+    <link rel="stylesheet"  href="/css/style.css">
+    <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon.png">
+</head>
+<body>
+    <div id="conteiner">
+        <div id="user_req" style="padding-bottom: 30px;">
+            <div>Укажите таблицу для запроса: 
+                <select id="selTable" on></select>
+             </div>
+            <textarea  id="field_req" placeholder="Введите запрос" style="display: inline-block; width: 350px; height: 80px; padding-right: 15px; margin-top: 30px;"></textarea>
+            <button id="start_req" onclick="startRun();">Выполнить</button>
+        </div>
+        <div id="user_res">
+            <table id="user_res_full"></table>
+        </div>
+    </div>
+</body>
+<script src="/mainjs.js"></script>
+
+
+
+</html>
