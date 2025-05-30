@@ -8,11 +8,9 @@ const jsonParser = express.json();
 const path = require('path');
 const fs = require("fs");
 const WebSocket = require('ws');
-const port = 5632;
+const port = 5632; //WebSocket
 const server = new WebSocket.Server({ port:port });
 const upload = multer ({dest: path.join(__dirname, 'uploads')});
-//const readline = require('readline-sync');
-//const fetch = require('node-fetch');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -28,13 +26,26 @@ const storageConfig = multer.diskStorage({
 });*/
  
 //app.use(multer({storage:storageConfig}).single("ChoiseFile"));
-
+//-----------------------------
 //webSocet-connect
-let clients = [];
+server.on('connection', (wsConnection) => {
+ let receivedBytes = 0;   
+  wsConnection.on('message', (message) => {
+    console.log(`server received: ${message}`);
+    
+    receivedBytes += message.length;
+    console.log(`Received ${receivedBytes} bytes.`);
+    wsConnection.send(`Received ${receivedBytes} bytes.`);
+  });
+
+  wsConnection.send('got your message!');
+});
+/*let clients = [];
 let timer = 0;
 server.on('connection',connection =>{
     connection.send('hello from server to client! timer: ' + timer);
     connection.on('message', message =>{
+       // console.log(message);
         if(message === 'KEEP_ME_ALIVE'){
             clients.forEach(client =>{
                 if(client.connection ===connection)
@@ -49,15 +60,16 @@ server.on('connection',connection =>{
 setInterval(()=>{
     timer++;
     clients.forEach(client => {
+      //  console.log('client', Date.now()- client.lastkeepalive);
         if((Date.now() - client.lastkeepalive)>12000){
             client.connection.terminate();
             client.connection =null;
         }
         else
-        client.connection.send('timer' + timer);
+        client.connection.send('timer=' + timer);
     });
     clients = clients.filter(client => client.connection);
-}, 3000);
+}, 3000);*/
 
 //HTTP
 app.options("/upload", function (request, response) {
@@ -72,25 +84,26 @@ const serviceDownFiles = upload.fields([{name:'file', maxCount:1}]);
 app.post("/upload", serviceDownFiles ,function (request, response) {
   response.setHeader("Access-Control-Allow-Origin", "*");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
     let filedata = request.body;
   //  console.log('filedata',request.files);
     try{
-        let fname = request.files.file[0]["filename"];
-        let fOrname = request.files.file[0]["originalname"];
-        let infoFile = {[fname] :{[0]:filedata["comment"], [1]:fOrname}};
+       let fname = request.files.file[0]["filename"];
+       let fOrname =decodeURI(filedata["fileOrigName"]);
+
+/*****прочитали с файла названия всех имеющихся загрузок с комментами*/
         let infoFiles0 = fs.readFileSync(path.resolve(__dirname, "filesComment.json"));
         let infoFiles = JSON.parse(infoFiles0);
-      // 
-      let len = Object.keys(infoFiles).length;
-     //  console.log('len', len);
+     // console.log('fOrname',decodeURI(fOrname));
+        
+/**** Записали в файл коммент + имя файла (внутреннее и оригинальное) */
+        let len = Object.keys(infoFiles).length;
         infoFiles[fname] ={[0]:filedata["comment"], [1]:fOrname, ["len"]:len+1};
-       // infoFiles.push(infoFile);
-           fs.writeFileSync(path.resolve(__dirname, "filesComment.json"), JSON.stringify(infoFiles));
-          //    console.log("/voit write to file", infoFiles);
-           }
-           catch (err) {
+        fs.writeFileSync(path.resolve(__dirname, "filesComment.json"), JSON.stringify(infoFiles));
+        }
+        catch (err) {
             console.log(err);
-           }
+        }
     if(!filedata)
         response.send("Ошибка при загрузке файла");
     else
@@ -154,23 +167,25 @@ try{
    //console.log(request.headers["accept"]);
     let itemName0 = request.body.item;
     let itemName;
-    //console.log(request.body);
+    console.log(request.body.item);
     let infoFiles0 = await fs.readFileSync(path.resolve(__dirname, "filesComment.json"));
     let infoFiles = JSON.parse(infoFiles0);
     for(key in infoFiles)
     {
         if(infoFiles[key]['len'].toString() === itemName0.toString())
            itemName = key;
+         console.log("itemName", itemName);
     }
 
-    if(itemName==='')
+    if(itemName === '')
         response.sendStatus(400);
+   
     let folderPath = path.resolve(__dirname, "uploads", itemName);
     
     //проверить - есть ли такой файл?
     fs.stat(folderPath, function(err, stat) {
        if (err == null) {
-            console.log('File exists', folderPath);
+          //  console.log('File exists', folderPath);
             response.download(folderPath);
         } 
             else if (err.code === 'ENOENT') {
@@ -186,50 +201,6 @@ try{
      catch(err){console.log(err)};
 });    
 
-async function feadF(file_path) {
-  const mime_type = mime.lookup(file_path); 
-     let data =await  fs.readFileSync(file_path); 
-     let sendData = await readData(data); 
-  console.log(mime_type);
-  if(mime_type.includes('image'))   //если возвращается картинка
-    {
-     console.log('if img');
-     const arrayBuffer = await data.arrayBuffer();
-     const base64data = Buffer.from(arrayBuffer).toString("base64");
-     const dataUrl = `data:${mime_type};base64,${base64data}`
-     //const dataUrl = `data:${res.headers.get("content-type")};base64,${base64data}`
-     const pic = JSON.stringify(dataUrl, null, 2);
-     return JSON.parse(pic);
-     //   console.log('resObj.body', resObj.body);
-    }
-  else //если возвращается не картинка
-    {
-    return await sendData;
-    } 
-}
-
-async function readData(data){
- try{
-  const chunks = [];
-    const buffers = []; // буфер для получаемых данных
-    for await (const chunk of data) {
-      buffers.push(chunk);        // добавляем в буфер все полученные данные
-    }
-    const chunksAll = Buffer.concat(buffers);
-    let position = 0;
-    for(let chunk of chunks) {
-      chunksAll.set(chunk, position); 
-      position += chunk.length;
-    }
-    let result = new TextDecoder("utf-8").decode(chunksAll);
-
-    console.log("result");
-    return result;
- }
- catch(er){
-  console.log(' getReqerror', er);
- }  
-    }
 
 
 app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
