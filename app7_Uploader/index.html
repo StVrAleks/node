@@ -13,22 +13,53 @@
 <div name="right_conteiner" id="rightPart">
     <h1>Загрузка файла</h1>
     <label>Файл</label><br>
-<!--    <form action="/upload" method="post" enctype="multipart/form-data">-->
     <input type="file" name="ChoiseFile" id="newFile"/><br><br>
-    <input type="text" value="your comment" id="newComment">
+    <input type="text" placeholder="your comment" id="newComment">
     <input type="submit" value="Send" onclick="addFile();"/>
- <!--    </form>-->
+    <div id="loadSteps">Идет загрузка файла >> получено:  <span id="nextStep"></span> из <span id="allSteps"></span></div>
 </div>
 </div>    
 </body>
 
 <script>
+
+//socet
+const url = 'ws://localhost:5632';
+let connection = new WebSocket(url);
+
+
+connection.addEventListener('open', (event) => { 
+  connection.send('hello from client to server!'); 
+}); 
+
+connection.addEventListener('message', (event) => { 
+  console.log('Клиентом получено сообщение от сервера:', event.data); 
+  const data = event.data;
+
+    // Обновляем элемент формы
+    document.getElementById('nextStep').innerText = data;
+});
+
+connection.addEventListener('error', (event) => { 
+  console.log('Websocet error: ', error); 
+});
+
+connection.addEventListener('close', (event) => { 
+  console.log('Соединение закрыто'); 
+});
+
 async function addFile() {
 
      let comment = document.getElementById('newComment').value;
      let formData=new FormData();
      formData.append("comment",comment);
      formData.append("file",document.getElementById("newFile").files[0]);
+     formData.append("fileOrigName",encodeURI(document.getElementById("newFile").files[0]['name']));
+    document.getElementById('loadSteps').style.opacity = 1;
+    document.getElementById('allSteps').style.innerHTML = document.getElementById("newFile").files[0]['size'];
+    let intervalId = setInterval(()=>{
+        connection.send(document.getElementById("newFile").files[0]['size']);
+    },100);
 
      const fetchOptions={
            method: "post",
@@ -38,11 +69,12 @@ async function addFile() {
     const response=await fetch('/upload',fetchOptions);
     const data=await response.text()
           .then(async()=>{
+            clearInterval(intervalId);
             let allOldBut = await allCurBut();
-           // var leftP = document.getElementsByClassName('button_class');
-           
+             document.getElementById('loadSteps').style.opacity = 0;    
+             document.getElementById('newFile').value='';         
           });
-    console.log(data-45);
+  //  console.log(data,'-45');
 }
 
 async function allCurBut() {
@@ -50,7 +82,7 @@ async function allCurBut() {
    const response = await fetch('/viewFiles', {method: 'POST'});
    const data = await response.json()
    .then(async (data) =>{
-        console.log('Получили данные и передали-53', data);
+       // console.log('Получили данные и передали-53', data);
         const res = await fetch('/readInfo',{
                     method: 'POST',
                     headers: { "Content-Type": "application/json" },
@@ -58,7 +90,7 @@ async function allCurBut() {
                 });
         const info = await res.json()
         .then((info) => {
-        console.log('Получили данные2-61',info);  
+     //   console.log('Получили данные2-61',info);  
         if(info)
         {
          var leftPartBut = document.getElementsByClassName('button_class');
@@ -74,13 +106,13 @@ async function allCurBut() {
            {
 
             if(readAllFil[i] in cuAllId)
-                console.log('readAllFil[i]', readAllFil[i]);
+                var a=1;
             else{
                 var leftP = document.getElementById('leftPart');
                 var newBut = document.createElement('input');  
                 newBut.type = 'button';
                 newBut.className = 'button_class';
-                newBut.value = info["0"][i]; 
+                newBut.value =  '⤓ '+info["0"][i]; 
                 newBut.id = 'download_' + info["len"][i];
                 newSpan = document.createElement('span'); 
                 newSpan.innerHTML =  info["1"][i];
@@ -89,6 +121,7 @@ async function allCurBut() {
                 var btn = document.getElementById('download_' + info["len"][i]);
                 btn.addEventListener('click', (event) => {addnewText(event);}, false); 
                 document.getElementById('newComment').value = '';
+                document.getElementById('newComment').placeholder="your comment";
             }
            }
         }   
@@ -103,7 +136,7 @@ async function name1() {
    const response = await fetch('/viewFiles', {method: 'POST'});
    const data = await response.json()
    .then(async (data) =>{
-        console.log('Получили данные и передали-106', data);
+      //  console.log('Получили данные и передали-106', data);
         const res = await fetch('/readInfo',{
                     method: 'POST',
                     headers: { "Content-Type": "application/json" },
@@ -111,7 +144,7 @@ async function name1() {
                 });
         const info = await res.json()
         .then((info) => {
-        console.log('Получили данные2-114',info);  
+       // console.log('Получили данные2-114',info);  
         if(info)
         {
             var leftP = document.getElementById('leftPart');
@@ -122,7 +155,7 @@ async function name1() {
                 newBut[key] = document.createElement('input');  
                 newBut[key].type = 'button';
                 newBut[key].className = 'button_class';
-                newBut[key].value = info["0"][key]; 
+                newBut[key].value = '⤓ '+ info["0"][key];
                 newBut[key].id = 'download_' + info["len"][key];
                 console.log('tut');
                 newSpan[key] = document.createElement('span'); 
@@ -142,19 +175,18 @@ async function name1() {
 catch(err){console.log(err);}   
 }    
 name1();
-async function addnewText(event){
-   console.log(event.target.value);    
+async function addnewText(event){   
    let getId = event.target.id;
-   let a = getId.replace('download_', '');
-   console.log('need id', a);
+   let num = getId.replace('download_', '');
+   let a = event.target.value.replace('⤓ ', '');
    const response = await fetch('/download',{
         method: 'POST',
         headers: { "Accept": "application/json, */* " },
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({"item": a})
+        body: JSON.stringify({"item": num})
     });
     const data = await response;
-    console.log('str159',data);
+    console.log('str163 скачен файл: ', a);
     const dataUri = "data:text/json;charset=utf8," + encodeURIComponent(JSON.stringify(data));
     downloadStat(data,a, dataUri);
 }
@@ -167,9 +199,10 @@ function downloadStat(data, fileName, dataUri) {
     URL.revokeObjectURL(link.href);
 }
 
-//socet
-const url = 'ws://localhost:5632';
-let connection = new WebSocket(url);
+
+/*** 
+
+
 
 connection.onopen = (event) =>{
     connection.send('hello from client to server!');
@@ -183,14 +216,16 @@ connection.onerror = error =>{
 connection.onclose = () =>{
     console.log('Соединение закрыто');
     connection = null;
-    clientInteval(keepAliveTimer);
+    clearInteval(keepAliveTimer);
 };
 let keepAliveTimer=setInterval(()=>{
     connection.send('KEEP_ME_ALIVE');
-},5000);
+},5000);* ***/
 </script>
 
 </html>
+
+
 
 
 
