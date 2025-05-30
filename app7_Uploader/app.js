@@ -1,3 +1,4 @@
+
 const http = require("http");
 const express = require("express"); // получаем модуль express
 const app = express();// создаем приложение express
@@ -11,6 +12,8 @@ const WebSocket = require('ws');
 const port = 5632; //WebSocket
 const server = new WebSocket.Server({ port:port });
 const upload = multer ({dest: path.join(__dirname, 'uploads')});
+//const readline = require('readline-sync');
+//const fetch = require('node-fetch');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -200,7 +203,51 @@ try{
     }
      catch(err){console.log(err)};
 });    
+/*
+async function feadF(file_path) {
+  const mime_type = mime.lookup(file_path); 
+     let data =await  fs.readFileSync(file_path); 
+     let sendData = await readData(data); 
+  //console.log(mime_type);
+  if(mime_type.includes('image'))   //если возвращается картинка
+    {
+     console.log('if img');
+     const arrayBuffer = await data.arrayBuffer();
+     const base64data = Buffer.from(arrayBuffer).toString("base64");
+     const dataUrl = `data:${mime_type};base64,${base64data}`
+     //const dataUrl = `data:${res.headers.get("content-type")};base64,${base64data}`
+     const pic = JSON.stringify(dataUrl, null, 2);
+     return JSON.parse(pic);
+     //   console.log('resObj.body', resObj.body);
+    }
+  else //если возвращается не картинка
+    {
+    return await sendData;
+    } 
+}*/
+/*
+async function readData(data){
+ try{
+  const chunks = [];
+    const buffers = []; // буфер для получаемых данных
+    for await (const chunk of data) {
+      buffers.push(chunk);        // добавляем в буфер все полученные данные
+    }
+    const chunksAll = Buffer.concat(buffers);
+    let position = 0;
+    for(let chunk of chunks) {
+      chunksAll.set(chunk, position); 
+      position += chunk.length;
+    }
+    let result = new TextDecoder("utf-8").decode(chunksAll);
 
+    //console.log("result");
+    return result;
+ }
+ catch(er){
+  console.log(' getReqerror', er);
+ }  
+    }*/
 
 
 app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
