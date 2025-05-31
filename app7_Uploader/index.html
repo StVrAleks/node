@@ -8,6 +8,7 @@
 </head>
 <body>
  
+
 <div id="conteiner">
 <div name="left_conteiner" id="leftPart"><h3>Загруженные файлы</h3></div>
 <div name="right_conteiner" id="rightPart">
@@ -22,9 +23,8 @@
 </body>
 
 <script>
-
 //socet
-const url = 'ws://localhost:5632';
+const url = 'ws://localhost:8180';
 let connection = new WebSocket(url);
 
 
@@ -46,8 +46,12 @@ connection.addEventListener('error', (event) => {
 
 connection.addEventListener('close', (event) => { 
   console.log('Соединение закрыто'); 
+  connection = null;
+    clearInteval(keepAliveTimer);
 });
-
+let keepAliveTimer=setInterval(()=>{
+    connection.send('KEEP_ME_ALIVE');
+}, 5000);
 async function addFile() {
 
      let comment = document.getElementById('newComment').value;
@@ -201,8 +205,6 @@ function downloadStat(data, fileName, dataUri) {
 
 
 /*** 
-
-
 
 connection.onopen = (event) =>{
     connection.send('hello from client to server!');
