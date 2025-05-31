@@ -1,4 +1,3 @@
-
 const http = require("http");
 const express = require("express"); // получаем модуль express
 const app = express();// создаем приложение express
@@ -9,7 +8,7 @@ const jsonParser = express.json();
 const path = require('path');
 const fs = require("fs");
 const WebSocket = require('ws');
-const port = 5632; //WebSocket
+const port = 8180; //WebSocket5632
 const server = new WebSocket.Server({ port:port });
 const upload = multer ({dest: path.join(__dirname, 'uploads')});
 //const readline = require('readline-sync');
@@ -31,18 +30,39 @@ const storageConfig = multer.diskStorage({
 //app.use(multer({storage:storageConfig}).single("ChoiseFile"));
 //-----------------------------
 //webSocet-connect
+let clients = [];
+let timer = 0;
 server.on('connection', (wsConnection) => {
  let receivedBytes = 0;   
   wsConnection.on('message', (message) => {
     console.log(`server received: ${message}`);
-    
-    receivedBytes += message.length;
-    console.log(`Received ${receivedBytes} bytes.`);
-    wsConnection.send(`Received ${receivedBytes} bytes.`);
-  });
+    if(message === 'KEEP_ME_ALIVE'){
+            clients.forEach(client =>{
+                if(client.connection ===connection)
+                    client.lastkeepalive = Date.now();
+            })}
+     else{ console.log('сервером получено сообщение от клиента: '+ message);} 
+     clients.push({wsConnection:wsConnection, lastkeepalive:Date.now()});
+
+     receivedBytes += message.length;              
+    // console.log(`Received ${receivedBytes} bytes.`);             
+     wsConnection.send(`Received ${receivedBytes} bytes.`);               
+    });   
 
   wsConnection.send('got your message!');
 });
+setInterval(()=>{
+    timer = timer+1;
+    clients.forEach(client => {
+        if((Date.now() - client.lastkeepalive)>12000){
+            client.wsConnection.terminate();
+            client.wsConnection =null;
+        }
+        else
+        client.wsConnection.send('timer=' + timer);
+    });
+    clients = clients.filter(client => client.wsConnection);
+}, 3000);
 /*let clients = [];
 let timer = 0;
 server.on('connection',connection =>{
