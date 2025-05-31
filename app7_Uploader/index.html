@@ -44,11 +44,11 @@ connection.addEventListener('error', (event) => {
   console.log('Websocet error: ', error); 
 });
 
-connection.addEventListener('close', (event) => { 
+connection.onclose = () => { 
   console.log('Соединение закрыто'); 
   connection = null;
     clearInteval(keepAliveTimer);
-});
+};
 let keepAliveTimer=setInterval(()=>{
     connection.send('KEEP_ME_ALIVE');
 }, 5000);
