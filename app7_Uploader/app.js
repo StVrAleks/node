@@ -1,22 +1,106 @@
+const WebSocket = require('ws');
+//const wsServer = new WebSocket.Server({port: 8180});
+//const WebSocketServer = require('ws').server;
 const http = require("http");
 const express = require("express"); // получаем модуль express
 const app = express();// создаем приложение express
 const urlencodedParser = express.urlencoded({extended: true});
-const mime = require('mime');
+//const mime = require('mime');
 const multer  = require('multer');
 const jsonParser = express.json();
 const path = require('path');
 const fs = require("fs");
-const WebSocket = require('ws');
-const port = 8180; //WebSocket5632
+var websocket = require('websocket-stream');
+//var ws = websocket('ws://echo.websocket.org');
+//const expressWebSocket = require('express-ws');
+//const websocketStream = require('websocket-stream/stream');
+/*
+var server = http.createServer(function(request, response) {
+    console.log((new Date()) + ' Received request for ' + request.url);
+    response.writeHead(404);
+    response.end();
+});*/
+//const port = 8180; 
+//const server = new WebSocket.Server({ port:port });
+
+/*
+wsServer = new WebSocketServer({
+    httpServer: server
+    //autoAcceptConnections: false
+});*/
+/*
+wsServer.on('request', function(request) {
+    if (!originIsAllowed(request.origin)) {
+      // Make sure we only accept requests from an allowed origin
+      request.reject();
+      console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+      return;
+    }
+    var connection = request.accept('echo-protocol', request.origin);
+    console.log((new Date()) + ' Connection accepted.');
+    connection.on('message', function(message) {
+        if (message.type === 'utf8') {
+            console.log('Received Message: ' + message.utf8Data);
+            connection.sendUTF(message.utf8Data);
+        }
+        else if (message.type === 'binary') {
+            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
+            connection.sendBytes(message.binaryData);
+        }
+    });
+    connection.on('close', function(reasonCode, description) {
+        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+    });
+});*/
+/*
+expressWebSocket(app, null, {
+    // ws options here
+    perMessageDeflate: false,
+});*/
+
+const port = 8180; 
 const server = new WebSocket.Server({ port:port });
+
+const host = 'localhost:8180';
 const upload = multer ({dest: path.join(__dirname, 'uploads')});
-//const readline = require('readline-sync');
-//const fetch = require('node-fetch');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+/*
+function onSocketPreError(error){
+    console.log(error);
+}
+
+server.on('upgrade', (req, socket, head) => {
+    socket.on('error', onSocketPreError);
+    if(!!req.headers['BadAuth']){
+        socket.write('HTTP/1.1 401 Ubauthorized\r\n\r\n');
+        socket.destroy();
+        return;
+    }
+    server.handleUpgrade(req, socket, head, (ws) =>{
+        socket.removeListener('error', onSocketPreError);
+        server.emit('connection', ws, req);
+    });
+});
+
+server.on('connection', (ws, req) =>{
+    ws.on('connection', (ws, req) =>{
+        ws.on('error', onSocketPostError);
+        ws.on('message', (msg, isBinary) => {
+            server.clients.forEach((client) => {
+                if(client.readyState === WebSocket.OPEN){
+                    client.send(msg, {binary: isBinary});
+                }
+            });
+        });
+        ws.on('close', () =>{
+            console.log('Connection is close');
+        });
+    });
+});
+*/
 /*
 const storageConfig = multer.diskStorage({
     destination: (req, file, cb) =>{
@@ -30,31 +114,65 @@ const storageConfig = multer.diskStorage({
 //app.use(multer({storage:storageConfig}).single("ChoiseFile"));
 //-----------------------------
 //webSocet-connect
+
 let clients = [];
 let timer = 0;
-server.on('connection', (wsConnection) => {
- let receivedBytes = 0;   
-  wsConnection.on('message', (message) => {
-    console.log(`server received: ${message}`);
-    if(message === 'KEEP_ME_ALIVE'){
-            clients.forEach(client =>{
-                if(client.connection ===connection)
-                    client.lastkeepalive = Date.now();
-            })}
-     else{ console.log('сервером получено сообщение от клиента: '+ message);} 
-     clients.push({wsConnection:wsConnection, lastkeepalive:Date.now()});
-
-     receivedBytes += message.length;              
-    // console.log(`Received ${receivedBytes} bytes.`);             
-     wsConnection.send(`Received ${receivedBytes} bytes.`);               
+let clientMes='';
+server.on('connection', (wsConnection, req) => { 
+  wsConnection.on('connection', (wsConnection, req) =>{  
+       // wsConnection.on('message', (message, isBinary) => {
+            console.log(`server received: ${message}`);
+            if(message === 'KEEP_ME_ALIVE'){
+                    clients.forEach(client =>{
+                        if(client.connection ===connection)
+                            client.lastkeepalive = Date.now();
+                    })
+                clients.push({wsConnection:wsConnection, lastkeepalive:Date.now()});    
+                }
+            else if(message === 'close'){      
+                client.lastkeepalive =null;
+            } 
+          //  else{
+                console.log('doshel');
+                const duplex = createWebSocketStream(wsConnection, { encoding: 'utf8' });
+                duplex.on('error', console.error);
+                duplex.on('data', () =>{wsConnection.send('dfhdfh');})
+               // duplex.pipe(process.stdout);
+                process.stdin.pipe(duplex);
+                //console.log(process);
+                console.log("duplex", duplex);
+                client.send(msg, {binary: isBinary});
+                 wsConnection.send('process');
+          //  }
+   
+/*    {
+try {
+  // сообщение пришло текстом, нужно конвертировать в JSON-формат
+        const jsonMessage = JSON.parse(message);
+        switch (jsonMessage) {
+            case 'ECHO':
+            server.send(jsonMessage.data);
+            break;
+            case 'PING':
+            setTimeout(function() {
+                server.send('PONG');
+            }, 2000);
+            break;
+            default:
+            console.log('Неизвестная команда');
+            break;
+        }
+        } catch (error) {
+        console.log('Ошибка', error);
+        }}*/
     });   
-
-  wsConnection.send('got your message!');
-});
+     wsConnection.send('got your message!');
+});//});
 setInterval(()=>{
-    timer = timer+1;
+    timer = timer + 1;
     clients.forEach(client => {
-        if((Date.now() - client.lastkeepalive)>12000){
+      //  console.log('raznica  ',Date.now() - client.lastkeepalive);
+        if((Date.now() - client.lastkeepalive)>150000){ //5минут300000
             client.wsConnection.terminate();
             client.wsConnection =null;
         }
@@ -63,53 +181,42 @@ setInterval(()=>{
     });
     clients = clients.filter(client => client.wsConnection);
 }, 3000);
-/*let clients = [];
-let timer = 0;
-server.on('connection',connection =>{
-    connection.send('hello from server to client! timer: ' + timer);
-    connection.on('message', message =>{
-       // console.log(message);
-        if(message === 'KEEP_ME_ALIVE'){
-            clients.forEach(client =>{
-                if(client.connection ===connection)
-                    client.lastkeepalive = Date.now();
-            });
-        }
-        else
-            console.log('сервером получено сообщение от клиента: '+ message);
-    });
-    clients.push({connection:connection, lastkeepalive:Date.now()});
-});
-setInterval(()=>{
-    timer++;
-    clients.forEach(client => {
-      //  console.log('client', Date.now()- client.lastkeepalive);
-        if((Date.now() - client.lastkeepalive)>12000){
-            client.connection.terminate();
-            client.connection =null;
-        }
-        else
-        client.connection.send('timer=' + timer);
-    });
-    clients = clients.filter(client => client.connection);
-}, 3000);*/
 
 //HTTP
 app.options("/upload", function (request, response) {
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    response.send();
+    response.send(); 
 });
 
 
 const serviceDownFiles = upload.fields([{name:'file', maxCount:1}]);
+
 //загрузка файла на сервер
 app.post("/upload", serviceDownFiles ,function (request, response) {
   response.setHeader("Access-Control-Allow-Origin", "*");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     let filedata = request.body;
-  //  console.log('filedata',request.files);
+    const totalBytes = parseInt(request.headers['content-length'], 10);
+    console.log(`Progress: ${totalBytes}`);
+   if(request.files.file[0])
+   {
+    var flag = 10; //шаг отображения загрузки в процентах
+    var uploadedBytes = 0;
+    var readableStream = fs.createReadStream(request.files.file[0]['destination'] + '/'+ request.files.file[0]['filename'],{encoding: 'utf8'});
+    readableStream.on('data', chunk => {
+        uploadedBytes += chunk.length;
+        const filePogress = (uploadedBytes / totalBytes) * 100;
+        if(filePogress - flag > 0)
+        {
+            console.log(`Progress: ${filePogress.toFixed(2)}%`);
+            flag += 10;
+            clientMes = filePogress.toFixed(2);
+        }
+    });
+   }
+
     try{
        let fname = request.files.file[0]["filename"];
        let fOrname =decodeURI(filedata["fileOrigName"]);
@@ -223,51 +330,5 @@ try{
     }
      catch(err){console.log(err)};
 });    
-/*
-async function feadF(file_path) {
-  const mime_type = mime.lookup(file_path); 
-     let data =await  fs.readFileSync(file_path); 
-     let sendData = await readData(data); 
-  //console.log(mime_type);
-  if(mime_type.includes('image'))   //если возвращается картинка
-    {
-     console.log('if img');
-     const arrayBuffer = await data.arrayBuffer();
-     const base64data = Buffer.from(arrayBuffer).toString("base64");
-     const dataUrl = `data:${mime_type};base64,${base64data}`
-     //const dataUrl = `data:${res.headers.get("content-type")};base64,${base64data}`
-     const pic = JSON.stringify(dataUrl, null, 2);
-     return JSON.parse(pic);
-     //   console.log('resObj.body', resObj.body);
-    }
-  else //если возвращается не картинка
-    {
-    return await sendData;
-    } 
-}*/
-/*
-async function readData(data){
- try{
-  const chunks = [];
-    const buffers = []; // буфер для получаемых данных
-    for await (const chunk of data) {
-      buffers.push(chunk);        // добавляем в буфер все полученные данные
-    }
-    const chunksAll = Buffer.concat(buffers);
-    let position = 0;
-    for(let chunk of chunks) {
-      chunksAll.set(chunk, position); 
-      position += chunk.length;
-    }
-    let result = new TextDecoder("utf-8").decode(chunksAll);
 
-    //console.log("result");
-    return result;
- }
- catch(er){
-  console.log(' getReqerror', er);
- }  
-    }*/
-
-
-app.listen(8181, ()=>console.log("Сервер запущен по адресу http://localhost:8181"));
+app.listen(8181, port, ()=>console.log(`Сервер запущен по адресу http://localhost:8181, ${host}`));
