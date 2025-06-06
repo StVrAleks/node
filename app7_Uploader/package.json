@@ -12,6 +12,9 @@
         "node-events": "0.0.2",
         "node-fetch": "^3.3.2",
         "readline-sync": "^1.4.10",
+        "socket.io": "^4.8.1",
+        "websocket-stream": "^5.5.2",
+        "winston": "^3.17.0",
         "ws": "^8.18.2"
     }
 }
