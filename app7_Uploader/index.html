@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <title>Upload</title>
+  <!--<script src="/node_modules/socket.io/client-dist/socket.io.js"></script>--> 
     <link rel="stylesheet"  href="/css/style.css">
     <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon.png">
 </head>
 <body>
  
-
 <div id="conteiner">
 <div name="left_conteiner" id="leftPart"><h3>Загруженные файлы</h3></div>
 <div name="right_conteiner" id="rightPart">
@@ -17,53 +17,140 @@
     <input type="file" name="ChoiseFile" id="newFile"/><br><br>
     <input type="text" placeholder="your comment" id="newComment">
     <input type="submit" value="Send" onclick="addFile();"/>
-    <div id="loadSteps">Идет загрузка файла >> получено:  <span id="nextStep"></span> из <span id="allSteps"></span></div>
+   <!-- <div id="loadSteps">Идет загрузка файла >> получено:  <span id="nextStep"></span>%</span></div>   -->
+     <div id="ws-mes-conteiner"><div id="ws-mes"></div></div>
 </div>
 </div>    
 </body>
 
 <script>
+
 //socet
 const url = 'ws://localhost:8180';
 let connection = new WebSocket(url);
+/*
+(function () {
+    const messages = document.getElementById('ws-mes');
+    const wsOpen = document.getElementById('idAddFile');
+
+    function showMessage(message){
+        if(!messages)
+            {return;}
+
+        messages.innerHTML +=`${message}`; 
+    }
+    function closeConnection(){
+        if(!!ws)
+            ws.close();
+    }
+    wsOpen.addEventListener('click', () => {
+
+        ws = new WebSocket('ws://localhost:8180');
+        ws.addEventListener('error', () =>{
+            showMessage('WebSocket error', error);
+        });
+        ws.addEventListener('open', () =>{
+            showMessage('WebSocket connection open');
+        });
+        ws.addEventListener('close', () =>{
+            showMessage('WebSocket connection close');
+        });
+        ws.addEventListener('message', (event) =>{
+            showMessage('WebSocket message', event.data);
+        });
+    });
+
+    wsClose.addEventListener('click', closeConnection);
+})();*/
 
 
 connection.addEventListener('open', (event) => { 
+const status = document.getElementById('ws-mes');    
+let keepAliveTimer=setInterval(()=>{
+    connection.send('KEEP_ME_ALIVE');
+}, 3000);
   connection.send('hello from client to server!'); 
+status.addEventListener('change', nextStep);
 }); 
 
 connection.addEventListener('message', (event) => { 
-  console.log('Клиентом получено сообщение от сервера:', event.data); 
-  const data = event.data;
+ // console.log('Клиентом получено сообщение от сервера:', event.data); 
+ // const data = event.data;
 
     // Обновляем элемент формы
-    document.getElementById('nextStep').innerText = data;
+  //  console.log('Получено от сервера', data);
+ /*   if(event.data === 'got your message!')
+        console.log('Получено от сервера', data);
+    else{
+        document.getElementById('loadSteps').style.opacity = 1;
+        document.getElementById('nextStep').innerText = data;
+    }  */
+   // document.getElementById('loadSteps').style.opacity = 0;  
+   console.log(event.data)
+   nextStep(event);
 });
+
+function nextStep(event){
+    if(!event)
+       {return;}
+    const data = event.data;   
+    console.log('Получено от сервера', data);
+    if(event.data !== 'got your message!')
+     {
+        console.log(event.data);
+        document.getElementById('ws-mes').style.width = event.data + 'px';
+        connection.send('next step'); 
+     }
+
+   // messages.innerHTML +=`${data}`; 
+}
 
 connection.addEventListener('error', (event) => { 
   console.log('Websocet error: ', error); 
 });
 
-connection.onclose = () => { 
+connection.addEventListener('close', (event) => { 
+//connection.onclose = () => { 
   console.log('Соединение закрыто'); 
   connection = null;
-    clearInteval(keepAliveTimer);
-};
-let keepAliveTimer=setInterval(()=>{
-    connection.send('KEEP_ME_ALIVE');
-}, 5000);
-async function addFile() {
+  clearInteval(keepAliveTimer);
+  connection.send('close'); 
+});
 
+
+/*const myWs = new WebSocket('ws://localhost:9000');
+// обработчик проинформирует в консоль когда соединение установится
+connection.onopen = function () {
+  console.log('подключился');
+};
+// обработчик сообщений от сервера
+connection.onmessage = function (message) {
+  console.log('Message: %s', message.data);
+};*/
+// функция для отправки echo-сообщений на сервер
+function wsSendEcho(value) {
+  connection.send(JSON.stringify({action: 'ECHO', data: value.toString()}));
+}
+// функция для отправки команды ping на сервер
+function wsSendPing() {
+  connection.send(JSON.stringify({action: 'PING'}));
+}
+
+
+
+
+async function addFile() {
      let comment = document.getElementById('newComment').value;
      let formData=new FormData();
      formData.append("comment",comment);
      formData.append("file",document.getElementById("newFile").files[0]);
      formData.append("fileOrigName",encodeURI(document.getElementById("newFile").files[0]['name']));
-    document.getElementById('loadSteps').style.opacity = 1;
-    document.getElementById('allSteps').style.innerHTML = document.getElementById("newFile").files[0]['size'];
-    let intervalId = setInterval(()=>{
-        connection.send(document.getElementById("newFile").files[0]['size']);
-    },100);
+   
+  
+    let sizeFil=document.getElementById("newFile").files[0]['size'];
+
+    connection.send(document.getElementById("newFile").files[0]); 
+
 
      const fetchOptions={
            method: "post",
@@ -73,12 +160,10 @@ async function addFile() {
     const response=await fetch('/upload',fetchOptions);
     const data=await response.text()
           .then(async()=>{
-            clearInterval(intervalId);
+           // clearInterval(intervalId);
             let allOldBut = await allCurBut();
-             document.getElementById('loadSteps').style.opacity = 0;    
              document.getElementById('newFile').value='';         
           });
-  //  console.log(data,'-45');
 }
 
 async function allCurBut() {
