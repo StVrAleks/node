@@ -17,7 +17,6 @@
     <input type="file" name="ChoiseFile" id="newFile"/><br><br>
     <input type="text" placeholder="your comment" id="newComment">
     <input type="submit" value="Send" onclick="addFile();"/>
-   <!-- <div id="loadSteps">Идет загрузка файла >> получено:  <span id="nextStep"></span>%</span></div>   -->
      <div id="ws-mes-conteiner"><div id="ws-mes"></div></div>
 </div>
 </div>    
@@ -28,82 +27,37 @@
 //socet
 const url = 'ws://localhost:8180';
 let connection = new WebSocket(url);
-/*
-(function () {
-    const messages = document.getElementById('ws-mes');
-    const wsOpen = document.getElementById('idAddFile');
 
-    function showMessage(message){
-        if(!messages)
-            {return;}
-
-        messages.innerHTML +=`${message}`; 
-    }
-    function closeConnection(){
-        if(!!ws)
-            ws.close();
-    }
-    wsOpen.addEventListener('click', () => {
-
-        ws = new WebSocket('ws://localhost:8180');
-        ws.addEventListener('error', () =>{
-            showMessage('WebSocket error', error);
-        });
-        ws.addEventListener('open', () =>{
-            showMessage('WebSocket connection open');
-        });
-        ws.addEventListener('close', () =>{
-            showMessage('WebSocket connection close');
-        });
-        ws.addEventListener('message', (event) =>{
-            showMessage('WebSocket message', event.data);
-        });
-    });
-
-    wsClose.addEventListener('click', closeConnection);
-})();*/
-
-
-connection.addEventListener('open', (event) => { 
-const status = document.getElementById('ws-mes');    
+connection.addEventListener('open', (event) => {   
 let keepAliveTimer=setInterval(()=>{
     connection.send('KEEP_ME_ALIVE');
 }, 3000);
+  connection.send(JSON.stringify({'type':"request_connection_id"}));
   connection.send('hello from client to server!'); 
-status.addEventListener('change', nextStep);
 }); 
 
 connection.addEventListener('message', (event) => { 
- // console.log('Клиентом получено сообщение от сервера:', event.data); 
- // const data = event.data;
+   
+   console.log(event.data);
+   if (event.data.includes("type")) {
+    // Получаем идентификатор от сервера
+    const message = JSON.parse(event.data);
+    const connectionId = message.type;
+    // Сохраняем идентификатор
+    localStorage.setItem("connectionId", connectionId); // или в любое другое место хранения
 
-    // Обновляем элемент формы
-  //  console.log('Получено от сервера', data);
- /*   if(event.data === 'got your message!')
-        console.log('Получено от сервера', data);
-    else{
-        document.getElementById('loadSteps').style.opacity = 1;
-        document.getElementById('nextStep').innerText = data;
-    }  */
-   // document.getElementById('loadSteps').style.opacity = 0;  
-   console.log(event.data)
-   nextStep(event);
+    console.log("Connection ID:", connectionId);
+   }
+   if(event.data === "0")
+        document.getElementById("ws-mes-conteiner").style.opacity = 0;    
+   if(!event.data.includes('timer') && event.data != "0" && !event.data.includes('type'))
+     { 
+        document.getElementById("ws-mes-conteiner").style.opacity = 1; 
+        document.getElementById('ws-mes').style.width = event.data + 'px'; 
+        document.getElementById('ws-mes').innerHTML = event.data + '%';
+
+    }
 });
-
-function nextStep(event){
-    if(!event)
-       {return;}
-    const data = event.data;   
-    console.log('Получено от сервера', data);
-    if(event.data !== 'got your message!')
-     {
-        console.log(event.data);
-        document.getElementById('ws-mes').style.width = event.data + 'px';
-        connection.send('next step'); 
-     }
-
-   // messages.innerHTML +=`${data}`; 
-}
 
 connection.addEventListener('error', (event) => { 
   console.log('Websocet error: ', error); 
@@ -114,53 +68,40 @@ connection.addEventListener('close', (event) => {
   console.log('Соединение закрыто'); 
   connection = null;
   clearInteval(keepAliveTimer);
+  localStorage.removeItem("connectionId");
   connection.send('close'); 
 });
 
 
-/*const myWs = new WebSocket('ws://localhost:9000');
-// обработчик проинформирует в консоль когда соединение установится
-connection.onopen = function () {
-  console.log('подключился');
-};
-// обработчик сообщений от сервера
-connection.onmessage = function (message) {
-  console.log('Message: %s', message.data);
+/*
+
+function getUniqueID() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
+    return s4() + s4() + '-' + s4();
 };*/
-// функция для отправки echo-сообщений на сервер
-function wsSendEcho(value) {
-  connection.send(JSON.stringify({action: 'ECHO', data: value.toString()}));
-}
-// функция для отправки команды ping на сервер
-function wsSendPing() {
-  connection.send(JSON.stringify({action: 'PING'}));
-}
-
-
-
 
 async function addFile() {
      let comment = document.getElementById('newComment').value;
+     let clID = localStorage.getItem("connectionId");
+     console.log("clID", clID);
      let formData=new FormData();
      formData.append("comment",comment);
      formData.append("file",document.getElementById("newFile").files[0]);
      formData.append("fileOrigName",encodeURI(document.getElementById("newFile").files[0]['name']));
-   
+      formData.append("clID",clID);  
   
     let sizeFil=document.getElementById("newFile").files[0]['size'];
+    document.getElementById("ws-mes-conteiner").style.opacity = 1;
 
-    connection.send(document.getElementById("newFile").files[0]); 
-
-
-     const fetchOptions={
+    const fetchOptions={
            method: "post",
-       //    headers: {'Content-Type': 'application/x-www-form-urlencoded',},
-           body: formData,
+           body: formData
            };
     const response=await fetch('/upload',fetchOptions);
     const data=await response.text()
           .then(async()=>{
-           // clearInterval(intervalId);
             let allOldBut = await allCurBut();
              document.getElementById('newFile').value='';         
           });
@@ -171,15 +112,13 @@ async function allCurBut() {
    const response = await fetch('/viewFiles', {method: 'POST'});
    const data = await response.json()
    .then(async (data) =>{
-       // console.log('Получили данные и передали-53', data);
         const res = await fetch('/readInfo',{
                     method: 'POST',
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({"data1": data})
                 });
         const info = await res.json()
-        .then((info) => {
-     //   console.log('Получили данные2-61',info);  
+        .then((info) => { 
         if(info)
         {
          var leftPartBut = document.getElementsByClassName('button_class');
@@ -225,7 +164,6 @@ async function name1() {
    const response = await fetch('/viewFiles', {method: 'POST'});
    const data = await response.json()
    .then(async (data) =>{
-      //  console.log('Получили данные и передали-106', data);
         const res = await fetch('/readInfo',{
                     method: 'POST',
                     headers: { "Content-Type": "application/json" },
@@ -233,7 +171,6 @@ async function name1() {
                 });
         const info = await res.json()
         .then((info) => {
-       // console.log('Получили данные2-114',info);  
         if(info)
         {
             var leftP = document.getElementById('leftPart');
@@ -246,7 +183,6 @@ async function name1() {
                 newBut[key].className = 'button_class';
                 newBut[key].value = '⤓ '+ info["0"][key];
                 newBut[key].id = 'download_' + info["len"][key];
-                console.log('tut');
                 newSpan[key] = document.createElement('span'); 
                 newSpan[key].innerHTML =  info["1"][key];
                 leftP.appendChild(newSpan[key]);                
