@@ -11,6 +11,7 @@
         "node-event": "0.0.0",
         "node-events": "0.0.2",
         "node-fetch": "^3.3.2",
+        "node-localstorage": "^3.0.5",
         "readline-sync": "^1.4.10",
         "socket.io": "^4.8.1",
         "websocket-stream": "^5.5.2",
