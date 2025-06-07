@@ -21,3 +21,16 @@
 #loadSteps{
     opacity: 0;
 }
+#ws-mes{
+    background-color: green;
+    width: 0;
+    height: 25px;
+}
+#ws-mes-conteiner{
+    height: 25px;
+    width: 100px;
+    border: 1px solid grey;
+    opacity: 0;
+    margin-top: 15px;
+    margin-left: 15px;
+}
