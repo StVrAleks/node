@@ -1,0 +1,269 @@
+:root
+ {
+    --lookbook-style-2-border-radius: .5rem;
+}
+:root {
+    --font-family-1: "DIN Next", sans-serif;
+    --font-family-2: "DIN Next", sans-serif;
+    --font-body-family: "DIN Next", sans-serif;
+    --font-body-size: 14px;
+    --font-body-weight: 400;
+    --body-line-height: 22px;
+    --body-letter-spacing: .03em;
+    --font-heading-family: "DIN Next", sans-serif;
+    --font-heading-size: 18px;
+    --font-heading-weight: 400;
+    --font-heading-style: normal;
+    --heading-line-height: 24px;
+    --heading-letter-spacing: .04em;
+    --heading-text-transform: capitalize;
+    --heading-border-height: 2px;
+    --font-menu-lv1-family: "DIN Next", sans-serif;
+    --font-menu-lv1-size: 18px;
+    --font-menu-lv1-weight: 500;
+    --menu-lv1-line-height: 22px;
+    --menu-lv1-letter-spacing: .04em;
+    --menu-lv1-text-transform: uppercase;
+    --font-menu-lv2-family: "DIN Next", sans-serif;
+    --font-menu-lv2-size: 14px;
+    --font-menu-lv2-weight: 400;
+    --menu-lv2-line-height: 22px;
+    --menu-lv2-letter-spacing: .02em;
+    --menu-lv2-text-transform: capitalize;
+    --font-menu-lv3-family: "DIN Next", sans-serif;
+    --font-menu-lv3-size: 14px;
+    --font-menu-lv3-weight: 400;
+    --menu-lv3-line-height: 22px;
+    --menu-lv3-letter-spacing: .02em;
+    --menu-lv3-text-transform: capitalize;
+    --font-mega-menu-lv2-family: "DIN Next", sans-serif;
+    --font-mega-menu-lv2-size: 14px;
+    --font-mega-menu-lv2-weight: 600;
+    --font-mega-menu-lv2-style: normal;
+    --mega-menu-lv2-line-height: 22px;
+    --mega-menu-lv2-letter-spacing: .02em;
+    --mega-menu-lv2-text-transform: uppercase;
+    --font-mega-menu-lv3-family: "DIN Next", sans-serif;
+    --font-mega-menu-lv3-size: 14px;
+    --font-mega-menu-lv3-weight: 400;
+    --mega-menu-lv3-line-height: 22px;
+    --mega-menu-lv3-letter-spacing: .02em;
+    --mega-menu-lv3-text-transform: capitalize;
+    --product-title-font: "DIN Next", sans-serif;
+    --product-title-font-size: 14px;
+    --product-title-font-weight: 400;
+    --product-title-line-height: 22px;
+}
+.header{
+   display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    font-size: 30px;
+    font-weight: 900;
+}
+
+.header__logo{
+    display: flex;
+    flex-direction: row;
+    width: 320px;
+    height: 50px;
+    font-size: 47px;
+}
+.header-single-line{
+     padding-top: 15px; 
+     padding-bottom: 0px; 
+     background-color: #ffffff; 
+     --header-text-transform: capitalize;
+}
+.search__button {
+    min-width: inherit;
+    text-overflow: unset;
+    padding: 1px 10px 4px;
+    border-radius: 0;
+    min-height: 30px;
+    background: transparent;
+    box-shadow: none;
+    border: 0;
+    background-color: #f9f9f9;
+}
+.userActivites{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+}
+/*поиск*/
+.field {
+    display: flex;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    background: #f9f9f9;
+    color: #323232;
+    --search-icon-color: #323232;
+    border-radius: 0px;
+    --spacing-l-r: 0px;
+    padding-top: 15px;
+    padding-bottom: 0px;
+    background-color: #ffffff;
+    --header-text-transform: capitalize;    
+}
+.search__input{
+    font-size: calc(var(--font-body-size) + 2px);
+    width: calc(100% - 50px);
+    padding: 10px 18px;
+    background-color: transparent;
+    border: 0;
+}
+.field__input{
+    flex-grow: 1;
+    background-color: #f9f9f9;
+    padding-top: 15px;
+    padding-bottom: 0px;
+    height: auto;
+}
+svg.icon-search {
+    width: 20px;
+    height: 26px;
+    transform: none;
+    position: relative;
+    top: 1px;
+    margin: 0 6px 0 0;
+    color: #323232;
+}
+
+.header__icon
+ {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 0;
+    letter-spacing: 0;
+    line-height: 1;
+    width: auto;
+    position: relative;
+}
+.header__group
+ {
+    min-width: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #232323
+}
+.cart-count-bubble{
+right: 0;
+    line-height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    font-size: 10px;
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    background-color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    border-radius: 50%;
+    display: inline-block !important;
+    vertical-align: middle;
+    top: 2px;
+}
+.text{
+    line-height: 13px;
+    font-size: 10px;
+    color: #ffffff;
+    align-items: center;
+    display: inline-block !important;
+    vertical-align: middle;
+    box-sizing: inherit;
+    padding-top: 1px;
+    padding-left: 3px;
+    text-transform: capitalize;
+}
+.icon:hover{
+    transition: all 0.3s ease;
+    transform: scale(1.2);
+}
+/*footer*/
+footer{
+    position: absolute;
+    top: calc(100vh - 70px);
+
+}
+#footer_contact{
+    width: 99vw;
+    height: 70px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    font-size: 20px;
+    font-weight: 600;
+    position: relative;
+   /* background-color: #aca8a8;*/
+    z-index: 5;
+    opacity: 0.5;
+}
+footer > img{
+    display: none;
+    position: absolute;
+    top: -52px;
+    z-index: 1;
+    width: 99vw;
+    height: 120px;
+    padding: 0;
+    margin: 0;
+}
+#conteiner{
+    position: relative;
+}
+#main_conteiner{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 4%);
+    display: block;
+    width: 32%;
+    height: 39vh;
+}
+/*Panel*/
+#single_line{
+    height: 30px;
+    width: 99vw;
+    display: flex;
+    flex-direction: row;
+    font-weight: 500;
+    padding-top: 10px;
+    font-size: 20px;
+    align-items: center;
+}
+#single_line_catalog{
+    padding: 0 15px;
+}
+#autentif{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 40vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 150px;
+    width: 32%;/*280px;*/
+}
+.main_button{
+    width: 100%;
+    background-color: #53AE42;
+    border-radius: 10px;
+    height: 40px;
+    color: white;
+    font-weight: 600;
+    font-size: 17px;
+}
+#autorization{
+    width: 40%;
+}
+#registration{
+    width: 70%;
+}
+#guest{
+    width: 100%;
+}
