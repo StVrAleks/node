@@ -1,0 +1,162 @@
+
+  .textMeta{
+      display: block;
+      font-size: 14px;
+      color: grey;
+    }
+  #conteiner_services{
+        max-width: 800px;
+        margin: 0;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        position: absolute;
+        left:50%;
+        transform: translate(-50%, 50px);
+    }
+    label, p, #service_add, #pageView{
+        font-size: 16px;
+        color: #333;
+        display: block;
+        margin-bottom: 8px;
+    }
+    #service_add, #pageView
+    {
+    height: 40px;
+    line-height: 40px;
+    }
+    #addNewItemFlower_but, #addNewVidItem_but{
+      background: none;
+      border: none;
+      color: #545489;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #control_services{
+      display: flex;
+      flex-direction: row;
+      max-width: 50%;
+      max-height: 45px;
+    }
+  .mistake{
+    color: red;
+    font-size: 18px;
+    font-weight: 600;
+    padding-bottom: 20px;
+  }
+  #control_table th, #control_table tr, #control_table tr td{
+    border-collapse: collapse;
+    border: 1px solid black;
+    padding: 4px;
+   } 
+   #control_table tr:nth-child(2n + 1){
+    background-color: white;/*rgba(167, 192, 175, 0.3);*/
+    border: 1px solid #999;
+   }
+   #control_table{
+        width: auto;
+        border-collapse: collapse;
+        position: relative;
+        margin-top: 20px;
+  }
+  .hystmodal > tbody > tr >td{
+    font-size: 18px;
+    font-weight: 700;
+    padding: 6px;
+  }
+    .hystmodal{
+      padding-bottom: 40px;
+    }
+    #control_modal{
+      padding-left: 30px;
+    }
+#control_services_flower, #control_services_vid, #control_services_user,
+#control_modal_save, .control_modal_close{
+    background-color: #4caf50;
+    color: white;
+    padding: 12px 20px;
+    margin-right: 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: backgraund-color 0.3s;
+}
+
+#control_services_flower:hover, #control_services_vid:hover, #control_services_user:hover,
+#control_modal_save:hover, .control_modal_close:hover
+{
+background-color: #45a049;
+border: 1px solid #333;
+}
+
+.class_control_button{
+    background:none;
+    border:none;
+    color: red;
+    text-decoration:underline;
+    cursor:pointer;
+    margin:0;
+    padding:0;
+}
+#myModal, #myModalVid, #myModalFlower, #myModalDisc, #myModalImg{
+  background-color: #FFFFFF;
+  border: 1px solid rgb(168, 163, 163);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-collapse: separate;
+    box-sizing: border-box;
+    text-indent: initial;
+    unicode-bidi: isolate;
+    display: none;
+}
+#myModal > tbody{
+    display: table-row-group;
+    vertical-align: middle;
+    unicode-bidi: isolate;
+    border-color: inherit;
+    /*opacity: 0.4;
+    background-color: #999;*/
+}
+.hystmodal {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 50%;
+    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center; 
+    align-items: center;
+    z-index: 99;
+    padding:30px 0;
+    font-size: 16px;
+    width: 450px;
+    height: 1px;
+    transform: translateX(-225px);
+}
+.inputInfo{
+  width: 100%; 
+ /* height: auto;*/
+  resize: none;
+ /* margin: 10px 0;*/
+
+}
+#table_myModalImg{width: 100%;}
+.pageControl{
+  font-weight: 600;
+  color: black;
+  margin-top: 15px;
+}
+#control_admin{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+#numPage{
+  width: 20px;
+  text-align: center;
+}

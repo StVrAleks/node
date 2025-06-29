@@ -1,0 +1,96 @@
+#conteiner{
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 15px;
+    margin: 0 auto;
+    padding-top: 40px;
+}
+.conteiner_items{
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, 225px);
+    justify-content: center;
+    justify-items: center;
+    margin: 0 auto;
+    column-gap: 30px;
+    row-gap:40px;
+    padding: 75px 0;
+}
+/*card*/    
+.card{
+    width: 225px;
+    min-height: 350px;  
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+    position: relative;
+    transition: 0.2s;
+}
+
+.card:hover{
+    box-shadow: 4px 8px 16px rgba(123, 187, 5, 0.2);
+    cursor: pointer;
+}
+.card__top{
+    flex: 0 0 220px;
+}
+.card__botoom{
+    flex: 1 0 auto;
+    padding: 10px;
+}
+.title_goods{
+    position: relative;
+    bottom: 10px;
+    left: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 400;
+    font-size: 16px;
+}
+.price{
+    font-size: 16px;
+    font-weight: 800;
+}
+.cardGood, .like_good, .watch{
+    position: relative;
+    background-color: white;
+    display: block;
+    height: 30px;
+    cursor: pointer;
+}
+.like_good{
+    display: block;
+    width: 25px;
+}
+.card_control{
+    position: relative;    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 40px;
+}
+
+.card_control > svg.icon.icon-cart.stroke-w-5{
+    position: absolute !important;
+    left:8px;
+    top: -9px;
+}
+
+div.card_control > svg.icon.icon-wishlist.w-h-{
+    position: absolute;
+    left: 197px;
+    top: -8px;
+}
+.imgs_goods{
+    width: inherit;
+    height: 225px;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+}
+.watch{
+    background: white;
+    cursor: pointer;
+    height: 30px;
+}

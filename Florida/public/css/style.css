@@ -184,8 +184,10 @@ right: 0;
 }
 /*footer*/
 footer{
-    position: absolute;
-    top: calc(100vh - 70px);
+    position: relative;
+    margin-top: 50px;
+    bottom: 40px;
+    /*top: calc(100% - 70px);*/
 
 }
 #footer_contact{

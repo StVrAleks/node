@@ -1,12 +1,23 @@
 
 
+  
   <div id="conteiner" >
      <img id='main_conteiner' src="/images/shop.jpg" alt="shops">
     <div id="autentif">
-        <input id="autorization" class="main_button" type="button" value="Авторизироваться">
-        <input id="registration" class="main_button" type="button" value="Загеристрироваться">
+        <input id="autorization" class="main_button" type="submit" value="Авторизироваться" onclick="loginUser();">
+        <input id="registration" class="main_button" type="button" value="Загеристрироваться" onclick="regUser();">
         <input id="guest" class="main_button" type="button" value="Я просто посмотреть">
      </div>
   </div>
+
+<script>
+function regUser(){
+   window.location.href = "/registration_user.html";
+}
+function loginUser(){
+   window.location.href = "/login_user.html";
+}
+</script> 
+
        
         

@@ -1,0 +1,1352 @@
+
+
+  <div id="conteiner" >
+    <div id="conteiner_services">
+     <div id="control_services">
+      <input type="button" id="control_services_flower" onclick="correctFlower();" value="Цветы">
+      <input type="button" id="control_services_vid" onclick="correctVid();" value="Виды цветов">
+      <input type="button" id="control_services_user" onclick="correctUsers();" value="Пользователи">
+     </div>
+     <div id="control_div_table">
+      <span id="mist3" class="mistake"></span>
+      <div id="control_admin">
+        <div id="service_add"></div>
+        <div id="pageView">
+            <input type="button" id="pre" class="pageControl" value="<<">
+            <input type="text" id="numPage" value="1" disabled>
+            <input type="button" id="next" class="pageControl" value=">>">
+        </div>
+       </div>
+        <table id="control_table"></table>
+     </div>
+    </div> 
+<!--добавить роли-->
+    <div class="hystmodal" id="myModal">
+      <div class="hystmodal__window">  
+          <span id="mist4"  class="mistake"></span>
+          <table id="myModalTable" style="padding-top: 25px;">
+            <tr>
+              <td>Имя пользователя</td>
+              <td id="modal_user_name"></td>
+            </tr>
+            <tr>
+              <td>Email пользователя</td>
+              <td  id="modal_user_email"></td>
+            </tr>
+            <tr>
+              <td>Роль пользователя</td>
+              <td ><input id="modal_user_role" type="text"></td>
+            </tr>
+            <tr>
+              <td>Статус пользователя</td>
+              <td id="modal_user_status"></td>
+            </tr>
+          </table>
+          <div id="control_modal">
+            <input type="button" id="control_modal_save" onclick="correctItem();" value="Сохранить">
+            <input type="button" class="control_modal_close" onclick="closeItem('myModal');" value="Отменить">
+          </div>
+      </div>
+    </div>
+<!--добавить вид-->
+     <div class="hystmodal" id="myModalVid">
+      <div class="hystmodal__window">  
+          <span id="mist5" class="mistake"></span>
+          <table id="myModalTable2">
+            <tr id="Itd">
+              <td>Id</td>
+              <td id="modal_vid_name"></td>
+            </tr>
+            <tr>
+              <td>Название вида</td>
+              <td id="modal_vid_name"><input id="modal_new_vid" type="text"> </td>
+            </tr>
+          </table>
+          <div id="control_modal_vid" style="padding-top: 40px;">
+           <!-- <div id="placeSave" ></div>
+            <input type="button" id="control_modal_save" onclick="correctItem();" value="Сохранить"> -->
+            <input type="button" class="control_modal_close" onclick="closeItem('myModalVid');" value="Отменить">
+          </div>
+      </div>
+    </div>
+<!--добавить цветок-->
+    <div class="hystmodal" id="myModalFlower">
+      <div class="hystmodal__window">  
+          <span id="mist6" class="mistake"></span>
+          <table id="myModalTableFlower">
+            <tr id="Itd2">
+              <td>ID</td>
+              <td id="modal_flower_id"></td>
+            </tr>
+            <tr>
+              <td>Вид</td>
+              <td><select id="modal_flower_vid_id"></select></td>
+            </tr>
+            <tr>
+              <td>Название</td>
+              <td ><input id="modal_flower_name" type="text"></td>
+            </tr>
+            <tr>
+              <td>Цена</td>
+              <td><input id="modal_flower_price" type="text"></td>
+            </tr>
+            <tr>
+              <td>mKey</td>
+              <td><input id="modal_flower_key" type="text"><span class="textMeta">Значение key для метатега </span></td>
+            </tr>   
+            <tr>
+              <td>mDiscription </td>
+              <td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение discription для метатега </span> </td>
+            </tr>                      
+          </table>
+          <div id="control_modal_flower">
+               <input type="button" class="control_modal_close" onclick="closeItem('myModalFlower');" value="Отменить">
+          </div>
+      </div>
+    </div>
+
+<!--добавить описание товара-->
+     <div class="hystmodal" id="myModalDisc">
+      <div class="hystmodal__window">  
+          <span id="mist7" class="mistake"></span>
+          <table id="table_myModalDisc">
+            <tr id="Itd2">
+              <td>ID товара</td>
+              <td id="modal_flower_id_info"></td>
+            </tr>
+            <tr>
+              <td>Название товара</td>
+              <td id="modal_flower_name_info"></td>
+            </tr>
+            </table>
+            <div id="flower_info">
+                <table id="table_flower_info"></table>
+            </div>
+            <div style="padding: 20px 0;">
+              <input type="button" id="adddiscFlower" class="control_modal_close" value="+ Добавить описание" onclick="addDiscr()">
+            </div>
+          <div id="control_modal_flower">    
+               <input type="button" class="control_modal_close" onclick = "updateItemFlowerInfo();" value = "Сохранить">              
+               <input type="button" class="control_modal_close" onclick = "closeItem('myModalDisc');" value = "Отменить">
+          </div>
+      </div>
+    </div>
+    <!---->
+    <div class="hystmodal" id="myModalImg" style="padding-top: 0;">
+      <div class="hystmodal__window">  
+      <div style="width: 100%;">
+        <div style="padding-left: 93%;">
+          <input type="button" name="close" value=" X " style="background-color: red; color: white; line-height: 20px; cursor:pointer;" onclick = closeItem('myModalImg');>
+        </div>
+      </div>  
+          <span id="mist8" class="mistake"></span>
+          <table id="table_myModalImg">
+            <tr id="Itd3">
+              <td>ID товара</td>
+            </tr>
+            <tr>
+              <td id="modal_flower_id_img"></td>
+            </tr>
+             <tr>
+              <td id="modal_flower_form">           
+            <h3>Загрузка файла</h3>
+                <input type="file" name="ChoiseFile" id="newFile"/><br><br>
+                <input type="submit" class="control_modal_close" value="Загрузить" onclick="addFile();"/>
+              </td>
+            </tr>          
+            </table>
+
+            <div id="flower_img">
+                <table id="table_flower_img"></table>
+            </div>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+
+
+function correctFlower(){
+  document.getElementById('control_services_user').style.border = 'none';
+  document.getElementById('control_services_vid').style.border = 'none';
+  document.getElementById('control_services_flower').style.border = '4px solid #333';
+  document.getElementById('service_add').style.display = 'block';
+  document.getElementById('pageView').style.display = 'block';
+
+  let controlAdd = document.getElementById('service_add');
+  let controlForAdd = document.getElementById('addNewItemFlower_but');
+    if(document.getElementById('addNewVidItem_but'))
+    {
+      let el = document.getElementById('addNewVidItem_but');
+      el.remove(el);      
+    }
+
+  if(controlForAdd === null)
+  {
+  var butAdd = document.createElement("input");
+      butAdd.type = 'button';
+      butAdd.id = 'addNewItemFlower_but';
+      butAdd.style.background = 'none';
+      butAdd.value = '⊕ Добавить товар(цветок)';
+  controlAdd.appendChild(butAdd);     
+  document.getElementById('addNewItemFlower_but').addEventListener('click', event => {addNewFlower(event)}, false);    
+  }
+
+
+ const localToken = localStorage.getItem('floweridaKey');
+  let table = document.getElementById('control_table'); 
+  while (table.rows.length > 0) {
+       table.deleteRow(0);
+     }
+
+  fetch('/api/flower/getAll',{
+        method: "GET",
+        headers: {"content-Type": "application/json", "Authorization": localToken}
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist3').innerHTML = data.mes || data.message;
+            else
+              {
+              console.log(data);
+              var trHead = document.createElement("tr");
+                  trHead.className = 'newTr'
+              //добавили заголовки
+              var tdHead0 = document.createElement("th");
+                  tdHead0.innerHTML = 'Удалить';
+                  trHead.appendChild(tdHead0); 
+              var tdHead1 = document.createElement("th");
+                  tdHead1.innerHTML = 'Изменить';
+                  trHead.appendChild(tdHead1); 
+              var tdHead2 = document.createElement("th");
+                  tdHead2.innerHTML = 'Id';
+                  trHead.appendChild(tdHead2); 
+              var tdHead3 = document.createElement("th");
+                  tdHead3.innerHTML = 'Название';
+                  trHead.appendChild(tdHead3);    
+              var tdHead4 = document.createElement("th");
+                  tdHead4.innerHTML = 'Цена';
+                  trHead.appendChild(tdHead4);  
+              var tdHead5 = document.createElement("th");
+                  tdHead5.innerHTML = 'Вид';
+                  trHead.appendChild(tdHead5);
+              var tdHead6 = document.createElement("th");
+                  tdHead6.innerHTML = 'Изображения';                      
+                  trHead.appendChild(tdHead6);
+              var tdHead7 = document.createElement("th");
+                  tdHead7.innerHTML = 'Описание';                      
+                  trHead.appendChild(tdHead7);  
+              var tdHead8 = document.createElement("th");
+                  tdHead8.innerHTML = 'mKeyWords';                      
+                  trHead.appendChild(tdHead8);                  
+              var tdHead8 = document.createElement("th");
+                  tdHead8.innerHTML = 'mDiscription';                      
+                  trHead.appendChild(tdHead8);                                      
+              document.getElementById('control_table').appendChild(trHead);  
+              if(data.rows.length > 0)
+              {
+                  for(var i=0; i < data.rows.length; i++)
+                    { 
+                      var num=i+1;
+                    var tr = document.createElement("tr");
+                        tr.className = 'newTr';
+                    var td1 = document.createElement("td");    
+                    var but1 = document.createElement("input");
+                        but1.type = 'button';
+                        but1.className = 'class_control_button';
+                        but1.value = 'Удалить запись';
+                        but1.id = 'butDelete'+num;
+                        td1.appendChild(but1);
+                        tr.appendChild(td1);                     
+                    var td2 = document.createElement("td");    
+                    var but2 = document.createElement("input");
+                        but2.type = 'button';
+                        but2.className = 'class_control_button';
+                        but2.value = 'Изменить запись';
+                        but2.id = 'butChange'+num;
+                        td2.appendChild(but2);
+                        tr.appendChild(td2); 
+                    var td3 = document.createElement("td");   
+                        td3.innerHTML = data.rows[i]['id'];
+                        tr.appendChild(td3); 
+                    var td4 = document.createElement("td");   
+                        td4.innerHTML = data.rows[i]['name']; 
+                        tr.appendChild(td4); 
+                    var td5 = document.createElement("td");     
+                        td5.innerHTML = data.rows[i]['price'];    
+                        tr.appendChild(td5); 
+                    var td6 = document.createElement("td");     
+                        td6.innerHTML = data.rows[i]['flowerVidId'];    
+                        tr.appendChild(td6);  
+                    var td7 = document.createElement("td");                         
+                    var but4 = document.createElement("input");
+                        but4.type = 'button';
+                        but4.className = 'class_control_button';
+                        but4.value = '⇓ Добавить фото';
+                        but4.id = 'butChangeImg'+num;
+                        td7.appendChild(but4);
+                        tr.appendChild(td7); 
+                    var td8 = document.createElement("td");                       
+                    var but5 = document.createElement("input");
+                        but5.type = 'button';
+                        but5.className = 'class_control_button';
+                        but5.value = '+ Добавить описание';
+                        but5.id = 'butChangeDisc'+num;
+                        td8.appendChild(but5);     
+                        tr.appendChild(td8);                   
+                    var td9 = document.createElement("td");     
+                        td9.innerHTML = data.rows[i]['mKeyWords'];           
+                        tr.appendChild(td9); 
+                    var td10 = document.createElement("td");     
+                        td10.innerHTML = data.rows[i]['mDiscript'];           
+                        tr.appendChild(td10);                                                            
+                    document.getElementById('control_table').appendChild(tr);    
+
+                    document.getElementById('butDelete'+num).addEventListener('click', event => {delItemFlower(event)}, false);    
+                    document.getElementById('butChange'+num).addEventListener('click', event => {changeItemFlower(event)}, false);    
+                    document.getElementById('butChangeImg'+num).addEventListener('click', event => {imgItemFlower(event)}, false);   
+                    document.getElementById('butChangeDisc'+num).addEventListener('click', event => {discItemFlower(event)}, false);                  
+                    } 
+              } 
+            }
+        }).catch((error)=> console.log(error));
+
+}
+function correctVid(){
+  document.getElementById('control_services_user').style.border = 'none';
+  document.getElementById('control_services_vid').style.border = '4px solid #333';
+  document.getElementById('control_services_flower').style.border = 'none';
+  document.getElementById('service_add').style.display = 'block';
+  document.getElementById('pageView').style.display = 'block';
+
+  let controlAdd = document.getElementById('service_add');
+  let controlForAdd = document.getElementById('addNewVidItem_but');
+
+  
+  let butNum = document.getElementById('numPage').value;
+  butNum = parseInt(butNum);
+  let butNext = document.getElementById('next');
+  let butPre = document.getElementById('pre');  
+  butNext.addEventListener('click', event =>{
+  document.getElementById('numPage').value = butNum + 1; 
+    correctVid();});
+  butPre.addEventListener('click', event =>{
+    if(butNum > 1)
+    {
+      document.getElementById('numPage').value = butNum - 1; 
+      correctVid();
+    }
+      });
+
+  if(document.getElementById('addNewItemFlower_but'))
+    {
+     let el = document.getElementById('addNewItemFlower_but');
+     el.remove(el);      
+    }
+
+  if(controlForAdd === null)
+  {
+  var butAdd = document.createElement("input");
+      butAdd.type = 'button';
+      butAdd.id = 'addNewVidItem_but';
+      butAdd.style.background = 'none';
+      butAdd.value = '⊕ Добавить вид';
+  controlAdd.appendChild(butAdd);     
+  document.getElementById('addNewVidItem_but').addEventListener('click', event => {addNewVid(event)}, false);    
+  }
+
+  const localToken = localStorage.getItem('floweridaKey');
+  let table = document.getElementById('control_table'); 
+  while (table.rows.length > 0) {
+       table.deleteRow(0);
+     }
+
+   fetch('/api/vid/getAll',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken},
+        body:JSON.stringify({'page': butNum})
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist3').innerHTML = data.mes || data.message;
+            else// if(data.authUser) 
+              {
+              console.log(data);
+              var trHead = document.createElement("tr");
+                  trHead.className = 'newTr'
+              //var trRez = new Array, tdRez = new Array;
+              //добавили заголовки
+              var tdHead1 = document.createElement("th");
+                  tdHead1.innerHTML = 'Удалить';
+                  trHead.appendChild(tdHead1);               
+              var tdHead1 = document.createElement("th");
+                  tdHead1.innerHTML = 'Изменить';
+                  trHead.appendChild(tdHead1); 
+              var tdHead2 = document.createElement("th");
+                  tdHead2.innerHTML = 'Id';
+                  trHead.appendChild(tdHead2); 
+              var tdHead3 = document.createElement("th");
+                  tdHead3.innerHTML = 'Вид';
+                  trHead.appendChild(tdHead3);    
+              document.getElementById('control_table').appendChild(trHead);                                     
+              for(var i=0; i < data.rows.length; i++)
+                { 
+                  var num=i+1;
+                var tr = document.createElement("tr");
+                    tr.className = 'newTr';
+                var td0 = document.createElement("td");    
+                var but0 = document.createElement("input");
+                    but0.type = 'button';
+                    but0.className = 'class_control_button';
+                    but0.value = 'Удалить запись';
+                    but0.id = 'delChange'+num;
+                    td0.appendChild(but0);
+                    tr.appendChild(td0);                     
+                var td1 = document.createElement("td");    
+                var but1 = document.createElement("input");
+                    but1.type = 'button';
+                    but1.className = 'class_control_button';
+                    but1.value = 'Изменить запись';
+                    but1.id = 'butChange'+num;
+                    td1.appendChild(but1);
+                    tr.appendChild(td1); 
+                var td2 = document.createElement("td");   
+                    td2.innerHTML = data.rows[i]['id'];
+                    tr.appendChild(td2); 
+                var td3 = document.createElement("td");   
+                    td3.innerHTML = data.rows[i]['name']; 
+                    tr.appendChild(td3);                    
+                document.getElementById('control_table').appendChild(tr);    
+                document.getElementById('butChange'+num).addEventListener('click', event => {vidChange(event)}, false);            
+                document.getElementById('delChange'+num).addEventListener('click', event => {vidDelete(event)}, false);            
+                }  
+              }
+        }).catch((error)=> console.log(error));
+}
+
+//Нажали Добавить новый товар - цветок
+function addNewFlower(event){
+
+  document.getElementById('myModalFlower').style.display = 'table';//block';
+  document.getElementById('myModalFlower').style.height = '400px';
+   document.getElementById('Itd2').style.display = 'none';
+  //document.getElementById('control_div_table').style.display = 'block';
+  document.getElementById('service_add').style.display = 'block';
+    document.getElementById('pageView').style.display = 'block';
+  const localToken = localStorage.getItem('floweridaKey');
+
+ fetch('/api/vid/getAll',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken}
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist6').innerHTML = data.mes || data.message;
+            else{
+             let vids = data;
+             let select = document.getElementById('modal_flower_vid_id');
+             console.log(data.rows.length);
+                for (var i = 0; i<data.rows.length; i++){
+                    var opt = document.createElement('option');
+                    opt.value = data.rows[i]['id'];
+                    opt.innerHTML = data.rows[i]['id'];
+                    select.appendChild(opt);
+                    console.log('+');
+                }
+            }
+          })
+
+   
+    document.getElementById('modal_flower_name').value = '';
+    document.getElementById('modal_flower_price').value = '';
+    // document.getElementById('modal_flower_vid').value = '';   
+    document.getElementById('modal_flower_key').value = '';
+    document.getElementById('modal_flower_mDis').value = '';    
+   if(document.getElementById('control_modal_save_flower'))
+      document.getElementById('control_modal_save_flower').remove;
+   if(document.getElementById('control_modal_save_flower1'))
+      document.getElementById('control_modal_save_flower1').remove;      
+
+  if(document.getElementById('control_modal_save_flower') === null)
+  {
+    let place = document.getElementById('control_modal_flower');
+      var butSave = document.createElement("input");
+      butSave.type = 'button';
+      butSave.value = 'Сохранить';
+      butSave.id = 'control_modal_save_flower';
+      butSave.className = 'control_modal_close';
+      place.appendChild(butSave);              
+  document.getElementById('control_modal_save_flower').addEventListener('click', event => {saveItemFlower();})
+  }
+
+}
+
+//сохранить цветок
+async function saveItemFlower() {
+const localToken = localStorage.getItem('floweridaKey');
+
+let name = document.getElementById('modal_flower_name').value;
+let price = document.getElementById('modal_flower_price').value;
+    // document.getElementById('modal_flower_vid').value = '';   
+let mKeyWords = document.getElementById('modal_flower_key').value;
+let mDiscript = document.getElementById('modal_flower_mDis').value;  
+let vidId = document.getElementById('modal_flower_vid_id').value;
+
+if(!name || !vidId)
+  document.getElementById('mist6').innerHTML = 'Не заполнено поле вид!';
+else{ 
+  fetch('/api/flower/create',{
+          method: "POST",
+          headers: {"content-Type": "application/json", "Authorization": localToken},
+          body: JSON.stringify({'name':name, 'price':price, 'vidId':vidId, 'mKeyWords':mKeyWords, 'mDiscript':mDiscript})
+          })
+          .then((response) => response.json())
+          .then(data =>{
+            if(data.mes || data.message)
+              document.getElementById('mist5').innerHTML = data.mes || data.message;
+            else 
+                {
+                correctFlower();
+                closeItem('myModalFlower');
+                }
+          });
+}
+}
+
+//Нажали Изменить товар - цветок
+function changeItemFlower(event){
+
+  document.getElementById('myModalFlower').style.display = 'block';
+  document.getElementById('myModalFlower').style.height = '400px';
+  const localToken = localStorage.getItem('floweridaKey');
+
+ fetch('/api/vid/getAll',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken}
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist7').innerHTML = data.mes || data.message;
+            else{
+              let select = document.getElementById('modal_flower_vid_id');
+              console.log(data.rows.length);
+                for (var i = 0; i<data.rows.length; i++){
+                    var opt = document.createElement('option');
+                    opt.value =  data.rows[i]['id'];
+                    opt.innerHTML = data.rows[i]['id'];
+                    select.appendChild(opt);
+                   // console.log('+');
+                }
+            }
+          })
+  
+
+    let trId = event.target.id;
+    let trNum = trId.replace('butChange', '');
+    trNum = parseInt(trNum) +1;
+   // console.log(trNum);
+
+    document.getElementById('modal_flower_id').innerHTML = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML || '';    
+    document.getElementById('modal_flower_name').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(4)').innerHTML || '';
+    document.getElementById('modal_flower_price').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(5)').innerHTML || '';
+     document.getElementById('modal_flower_vid_id').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(6)').innerHTML || '1';   
+    document.getElementById('modal_flower_key').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(9)').innerHTML || '';
+    document.getElementById('modal_flower_mDis').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(10)').innerHTML || '';    
+
+   if(document.getElementById('control_modal_save_flower1'))
+      document.getElementById('control_modal_save_flower1').remove;
+   if(document.getElementById('control_modal_save_flower'))
+      document.getElementById('control_modal_save_flower').remove;   
+
+if(document.getElementById('control_modal_save_flower1') === null)
+  {
+      let place = document.getElementById('control_modal_flower');
+      var butSave = document.createElement("input");
+      butSave.type = 'button';
+      butSave.value = 'Сохранить';
+      butSave.id = 'control_modal_save_flower1';
+      butSave.className = 'control_modal_close';
+      place.appendChild(butSave);              
+      document.getElementById('control_modal_save_flower1').addEventListener('click', event => {updateItemFlower();})
+  }
+}
+
+//нажали сохранить изменения в позицию цветок
+async function updateItemFlower(){
+    const localToken = localStorage.getItem('floweridaKey');
+    let id =document.getElementById('modal_flower_id').innerHTML;    
+    let name = document.getElementById('modal_flower_name').value;
+    let price = document.getElementById('modal_flower_price').value;
+    let vidId = document.getElementById('modal_flower_vid_id').value;   
+    let mKeyWords= document.getElementById('modal_flower_key').value;
+    let mDiscript = document.getElementById('modal_flower_mDis').value;
+
+fetch('/api/flower/change',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken},
+        body: JSON.stringify({'id':id, 'name':name, 'price':price, 'vidId':vidId, 'mKeyWords':mKeyWords, 'mDiscript':mDiscript})
+        })
+        .then((response) => response.json())
+        .then(data =>{
+          if(data.change === 'ok')
+          {
+             correctFlower();
+             closeItem('myModalFlower');
+          }  
+          else{
+            document.getElementById('mist6').innerHTML = data.mes || data.message;
+          }   
+        });
+}
+
+//Нажали Удалить новый товар - цветок
+function delItemFlower(event){
+   const localToken = localStorage.getItem('floweridaKey');
+  let trId = event.target.id;
+  console.log('trId', trId);
+  let trNum = trId.replace('butDelete', '');
+  trNum = parseInt(trNum) +1;  
+  let id = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML;
+ let flowerId = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(6)').innerHTML;
+//console.log('delID', id);
+
+ fetch('/api/vid/delete',{
+    method: "POST",
+    headers: {"content-Type": "application/json", "Authorization": localToken},
+    body: JSON.stringify({'flowerId':flowerId})
+    })
+    .then((response) => response.json())
+    .then(data =>{
+    if(data.mes || data.message)
+       document.getElementById('mist6').innerHTML = data.mes || data.message;
+    else 
+      {
+      fetch('/api/flower/delete',{
+          method: "POST",
+          headers: {"content-Type": "application/json", "Authorization": localToken},
+          body: JSON.stringify({'id':id})
+          })
+          .then((response) => response.json())
+          .then(data =>{
+            if(data.mes || data.message)
+              document.getElementById('mist6').innerHTML = data.mes || data.message;
+            else 
+                {
+                correctFlower();
+                closeItem('myModalFlower');
+                }
+          });
+      }
+      });
+}
+
+//Нажали Добавить-просмотреть фото товар - цветок
+function imgItemFlower(event, numId){
+    document.getElementById('myModalImg').style.display = 'block';
+    document.getElementById('myModalImg').style.height = '400px';
+let flowerId;
+
+if(!numId)
+{
+  let targetId = event.target.id;
+  let linkId = targetId.replace('butChangeImg', '');
+  linkId = parseInt(linkId)+1;  
+  console.log('1--', linkId);
+  flowerId = document.querySelector('#control_table > tr:nth-child('+linkId+') > td:nth-child(3)').innerHTML;
+  document.getElementById('modal_flower_id_img').innerHTML = flowerId;
+}
+else
+{
+  flowerId = numId;
+  document.getElementById('modal_flower_id_img').innerHTML = flowerId;
+}
+
+  flowerId = parseInt(flowerId);
+  console.log('flowerId',flowerId);
+    const table = document.getElementById('table_flower_img');
+    while (table.rows[0]) {
+        table.removeChild(table.rows[0]);
+    }
+
+//let flowerId = document.querySelector('#control_table > tr:nth-child('+linkId+') > td:nth-child(6)').innerHTML;
+
+
+const localToken = localStorage.getItem('floweridaKey');
+fetch('/api/imgs/getAll',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken},
+        body: JSON.stringify({'flowerId':flowerId})
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist8').innerHTML = data.mes || data.message;
+           else if(data.rows.length > 0) 
+             // console.log(data.rows.length);
+             for(var i=0; i<data.rows.length; i++)
+             {
+              console.log(data.rows[i]['img']);
+              addFileInTable();
+              document.getElementById('img' + (i+1)*3).src = '/imgStoreMINI/' + data.rows[i]['img'];
+              document.getElementById('spanName' + (i+1)*3).innerHTML = data.rows[i]['img'];
+              document.getElementById('spanID' + (i+1)*3).innerHTML = data.rows[i]['id'];              
+              document.getElementById('delImg' + (i+1)).addEventListener('click', event => {delOneImgDB(event);});
+             } 
+        });
+}
+function addFileInTable(){
+let count = document.querySelectorAll('#table_flower_img > tr').length;
+count = count+3;
+document.getElementById('table_flower_img');
+  var trTitle = document.createElement("tr");
+  var tdTitle1 = document.createElement("td");
+  var tdinp1 = document.createElement("input");
+      tdinp1.type = 'button';
+      tdinp1.value = 'Удалить';
+      tdinp1.id = 'delImg' + count/3;
+      tdinp1.className = 'class_control_button';
+      tdTitle1.appendChild(tdinp1);
+      trTitle.appendChild(tdTitle1);
+  var trTitle2 = document.createElement("tr");
+  var tdTitle2 = document.createElement("td"); 
+  var tdDiv = document.createElement("div");  
+  var tdImg = document.createElement("img"); 
+      tdImg.id = 'img'+count;
+  var tdSpan = document.createElement("span"); 
+      tdSpan.id = 'spanID'+count;   
+      tdSpan.style.opacity = 0;
+  var tdSpan2 = document.createElement("span"); 
+      tdSpan2.id = 'spanName'+count;
+      tdSpan2.style.opacity = 0;
+      tdDiv.appendChild(tdImg);
+      tdDiv.appendChild(tdSpan);
+      tdDiv.appendChild(tdSpan2);
+      tdTitle2.appendChild(tdDiv); 
+      trTitle2.appendChild(tdTitle2);  
+  var trTitle3 = document.createElement("tr");
+  var tdTitle3 = document.createElement("td");  
+      tdTitle3.innerHTML = count/3;   
+      tdTitle3.style.paddingBottom = '25px';   
+      trTitle3.appendChild(tdTitle3);                            
+document.getElementById('table_flower_img').appendChild(trTitle);
+document.getElementById('table_flower_img').appendChild(trTitle2);
+document.getElementById('table_flower_img').appendChild(trTitle3);
+}
+
+//add pic
+async function addFile() {
+  let formData=new FormData();
+  formData.append("file", document.getElementById("newFile").files[0]);// + nameExt);
+  num = document.querySelectorAll('#table_flower_img > tr').length;
+  num = num +1;
+  let flowerId = document.getElementById('modal_flower_id_img').innerHTML;
+  flowerId = parseInt(flowerId);
+
+  console.log('flowerId', flowerId);
+    fetch('/uploads',{
+        method: "POST",
+        body: formData
+        })
+        .then((response) => response.text())
+        .then(data=>{
+          if(data.mes)
+            document.getElementById('mist8').innerHTML = data.mes || data.message;
+          else{
+            const localToken = localStorage.getItem('floweridaKey');
+            fetch('/api/imgs/create',{
+                method: "POST",
+                headers: {"content-Type": "application/json", "Authorization": localToken},
+                body: JSON.stringify({'flowerId':flowerId,
+                'img':data, 
+                'num':num})
+                })
+                .then((response) => response.json())
+                .then(data =>{
+                  if(data.mes)
+                     document.getElementById('mist8').innerHTML = data.mes || data.message;
+                    // document.getElementById('butChangeImg'+flowerId).click;
+                      console.log('flowerId', flowerId);
+                  imgItemFlower(event, flowerId);
+                  });
+          }
+          document.getElementById('newFile').value='';    
+        });
+}
+//del img db
+async function delOneImgDB(event){
+const localToken = localStorage.getItem('floweridaKey');
+  let targetId = event.target.id;
+  let linkId = targetId.replace('delImg', '');
+  linkId = parseInt(linkId)*3;  
+  console.log('1', linkId);
+  let id = document.getElementById('spanID' +linkId).innerHTML;
+  let name = document.getElementById('spanName' +linkId).innerHTML;
+
+
+
+ fetch('/api/imgs/delete',{
+          method: "POST",
+          headers: {"content-Type": "application/json", "Authorization": localToken},
+          body: JSON.stringify({'id': id})
+          })
+          .then((response) => response.json())
+          .then(data =>{
+            if(data.mes || data.message)
+              document.getElementById('mist7').innerHTML = data.mes || data.message;
+            else 
+                {
+                 fetch('/deleteImg',{
+                  method: "POST",
+                  headers: {"content-Type": "application/json", "Authorization": localToken},
+                  body: JSON.stringify({'name': name})
+                  })
+                  .then((response) => response.json())
+                  .then(data =>{
+                    if(data.mes || data.message)
+                      document.getElementById('mist7').innerHTML = data.mes || data.message;
+                    else 
+                   imgItemFlower(event);
+                  }); 
+                }    
+          });
+}
+
+
+////Нажали Добавить-описание товара
+async function discItemFlower(event){
+  document.getElementById('myModalDisc').style.display = 'block';
+  document.getElementById('myModalDisc').style.height = '400px';
+  const table = document.getElementById('table_flower_info');
+  while (table.rows[0]) {
+       table.removeChild(table.rows[0]);
+   }
+
+    let trId = event.target.id;
+    let trNum = trId.replace('butChangeDisc', '');
+    trNum = parseInt(trNum) +1;
+    console.log(trNum);
+
+let flowerId = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML;
+    document.getElementById('modal_flower_id_info').innerHTML = flowerId;    
+    document.getElementById('modal_flower_name_info').innerHTML = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(4)').innerHTML || '';
+ //console.log(flowerId);
+ if(!flowerId)
+  {document.getElementById('mist7') = 'Не указан товар. Добавление описания товара не возможно!';}
+ else{
+    const localToken = localStorage.getItem('floweridaKey');
+  fetch('/api/info/getAll',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken},
+        body: JSON.stringify({'flowerId':flowerId})
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist7').innerHTML = data.mes || data.message;
+           if(data.rows.length > 0)
+              {
+                for(var i = 0; i < data.rows.length; i++)
+                 {
+                  getDiscr(data.rows[i], i);
+                  document.getElementById('title' + (i+1)*3).value = data.rows[i]['title'];
+                  document.getElementById('discr' + (i+1)*3).value = data.rows[i]['discription'];
+                  document.getElementById('link' +(i+1)*3).addEventListener('click', event => {delOneDiscriptionDB(event);});
+                  document.querySelector('#table_flower_info > tr:nth-child('+(i+1)*3+') > td:nth-child(1) > span').innerHTML = data.rows[i]['id'];
+                 }
+              }
+        });   
+ } 
+
+}
+
+function addDiscr(){
+getDiscr();
+document.querySelector('#table_flower_info > tr:last-child > td:nth-child(2) > input').addEventListener('click', event => {delOneDiscription(event);});
+
+
+}
+function delOneDiscription(event){
+  let targetId = event.target.id;
+  let linkId = targetId.replace('link', '');
+  linkId = parseInt(linkId); 
+  const table = document.getElementById('table_flower_info');
+
+for(var i=linkId; i>linkId-3; i--)
+    table.removeChild(table.rows[linkId-3]);
+  
+}
+//добавить одно описание - нажали кнопку Добавить
+async function getDiscr(){
+let count = document.querySelectorAll('#table_flower_info > tr').length;
+count = count+3;
+   var trTitle = document.createElement("tr");
+   var tdTitle1 = document.createElement("td");
+       tdTitle1.innerHTML = 'Название блока';
+       trTitle.appendChild(tdTitle1);
+   var tdTitle11 = document.createElement("td");       
+       tdTitle11.className = 'countBlocks';
+   var inputTitle = document.createElement("input");
+       inputTitle.type = 'text';
+       inputTitle.className = 'inputInfo';
+       inputTitle.id = 'title' + count;
+
+       tdTitle11.appendChild(inputTitle);
+       trTitle.appendChild(tdTitle11);
+
+  var trTitle2 = document.createElement("tr");    
+  var tdTitle2 = document.createElement("td");      
+      tdTitle2.innerHTML = 'Описание блока';
+      trTitle2.appendChild(tdTitle2);
+  var tdTitle22 = document.createElement("td");      
+  var areaDisc = document.createElement("textarea");
+      areaDisc.className = 'inputInfo';
+      areaDisc.id = 'discr' + count;
+      tdTitle22.appendChild(areaDisc);
+      trTitle2.appendChild(tdTitle22);
+
+  var trTitle3 = document.createElement("tr"); 
+      trTitle3.style.borderBottom = '2px solid grey';
+      trTitle3.style.padding = '7px 0';
+      trTitle3.style.textAlign = 'center';
+  var tdTitle3 = document.createElement("td");
+  var span = document.createElement("span");
+      span.style.opacity = 0;
+   //   tdTitle3.colSpan = '2';
+  var tdTitle33 = document.createElement("td");
+  var inputLink = document.createElement("input");   
+      inputLink.type = 'button';
+      inputLink.id = 'link' + count;
+      inputLink.className = 'class_control_button';
+      inputLink.style.marginBottom = '15px';
+      inputLink.value = 'Удалить блок';
+      tdTitle3.appendChild(span);
+      tdTitle33.appendChild(inputLink);
+      trTitle3.appendChild(tdTitle3);
+      trTitle3.appendChild(tdTitle33);      
+
+  document.getElementById('table_flower_info').appendChild(trTitle);
+  document.getElementById('table_flower_info').appendChild(trTitle2);
+  document.getElementById('table_flower_info').appendChild(trTitle3);
+
+}
+
+//сохранить добавленные описания товара - нажали кнопку Сохранить описание 
+async function updateItemFlowerInfo(){
+let flowerId = document.getElementById('modal_flower_id_info').innerHTML;
+let countRowTable = document.querySelectorAll('#table_flower_info > tr').length;
+countRowTable = countRowTable/3;
+let allInfo = new Array, allInfoNew = new Array, allInfoId = new Array;
+let rowIndex = 1;
+  for(var i = 0; i < countRowTable; i++)
+  {
+    allInfo[i]=({['flowerId'] : flowerId,
+                ['title'] : document.querySelector('#table_flower_info > tr:nth-child('+[rowIndex]+') > td:nth-child(2) > input').value,
+                ['discription'] : document.querySelector('#table_flower_info > tr:nth-child('+[rowIndex+1]+') > td:nth-child(2) > textarea').value,
+    });
+    allInfoId[i] = ({['id'] :document.querySelector('#table_flower_info > tr:nth-child('+[rowIndex+2]+') > td:nth-child(1) > span').innerHTML});
+    rowIndex = rowIndex+3;
+  }
+
+
+  if(allInfo.length === 0)
+    document.getElementById('mist7').innerHTML ='Нет описания товара';
+  else
+  {
+    const localToken = localStorage.getItem('floweridaKey');
+
+    fetch('/api/info/getAll',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken},
+        body: JSON.stringify({'flowerId':allInfo[0]['flowerId']})
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist7').innerHTML = data.mes || data.message;
+
+          console.log(allInfo.length);
+           for(var i=0; i<allInfo.length; i++)
+             {
+            //  console.log(data.rows);
+              let flag = 0;
+              for(var j=0; j< data.rows.length; j++)
+                {
+                  if(data.rows[j]['id'] === parseInt(allInfoId[i]['id']))
+                      {
+                        flag=1;
+                        fetch('/api/info/update',{
+                              method: "POST",
+                              headers: {"content-Type": "application/json", "Authorization": localToken},
+                              body: JSON.stringify({'id':parseInt(allInfoId[i]['id']),'flowerId':allInfo[i]['flowerId'],'title':allInfo[i]['title'], 'discription':allInfo[i]['discription']})
+                              })
+                        .then((response) => response.json())
+                        .then(data =>{
+                                if(data.mes || data.message)
+                                  document.getElementById('mist7').innerHTML = data.mes || data.message;
+                                else{
+                                    allInfoId[i]={['id']:0};
+                                    console.log('заенил');   
+                                    console.log(i, allInfoId);  
+                                   }
+                        });
+                       }  
+                }    
+                if(flag === 0){
+                    fetch('/api/info/create',{
+                    method: "POST",
+                    headers: {"content-Type": "application/json", "Authorization": localToken},
+                    body: JSON.stringify({'flowerId':allInfo[i]['flowerId'], 'title':allInfo[i]['title'], 'discription':allInfo[i]['discription']})
+                    })
+                    .then((response) => response.json())
+                    .then(data =>{
+                      if(data.mes || data.message)
+                        document.getElementById('mist7').innerHTML = data.mes || data.message;
+                      else
+                          closeItem('myModalDisc');
+                    });   
+                   }
+                   else{
+                    closeItem('myModalDisc');
+                   }
+                }
+               });     
+             }
+     //   }
+            /* for(var i=0; i<allInfoId.length; i++)
+                {
+                  if(allInfoId[i]['id'] != 0)
+                  {
+                    console.log('allInfoId[i]', allInfoId[i]['id']);
+                    allInfoNew.push(allInfo[i]);
+                  } 
+                }*/
+         // }
+        //  console.log(allInfoNew, allInfoId);
+         // if(allInfoNew.length > 0)
+        //return allInfoNew;
+       // });
+      //  .then(data =>{
+       //   console.log('data', data);
+         /* for(var i=0; i<allInfoId.length; i++){
+            if(allInfoId[i]['id'] != 0)
+            {
+              console.log('allInfoId[i]', allInfoId[i]['id']);
+              allInfoNew.push(allInfo[i]);
+            } 
+          }*/
+     /*     console.log(allInfoNew, allInfoId);
+          if(allInfoNew.length > 0)
+          {
+        fetch('/api/info/create',{
+                method: "POST",
+                headers: {"content-Type": "application/json", "Authorization": localToken},
+                body: JSON.stringify({'allInfo':allInfoNew})
+                })
+                .then((response) => response.json())
+                .then(data =>{
+                  if(data.mes || data.message)
+                    document.getElementById('mist7').innerHTML = data.mes || data.message;
+                  else
+                      closeItem('myModalDisc');
+                });   
+          }     
+        });*/
+        
+
+     }
+  //}  
+
+//сохранили форму с описанием
+async function saveItemDisc(){}
+
+async function delOneDiscriptionDB(event){
+  const localToken = localStorage.getItem('floweridaKey');
+  let targetId = event.target.id;
+  let linkId = targetId.replace('link', '');
+  linkId = parseInt(linkId);  
+  let id = document.querySelector('#table_flower_info > tr:nth-child('+linkId +') > td:nth-child(1) > span').innerHTML;
+ // let flowerId = document.getElementById('modal_flower_id_info').innerHTML;
+ fetch('/api/info/delete',{
+          method: "POST",
+          headers: {"content-Type": "application/json", "Authorization": localToken},
+          body: JSON.stringify({'id':id})//, 'flowerId':flowerId})
+          })
+          .then((response) => response.json())
+          .then(data =>{
+            if(data.mes || data.message)
+              document.getElementById('mist7').innerHTML = data.mes || data.message;
+            else 
+                {
+                  delOneDiscription(event);
+                }
+          });
+
+}
+/*-----------------*/
+//нажали кнопку +добавить вид
+async function addNewVid()
+{
+  document.getElementById('myModalVid').style.display = 'block';
+  document.getElementById('myModalVid').style.height = '400px';
+  document.getElementById('Itd').style.display = 'none';
+  //document.getElementById('control_div_table').style.display = 'block';
+  document.getElementById('service_add').style.display = 'block';
+    document.getElementById('pageView').style.display = 'block';
+
+  document.getElementById('modal_new_vid').value = '';
+   if(document.getElementById('control_modal_save_vid'))
+      document.getElementById('control_modal_save_vid').remove;
+
+  if(document.getElementById('control_modal_save_vid') === null)
+    {
+     let place = document.getElementById('control_modal_vid'); 
+      var butSave = document.createElement("input");
+          butSave.type = 'button';
+          butSave.value = 'Сохранить';
+          butSave.id = 'control_modal_save_vid';
+          butSave.className = 'control_modal_close';
+      place.appendChild(butSave);          
+      document.getElementById('control_modal_save_vid').addEventListener('click', event => {addItemVid();})
+    }
+}
+
+//нажали кнопку cохранить новый вид
+async function addItemVid(){
+document.getElementById('control_modal_save_vid').remove;  
+const localToken = localStorage.getItem('floweridaKey');
+let name = document.getElementById('modal_new_vid').value;
+if(!name)
+  document.getElementById('mist5').innerHTML = 'Не заполнено поле вид!';
+else{ 
+  fetch('/api/vid/create',{
+          method: "POST",
+          headers: {"content-Type": "application/json", "Authorization": localToken},
+          body: JSON.stringify({'name':name})
+          })
+          .then((response) => response.json())
+          .then(data =>{
+            if(data.mes || data.message)
+              document.getElementById('mist5').innerHTML = data.mes || data.message;
+            else 
+                {
+                correctVid();
+                closeItem('myModalVid');
+                }
+          });
+}
+}
+
+//нажали кнопку изменить вид
+async function vidChange(event){
+  document.getElementById('myModalVid').style.display = 'block';
+  document.getElementById('myModalVid').style.height = '400px';
+  document.getElementById('Itd').style.display = 'block';
+
+   if(document.getElementById('control_modal_save_vid1'))
+      document.getElementById('control_modal_save_vid1').remove;
+
+ let place = document.getElementById('control_modal_vid');
+ if(document.getElementById('control_modal_save_vid1') === null)
+ {
+  var butSave = document.createElement("input");
+      butSave.type = 'button';
+      butSave.value = 'Сохранить';
+      butSave.id = 'control_modal_save_vid1';
+      butSave.className = 'control_modal_close';
+  place.appendChild(butSave);          
+  document.getElementById('control_modal_save_vid1').addEventListener('click', event => {changeItemVid();})
+ }
+
+  let trId = event.target.id;
+  let trNum = trId.replace('butChange', '');
+  trNum = parseInt(trNum) +1;
+  console.log(trNum);
+ // console.log(document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML);
+  document.getElementById('modal_vid_name').innerHTML = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML;
+  document.getElementById('modal_new_vid').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(4)').innerHTML;
+
+}
+
+async function changeItemVid(){
+  const localToken = localStorage.getItem('floweridaKey');
+  let id = document.getElementById('modal_vid_name').innerHTML;
+  let name =  document.getElementById('modal_new_vid').value;
+
+fetch('/api/vid/change',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken},
+        body: JSON.stringify({'id':id, 'name':name})
+        })
+        .then((response) => response.json())
+        .then(data =>{
+          if(data.change === 'ok')
+          {
+            document.getElementById('control_modal_save_vid1').remove;
+             correctVid();
+             closeItem('myModalVid');
+          }  
+          else{
+            document.getElementById('mist5').innerHTML = data.mes || data.message;
+          }   
+        });
+
+}
+//нажали кнопку удалить вид
+async function vidDelete(event){
+  const localToken = localStorage.getItem('floweridaKey');
+  let trId = event.target.id;
+  let trNum = trId.replace('delChange', '');
+  trNum = parseInt(trNum) +1;  
+  let id = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML;
+//console.log('delID', id);
+  fetch('/api/vid/delete',{
+          method: "POST",
+          headers: {"content-Type": "application/json", "Authorization": localToken},
+          body: JSON.stringify({'id':id})
+          })
+          .then((response) => response.json())
+          .then(data =>{
+            if(data.mes || data.message)
+              document.getElementById('mist5').innerHTML = data.mes || data.message;
+            else 
+                {
+                correctVid();
+                closeItem('myModalVid');
+                }
+          });
+}
+
+
+//нажали кнопку Пользователи
+async function correctUsers(){
+
+document.getElementById('control_services_user').style.border = '4px solid #333';
+document.getElementById('control_services_vid').style.border = 'none';
+document.getElementById('control_services_flower').style.border = 'none';
+
+//document.getElementById('control_div_table').style.display = 'block';
+document.getElementById('service_add').style.display = 'none';
+  document.getElementById('pageView').style.display = 'none';
+
+  const localToken = localStorage.getItem('floweridaKey');
+  let table = document.getElementById('control_table'); 
+  while (table.rows.length > 0) {
+       table.deleteRow(0);
+     }
+
+  fetch('/api/user/allUsers',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken}
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes || data.message)
+             document.getElementById('mist3').innerHTML = data.mes || data.message;
+            else// if(data.authUser) 
+              {
+              console.log(data);
+              var trHead = document.createElement("tr");
+                  trHead.className = 'newTr'
+             // var trRez = new Array, tdRez = new Array;
+              //добавили заголовки
+              var tdHead1 = document.createElement("th");
+                  tdHead1.innerHTML = 'Изменить';
+                  trHead.appendChild(tdHead1); 
+              var tdHead2 = document.createElement("th");
+                  tdHead2.innerHTML = 'Имя пользователя';
+                  trHead.appendChild(tdHead2); 
+              var tdHead3 = document.createElement("th");
+                  tdHead3.innerHTML = 'Почта';
+                  trHead.appendChild(tdHead3);    
+              var tdHead4 = document.createElement("th");
+                  tdHead4.innerHTML = 'Роль';
+                  trHead.appendChild(tdHead4);  
+              var tdHead5 = document.createElement("th");
+                  tdHead5.innerHTML = 'Статус';                  
+                  trHead.appendChild(tdHead5);  
+              document.getElementById('control_table').appendChild(trHead);                                     
+              for(var i=0; i< data.rows.length; i++)
+                { 
+                  var num=i+1;
+                var tr = document.createElement("tr");
+                    tr.className = 'newTr';
+                var td1 = document.createElement("td");    
+                var but1 = document.createElement("input");
+                    but1.type = 'button';
+                    but1.className = 'class_control_button';
+                    but1.value = 'Изменить запись';
+                    but1.id = 'butChange'+num;
+                    td1.appendChild(but1);
+                    tr.appendChild(td1); 
+                var td2 = document.createElement("td");   
+                    td2.innerHTML = data.rows[i]['name'];
+                    tr.appendChild(td2); 
+                var td3 = document.createElement("td");   
+                    td3.innerHTML = data.rows[i]['email']; 
+                    tr.appendChild(td3); 
+                var td4 = document.createElement("td");     
+                    td4.innerHTML = data.rows[i]['role'];    
+                    tr.appendChild(td4); 
+                var td5 = document.createElement("td");     
+                    td5.innerHTML = data.rows[i]['user_status'];    
+                    tr.appendChild(td5);                    
+                document.getElementById('control_table').appendChild(tr);    
+                document.getElementById('butChange'+num).addEventListener('click', event => {showChange(event)}, false);            
+                }  
+              }
+        }).catch((error)=> console.log(error));
+}
+
+//нажали кнопку Пользователи - изменить
+function showChange(event){
+  document.getElementById('myModal').style.display = 'block';
+  document.getElementById('myModal').style.height = '400px';
+
+  let trId = event.target.id;
+  let trNum = trId.replace('butChange', '');
+  trNum = parseInt(trNum) +1;
+  console.log(trNum);
+ // console.log(document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML);
+  document.getElementById('modal_user_name').innerHTML = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(2)').innerHTML;
+  document.getElementById('modal_user_email').innerHTML = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML;
+  document.getElementById('modal_user_role').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(4)').innerHTML;
+  document.getElementById('modal_user_status').innerHTML = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(5)').innerHTML;
+
+}
+
+//нажали кнопку изменить Пользователь - модальное окно - Сохранить
+function correctItem(){
+const localToken = localStorage.getItem('floweridaKey');
+
+let email = document.getElementById('modal_user_email').innerHTML;
+let role = document.getElementById('modal_user_role').value;
+fetch('/api/user/changeUser',{
+        method: "POST",
+        headers: {"content-Type": "application/json", "Authorization": localToken},
+        body: JSON.stringify({'email':email, 'role':role})
+        })
+        .then((response) => response.json())
+        .then(data =>{
+          if(data.change === 'ok')
+          {
+             correctUsers();
+             closeItem('myModal');
+          }  
+          else{
+            document.getElementById('mist4').innerHTML = data.mes || data.message;
+          }   
+        });
+}
+
+//модальное окно - отмена
+function closeItem(idModal){
+  document.getElementById(idModal).style.display = 'none';
+  document.getElementById(idModal).style.height = '1px';
+}
+</script>    
+        

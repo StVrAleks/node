@@ -1,0 +1,110 @@
+
+
+  <div id="conteiner" >
+    
+<div id="mist00"></div>
+        <div>Название товара:</div>
+        <div id="titleFl"></div>
+        <div id="imgsFl"></div>
+
+        <div>Цена:</div>
+        <div id="priceFl"></div>
+        <div>Описание</div>
+        <div id="discr"></div>    
+
+        <div id="idFl">{{id}}</div>
+        
+
+  </div>
+<style>
+ #imgsFl{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  }
+ #imgsFl > img{
+ padding: 5px 20px;
+ } 
+</style>
+  <script>
+   let idFl = document.getElementById('idFl').innerHTML;
+   fetch('/api/flower/getOne',{
+      method: "POST",
+      headers: {"content-Type": "application/json"},
+      body: JSON.stringify({'id':idFl})
+      })
+      .then((response) => response.json())
+      .then(data =>{
+        if(data.mes || data.message)
+            console.log(data.mes);
+        else //if(data.rows.length > 0)
+        {
+            console.log(data);
+            document.getElementById('titleFl').innerHTML=data['name'];
+            document.getElementById('priceFl').innerHTML=data['price'];
+
+            let metaContent = document.getElementsByTagName('meta')['description'].content;
+            metaContent = metaContent + data['mDiscript'];
+            document.getElementsByTagName('meta')['description'].content = metaContent;
+
+            let metaContent2 = document.getElementsByTagName('meta')['keywords'].content;
+            metaContent2 = metaContent2 + data['mKeyWords'];
+            document.getElementsByTagName('meta')['keywords'].content = metaContent2;
+          
+        }  
+       });    
+
+let divImg = document.getElementById('imgsFl');
+ fetch('/api/imgs/getAll',{
+      method: "POST",
+      headers: {"content-Type": "application/json"},
+      body: JSON.stringify({'flowerId':idFl})
+      })
+      .then((response) => response.json())
+      .then(data =>{
+        if(data.mes || data.message)
+            console.log(data.mes);
+        else if(data.rows.length > 0)
+        {
+            for(var i=0; i<data.rows.length; i++)
+            {
+                  let path = '/imgStore/' + data.rows[i]['img'];
+                  var img = document.createElement("img");  
+                  img.src = path;
+                  divImg.appendChild(img);   
+            }
+        }  
+       });    
+
+let discr = document.getElementById('discr');       
+fetch('/api/info/getOne',{
+      method: "POST",
+      headers: {"content-Type": "application/json"},
+      body: JSON.stringify({'flowerId':idFl})
+      })
+      .then((response) => response.json())
+      .then(data =>{
+        if(data.mes || data.message)
+            document.getElementById('mist00').innerHTML = data.mes || data.message;
+        else if(data.rows.length > 0)
+        {
+            for(var i=0; i < data.rows.length; i++)
+            {
+                  var div1 = document.createElement("div");  
+                  div1.innerHTML = data.rows[i]['title'];
+                  div1.style.fontWeight = '500';
+                  div1.style.paddingBottom = '15px';
+                  var div2 = document.createElement("div");  
+                  div2.innerHTML = data.rows[i]['discription'];
+                  discr.appendChild(div1);   
+                  discr.appendChild(div2);  
+            }
+        }  
+       });    
+
+
+  </script>    
+
+    
