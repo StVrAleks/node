@@ -1,0 +1,159 @@
+
+
+  <div id="conteiner" >
+     <form id="form-reg-user">
+        <div class = "row">
+            <p id="goodReg" style="color:#4caf50"></p>
+             <div>
+                <label for="userName">Имя пользователя</label>
+                <input class="u-full-width" type="text" id="userName" required name="nameUser">
+                 <span id="erUserName"></span>
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input class="u-full-width" type="email" id="email" required name="emailUser">
+            </div>
+            <div>
+                <label for="password">Пароль</label>
+                <input class="u-full-width" type="password" id="password1" name="pasw">
+                 <span id="erPas1"></span>
+            </div>
+          <div>
+                <label for="password">Подтверждение пароля</label>
+                <input class="u-full-width" type="password" id="password2">
+                <span id="erPas2"></span>
+            </div>            
+            <input type="submit" id="pasLogin" value="Зарегистрироваться">
+        </div>
+    </form>
+  </div>
+  <style>
+   #form-reg-user{
+        max-width: 400px;
+        margin: 0;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        position: absolute;
+        left:50%;
+        transform: translate(-50%, 50px);
+    }
+    label, p{
+        font-size: 16px;
+        color: #333;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .u-full-width{
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+#pasLogin{
+    background-color: #4caf50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: backgraund-color 0.3s;
+}
+span{color:red;}
+#pasLogin:hover
+{
+background-color: #45a049;
+}
+</style>
+
+<script>
+const feedbackForm = document.getElementById('form-reg-user');
+const pasForm1 = document.getElementById('password1');
+const pasForm2 = document.getElementById('password2');
+const subForm = document.getElementById('pasLogin');
+subForm.disabled = true;
+
+function sendFeedback(feedback){
+let userName= document.getElementById('userName').value;
+let email= document.getElementById('email').value;
+let password=document.getElementById('password1').value;
+
+fetch('api/user/registration',{
+        method: "POST",
+        headers: {"content-Type": "application/json"},
+        body: JSON.stringify({"userName": userName, "email": email,"password": password})
+        }).then((response) => response.json())
+        .then(data =>{
+            console.log('data',data);
+            document.getElementById('password1').value = '';
+            document.getElementById('password2').value = '';
+            document.getElementById('goodReg').innerHTML = data.statusUser || data.mes;
+        }).catch((error)=>console.log(error));
+}
+
+pasForm1.addEventListener('blur', (event)=>
+  { 
+   console.log('pasForm1Blur');
+   subForm.disabled = true;
+    let valInput = pasForm1.value;
+   document.getElementById('erPas1').innerHTML = '';
+   if(valInput.length < 5)
+    { document.getElementById('erPas1').innerHTML = "Количество символов должно быть больше 5";}
+   else if(checkLatinLetters(valInput) === false)  
+     {document.getElementById('erPas1').innerHTML = "Пароль может содержать только латинские буквы и цифры";}
+   else 
+    {
+     document.getElementById('erPas1').innerHTML = '';
+     subForm.disabled = false;
+     }
+  }
+);
+pasForm2.addEventListener('blur',(event)=>
+  { 
+    subForm.disabled = true;
+    let valInput = pasForm1.value;
+   document.getElementById('erPas2').innerHTML = '';
+   if(valInput.length < 5)
+     {document.getElementById('erPas2').innerHTML = "Количество символов должно быть больше 5";}
+   else if(checkLatinLetters(valInput) === false)  
+     {document.getElementById('erPas2').innerHTML = "Пароль может содержать только латинские буквы и цифры";}
+   else
+    {
+        document.getElementById('erPas2').innerHTML = '';
+        subForm.disabled = false;
+    }  
+  } 
+);
+
+function checkLatinLetters(str) {
+  const regex = /^[a-zA-Z0-9]+$/;
+  return regex.test(str);
+}
+feedbackForm.addEventListener('submit', (e) =>{
+     //  console.log('submit');
+    if(pasForm1.value != pasForm2.value)
+    {
+        e.preventDefault();
+        document.getElementById('erPas1').innerHTML = "Введенные пароли не совпадают!";
+        document.getElementById('erPas2').innerHTML = "Введенные пароли не совпадают!";
+        return false;
+    }
+    else
+       { 
+        e.preventDefault();
+        const feedbackFormData = new FormData(e.target);
+       // console.log("feedbackFormData", feedbackFormData);
+        const feedback = Object.fromEntries(feedbackFormData);
+       // console.log('feedback', feedback);
+        sendFeedback(feedback);
+        return true;
+        }
+    return false;
+});
+   </script>    
+        

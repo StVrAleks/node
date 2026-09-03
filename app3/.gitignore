@@ -1,0 +1,21 @@
+# Мусор Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Логи и кэш VS Code
+.vscode/
+*.code-workspace
+.history/
+.eslintcache
+
+# Временные файлы и бэкапы редакторов
+*.log
+*.tmp
+*.bak
+
+#Node.js / Frontend (React, Vue, JS)
+node_modules/
+dist/
+build/
+.env.local

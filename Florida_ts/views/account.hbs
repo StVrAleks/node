@@ -1,0 +1,97 @@
+
+
+  <div id="conteiner" >
+     <div id="form-logOut-user">
+        <div class = "row">
+             <div>
+                <span id="mist2"></span>
+                
+                <span> Ваше имя пользователя: </span>
+                <span id="logOutUserName"></span>
+                </br>
+                <span> Ваш email: </span>
+                <span id="logOutUserEmail"></span>
+                </br>
+                </br>
+            </div>
+            <input type="button" id="exitLogout" value="Ввернуться на главную" onclick="logOutBak();">
+            <input type="button" id="logout" value="Выйти" onclick="logOutUser();">
+        </div>
+    </div>
+  </div>
+
+  <style>
+   #form-logOut-user{
+        max-width: 400px;
+        margin: 0;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        position: absolute;
+        left:50%;
+        transform: translate(-50%, 50px);
+    }
+    label, p{
+        font-size: 16px;
+        color: #333;
+        display: block;
+        margin-bottom: 8px;
+    }
+#exitLogout, #logout{
+    background-color: #4caf50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: backgraund-color 0.3s;
+}
+
+#exitLogout:hover, #logout:hover
+{
+background-color: #45a049;
+}
+</style>
+
+<script>
+ const localToken = localStorage.getItem('floweridaKey');
+ if(!localToken)
+ {
+  window.location.href = '/login_user.html';
+ }
+ else{
+  fetch('/api/user/authUser',{
+        method: "GET",
+        headers: {"content-Type": "application/json", "Authorization": localToken}
+        })
+        .then((response) => response.json())
+        .then(data =>{
+           if(data.mes)
+             document.getElementById('mist2').innerHTML = data.mes;
+            else if(data.authUser) 
+              {
+                document.getElementById('logOutUserName').innerHTML = data.authUser['authName'];
+                document.getElementById('logOutUserEmail').innerHTML = data.authUser['authEmail'];
+               }
+        }).catch((error)=> console.log(error));
+ }
+
+function logOutBak(){
+  window.location.href = '/home.html'; 
+}
+
+function logOutUser(){
+   const localToken = localStorage.getItem('floweridaKey');
+   if(localToken)
+      {
+        delete localStorage.floweridaKey;
+        headers.delete('authorization');
+        window.location.href = '/home.html'; 
+      }
+
+}
+
+</script>    
+        
