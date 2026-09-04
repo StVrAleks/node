@@ -2,16 +2,16 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../db';
 
 //покупатель
-interface UserAttributes  {
+export interface UserAttributes  {
     id: number,
     name: string,
     email: string,
-    password: string,
+    password?: string,
     user_status: string,
     created_user: number,
     role: string
 };
-type UserCreationAttributes = Optional<UserAttributes, 'id'>;
+type UserCreationAttributes = Optional<UserAttributes, 'id' | 'role' | 'user_status' | 'created_user'>;
 
 const User = sequelize.define<Model<UserAttributes, UserCreationAttributes> & UserAttributes>( 'user', {
         id: {type:DataTypes.INTEGER, primaryKey: true, autoIncrement: true},

@@ -1,5 +1,6 @@
 import { FlowerInfo} from '../models/models';
 import ApiError from '../error/ApiError';
+import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
 
 interface CreateInfoRequestBody {
@@ -34,6 +35,7 @@ class InfoController{
         if(!flowerId || !title)
             return next(ApiError.badRequest('Не указан цветок или название блока с описанием'));
         const inforow = await FlowerInfo.create({flowerId, title, discription});
+        logger.info(`/добавили новый блок описания для цветка ${flowerId} с загаловком: ${title}`);
         return response.status(201).json(inforow);
         }
     catch(error: any){

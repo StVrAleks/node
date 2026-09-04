@@ -37,7 +37,7 @@ class FlowerController{
         if(quantity !== undefined && quantity < 0)
             return next(ApiError.badRequest('Количество товара не может быть отрицательным числом'));
         //создаем строку с цветком
-        logger.info(`/создали новую позицию в карзине: ${basketId}`);
+        logger.info(`/создали новую позицию в корзине: ${basketId}`);
         
         const rowBascet = await BasketFlower.create({basketId, flowerId, quantity});
         return response.status(201).json(rowBascet);

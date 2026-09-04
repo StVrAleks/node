@@ -1,5 +1,6 @@
 import {Vid} from '../models/models';
 import ApiError from '../error/ApiError';
+import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
 
 interface CreateCategoryRequestBody {
@@ -26,6 +27,7 @@ class VidController {
             if(!name)
                 return next(ApiError.badRequest('Не заполнено поле "name"'));
             const vid = await Vid.create({name});
+            logger.info(`/создали новый вид: ${name}`);
             return response.status(201).json(vid);
         }    
         catch(error: any){

@@ -1,5 +1,6 @@
 import {FlowerImgs} from '../models/models';
 import ApiError from '../error/ApiError';
+import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
 
 interface CreateImgRequestBody {
@@ -26,6 +27,7 @@ class ImgController{
              return next(ApiError.badRequest('Не указан идентификатор цветка или не добавлена ссылка на изображение'));
 
         let flrows = await FlowerImgs.create({flowerId, img});
+        logger.info(`/добавили новое изображение для цветка с ИД: ${flowerId}`);
         return response.status(201).json(flrows);
         }
      catch(error:any){
