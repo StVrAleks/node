@@ -39,25 +39,28 @@
                                 <input type="hidden" name="type" value="product">
  
                             </div>
-                           <!-- <div class="predictive-search predictive-search--header quickSearchResultsWrap" tabindex="-1" data-predictive-search="">
-                                <div class="predictive-search__loading-state">
-                                    <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg" width= "50px;">
-                                        <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
-                                    </svg>
-                                </div>
-                            </div>-->
+
                             <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
                         </form>
 <div class="userActivites">
             <div class="header-single-line__item header-single-line__item--customer">
                 <div class="header__iconItem header__group">
+                    {{#if user}}
                     <a href="/account.html" class="header__icon header__icon--account link link--text">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="icon icon-account" viewBox="0 0 1024 1024" width="18px" height="50px">
                             <path class="path1" d="M486.4 563.2c-155.275 0-281.6-126.325-281.6-281.6s126.325-281.6 281.6-281.6 281.6 126.325 281.6 281.6-126.325 281.6-281.6 281.6zM486.4 51.2c-127.043 0-230.4 103.357-230.4 230.4s103.357 230.4 230.4 230.4c127.042 0 230.4-103.357 230.4-230.4s-103.358-230.4-230.4-230.4z"></path>
                             <path class="path2" d="M896 1024h-819.2c-42.347 0-76.8-34.451-76.8-76.8 0-3.485 0.712-86.285 62.72-168.96 36.094-48.126 85.514-86.36 146.883-113.634 74.957-33.314 168.085-50.206 276.797-50.206 108.71 0 201.838 16.893 276.797 50.206 61.37 27.275 110.789 65.507 146.883 113.634 62.008 82.675 62.72 165.475 62.72 168.96 0 42.349-34.451 76.8-76.8 76.8zM486.4 665.6c-178.52 0-310.267 48.789-381 141.093-53.011 69.174-54.195 139.904-54.2 140.61 0 14.013 11.485 25.498 25.6 25.498h819.2c14.115 0 25.6-11.485 25.6-25.6-0.006-0.603-1.189-71.333-54.198-140.507-70.734-92.304-202.483-141.093-381.002-141.093z"></path>
                         </svg>
-                        <span class="customer-links">Sign In</span>
+                        <span class="customer-links">Привет, {{user.name}}</span>
                     </a>
+                    {{else}}
+                        <a href="/login_user.html" class="header__icon header__icon--account link link--text">
+                            <svg xmlns="http://w3.org" class="icon icon-account" viewBox="0 0 1024 1024" width="18px" height="50px">
+                                <path d="M486.4 563.2c-155.275 0-281.6-126.325-281.6-281.6s126.325-281.6 281.6-281.6 281.6 126.325 281.6 281.6-126.325 281.6-281.6 281.6zM486.4 51.2c-127.043 0-230.4 103.357-230.4 230.4s103.357 230.4 230.4 230.4c127.042 0 230.4-103.357 230.4-230.4s-103.358-230.4-230.4-230.4z"></path>
+                            </svg>
+                            <span class="customer-links">Sign In</span>
+                        </a>
+                    {{/if}}                    
                 </div>
             </div>
             <div class="header-single-line__item header-single-line__item--wishlist">
@@ -90,6 +93,7 @@
             </div>           
  </div>        
 
+
 </header>
 <div id="single_line">
     <div id="single_line_catalog">
@@ -100,227 +104,6 @@
         <a href="/adminka.html"> &#8921; Админка</a>
     </div>
 </div>
-<!--
-<style>
-.predictive-search{
-    width: 50px;
-}
-    
-</style>
-
-<div class="header-navigation-wrapper">
-<div class="header-navigation header-nav-plain">
-    <div class="container container-1770 d-flex flex-jc-between flex-align-stretch p-static o-unset sticky-container-full">
-        <div class="main-menu header-item p-static w-100 d-flex flex-align-center label-main-menu main-menu-hasLabel label-small">
-                <div class="p-static container container-1770 o-unset">
-                    <div class="main-menu--wrapper" id="HeaderNavigation"><nav class="header__inline-menu" data-navigation="" role="navigation" style="--lv_1_color: #000000;--lv_1_color_hover: #000000;--lv_2_color: #000000;--lv_2_color_hover: #000000;--lv_3_color: #3c3c3c;--lv_3_color_hover: #000000;--menu_top_spacing: 10px;--menu_top_spacing_sticky: -11px;--menu_bottom_spacing: 10px;--menu_margin_left: -30px;--grid_gap_menu_item: 30px;--bg_mega_menu: #ffffff;--sale_item_color: #d12442;--new_label_color: #ffffff;--new_label_border: #06bfe2;--new_label_bg: #06bfe2;--sale_label_color: #ffffff;--sale_label_border: #ef6454;--sale_label_bg: #ef6454;--hot_label_color: #ffffff;--hot_label_border: #ffbb49;--hot_label_bg: #ffbb49">
-                                <ul class="list-menu list-menu--inline text-center" role="list"><li class="menu-lv-item menu-lv-1 has-megamenu dropdown block_layout--custom_width">
-                                    <a class="menu-lv-1__action header__menu-item list-menu__item link focus-inset menu_mobile_link link-effect" href="/collections/womens-clothing">
-            <span class="text p-relative">Women</span>
-            <span class="icon-dropdown" data-toggle-menu-mb="">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret">
-                <path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path>
-                </svg>
-                </span>
-                </a>
-                <div class="menu-dropdown custom-scrollbar megamenu_style_2 p-absolute top-auto left-0 w-100 zi-10 o-x-hidden o-y-auto text-left opacity-0">
-                <div class="container" style="--container_size: 1200px">
-                    <div class="menu-dropdown__wrapper d-flex flex-wrap flex-align-stretch flex-jc-between">
-                        <div class="nav-title-mobile text-center"><span class="icon-dropdown">
-                            <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path>
-                            </svg>
-                            </span> Women</div>
-                        <div class="site-nav navigation_all_mobile d-none">
-                            <div class="site-nav-list "><a href="/collections/womens-clothing" class="site-nav-title menu-lv-2">
-                            <span>Shop All Women</span></a></div>
-                        </div>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div></li>
-<li class="menu-lv-item menu-lv-1 text-left no-megamenu dropdown">
-    <a class="menu-lv-1__action  header__menu-item list-menu__item link focus-inset menu_mobile_link link-effect" href="/collections/womens-plus-size-clothing">
-    <span class="text p-relative">Plus</span>
-        <span class="icon-dropdown" data-toggle-menu-mb="">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret">
-            <path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path>
-            </svg>
-            </span>
-            </a>
-    <ul class="header__submenu list-menu list-menu--disclosure list-menu--disclosure-1 caption-large motion-reduce" role="list">
-        <div class="nav-title-mobile text-center"><span class="icon-dropdown">
-            <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav">
-            <path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class="">
-
-            </path></svg></span>Plus</div>
-        <li class="menu-lv-item menu-lv-2 text-left navigation_all_mobile d-none">
-            <a href="/collections/womens-plus-size-clothing" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect">
-            <span class="text p-relative">Shop All Plus</span></a></li>
-            <li class="menu-lv-item menu-lv-2 text-left   menu-lv-blink">
-                <a href="/collections/womens-plus-size-tops" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect">
-                <span class="text p-relative">Tops</span></a></li>
-            <li class="menu-lv-item menu-lv-2 text-left   menu-lv-blink">
-                <a href="/collections/womens-plus-size-bottoms" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect">
-                <span class="text p-relative">Bottoms</span></a></li>
-            <li class="menu-lv-item menu-lv-2 text-left   menu-lv-blink">
-                <a href="/collections/womens-plus-size-jeans" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect">
-                <span class="text p-relative">Jeans</span></a></li></ul></li>
-<li class="menu-lv-item menu-lv-1 has-megamenu dropdown block_layout--custom_width">
-    <a class="menu-lv-1__action header__menu-item list-menu__item link focus-inset menu_mobile_link link-effect" href="/collections/mens-clothing">
-            <span class="text p-relative">Men</span>
-            <span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="menu-dropdown custom-scrollbar megamenu_style_2 p-absolute top-auto left-0 w-100 zi-10 o-x-hidden o-y-auto text-left opacity-0">
-                <div class="container" style="--container_size: 1200px">
-                    <div class="menu-dropdown__wrapper d-flex flex-wrap flex-align-stretch flex-jc-between">
-                        <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Men</div>
-                        <div class="site-nav navigation_all_mobile d-none">
-                            <div class="site-nav-list "><a href="/collections/mens-clothing" class="site-nav-title menu-lv-2"><span>Shop All Men</span></a></div>
-                        </div>
-                        <div class="menu-dropdown__column menu-dropdown__column-3 w-auto column-full" data-masonry="{ &quot;itemSelector&quot;: &quot;[data-gridItem]&quot;, &quot;columnWidth&quot;: &quot;.grid-sizer&quot; }" style="position: relative; height: 591px;">
-                            <div class="grid-sizer"></div>
-                                <div class="site-nav dropdown menu-lv-blink" data-griditem="" style="position: absolute; left: 0px; top: 0px;">
-                                    <div class="site-nav-list">
-                                        <a href="/collections/mens-clothing" class="site-nav-title menu_mobile_link_2">
-                                            <span class="text">Clothing</span><span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="site-nav-sub">
-                                                <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Clothing</div>
-                                                <ul class="list-unstyled">
-                                                    <li class="site-nav-item menu-lv-3 text-left navigation_all_mobile d-none"><a href="/collections/mens-clothing" class="site-nav-link m-zero link link-underline link--text focus-inset link-effect caption-large"><span class="text  p-relative">Shop All Clothing</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/men-best-sellers" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Best Sellers</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-new-arrivals" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">New Arrivals</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-tees" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">T-Shirts</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-activewear" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Activewear</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-blazers-sportcoats" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Blazers</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-casual-shirts" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Casual Shirts</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-dress-shirts" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Dress Shirts</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="#" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Formal Wear</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-outerwear-3" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Jackets &amp; Outerwear</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-jeans" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Jeans</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-robes-sleepwear" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Loungewear &amp; Sleepwear</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-pants" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Pants</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-polo-shirts" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Polo Shirts</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-shorts" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Shorts</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-sweaters" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Sweaters</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-hoodies-sweatshirts" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Sweatshirts &amp; Hoodies</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-swim" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Swimwear</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-socks-underwear" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Underwear, Undershirts &amp; Socks</span></a></li></ul>
-                                            </div></div>
-                                </div>
-                                <div class="site-nav dropdown menu-lv-blink" data-griditem="" style="position: absolute; left: 342.328px; top: 0px;">
-                                    <div class="site-nav-list">
-                                        <a href="/collections/big-tall" class="site-nav-title menu_mobile_link_2">
-                                            <span class="text">Big &amp; Tall</span><span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="site-nav-sub">
-                                                <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Big &amp; Tall</div>
-                                                <ul class="list-unstyled">
-                                                    <li class="site-nav-item menu-lv-3 text-left navigation_all_mobile d-none"><a href="/collections/big-tall" class="site-nav-link m-zero link link-underline link--text focus-inset link-effect caption-large"><span class="text  p-relative">Shop All Big &amp; Tall</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/big-tall-tops" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Big &amp; Tall Tops</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/big-tall-bottoms" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Big &amp; Tall Bottoms</span></a></li></ul>
-                                            </div></div>
-                                </div>
-                                <div class="site-nav dropdown menu-lv-blink" data-griditem="" style="position: absolute; left: 684.656px; top: 0px;">
-                                    <div class="site-nav-list">
-                                        <a href="/collections/mens-accessories" class="site-nav-title menu_mobile_link_2">
-                                            <span class="text">Accessories</span><span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="site-nav-sub">
-                                                <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Accessories</div>
-                                                <ul class="list-unstyled">
-                                                    <li class="site-nav-item menu-lv-3 text-left navigation_all_mobile d-none"><a href="/collections/mens-accessories" class="site-nav-link m-zero link link-underline link--text focus-inset link-effect caption-large"><span class="text  p-relative">Shop All Accessories</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-bags-backpacks" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Bags</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-sunglasses" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Sunglasses</span></a></li></ul>
-                                            </div></div>
-                                </div></div>
-                        <div class="menu-dropdown__banner clearfix">
-                            <div class="site-nav-banner d-flex ft-0 ls-0 flex-jc-end">
-                                <div class="site-nav-banner--item site-nav-banner-item--left d-inline-block ver-alg-top w-100 disable_banner_3"></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div></li>
-<li class="menu-lv-item menu-lv-1 has-megamenu dropdown block_layout--custom_width"><a class="menu-lv-1__action header__menu-item list-menu__item link focus-inset menu_mobile_link link-effect" href="/collections/shoes">
-            <span class="text p-relative">Shoes</span>
-            <span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="menu-dropdown custom-scrollbar megamenu_style_2 p-absolute top-auto left-0 w-100 zi-10 o-x-hidden o-y-auto text-left opacity-0">
-                <div class="container" style="--container_size: 1200px">
-                    <div class="menu-dropdown__wrapper d-flex flex-wrap flex-align-stretch flex-jc-between">
-                        <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Shoes</div>
-                        <div class="site-nav navigation_all_mobile d-none">
-                            <div class="site-nav-list "><a href="/collections/shoes" class="site-nav-title menu-lv-2"><span>Shop All Shoes</span></a></div>
-                        </div>
-                        <div class="menu-dropdown__column menu-dropdown__column-2 w-auto column-full" data-masonry="{ &quot;itemSelector&quot;: &quot;[data-gridItem]&quot;, &quot;columnWidth&quot;: &quot;.grid-sizer&quot; }" style="position: relative; height: 231px;">
-                            <div class="grid-sizer"></div>
-                                <div class="site-nav dropdown menu-lv-blink" data-griditem="" style="position: absolute; left: 0px; top: 0px;">
-                                    <div class="site-nav-list">
-                                        <a href="/collections/mens-shoes" class="site-nav-title menu_mobile_link_2">
-                                            <span class="text">Men's Shoes</span><span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="site-nav-sub">
-                                                <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Men's Shoes</div>
-                                                <ul class="list-unstyled">
-                                                    <li class="site-nav-item menu-lv-3 text-left navigation_all_mobile d-none"><a href="/collections/mens-shoes" class="site-nav-link m-zero link link-underline link--text focus-inset link-effect caption-large"><span class="text  p-relative">Shop All Men's Shoes</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-dress-shoes" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Dress Shoes</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-casual-shoes" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Casual Shoes</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-sneakers" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Sneakers </span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-sandals-slides" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Slides</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/mens-boots" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Boots</span></a></li></ul>
-                                            </div></div>
-                                </div>
-                                <div class="site-nav dropdown menu-lv-blink" data-griditem="" style="position: absolute; left: 516px; top: 0px;">
-                                    <div class="site-nav-list">
-                                        <a href="/collections/womens-shoes" class="site-nav-title menu_mobile_link_2">
-                                            <span class="text">Women's Shoes</span><span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="site-nav-sub">
-                                                <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Women's Shoes</div>
-                                                <ul class="list-unstyled">
-                                                    <li class="site-nav-item menu-lv-3 text-left navigation_all_mobile d-none"><a href="/collections/womens-shoes" class="site-nav-link m-zero link link-underline link--text focus-inset link-effect caption-large"><span class="text  p-relative">Shop All Women's Shoes</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/womens-booties" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Booties</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/womens-heels" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Heels &amp; Pumps</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/womens-wedges" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Wedges &amp; Platforms</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/womens-sandals" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Sandals</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/womens-boots" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Boots</span></a></li>
-                                                        <li class="site-nav-item text-left"><a href="/collections/womens-flats" class="site-nav-link m-zero link link--text focus-inset link-effect caption-large"><span class="text  p-relative">Flats &amp; Loafers</span></a></li></ul>
-                                            </div></div>
-                                </div></div>
-                        <div class="menu-dropdown__banner clearfix">
-                            <div class="site-nav-banner d-flex ft-0 ls-0 flex-jc-end">
-                                <div class="site-nav-banner--item site-nav-banner-item--left d-inline-block ver-alg-top w-100 disable_banner_3"></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div></li>
-<li class="menu-lv-item menu-lv-1 has-megamenu dropdown block_layout--custom_width"><a class="menu-lv-1__action header__menu-item list-menu__item link focus-inset menu_mobile_link link-effect" href="/collections/accessories">
-            <span class="text p-relative">Accessories</span>
-            <span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a><div class="menu-dropdown custom-scrollbar megamenu_style_2 p-absolute top-auto left-0 w-100 zi-10 o-x-hidden o-y-auto text-left opacity-0">
-                <div class="container" style="--container_size: 1200px">
-                    <div class="menu-dropdown__wrapper d-flex flex-wrap flex-align-stretch flex-jc-between">
-                        <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span> Accessories</div>
-                        <div class="site-nav navigation_all_mobile d-none">
-                            <div class="site-nav-list "><a href="/collections/accessories" class="site-nav-title menu-lv-2"><span>Shop All Accessories</span></a></div>
-                        </div>
-                       
-                        
-                    </div>
-                </div>
-            </div>
-            </li>
-<li class="menu-lv-item menu-lv-1 text-left no-megamenu dropdown"><a class="menu-lv-1__action  header__menu-item list-menu__item link focus-inset menu_mobile_link link-effect" href="/collections/sale"><span class="text p-relative">Sale</span>
-        <span class="icon-dropdown" data-toggle-menu-mb=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><path d="M 7.75 1.34375 L 6.25 2.65625 L 14.65625 12 L 6.25 21.34375 L 7.75 22.65625 L 16.75 12.65625 L 17.34375 12 L 16.75 11.34375 Z"></path></svg></span></a>
-    <ul class="header__submenu list-menu list-menu--disclosure list-menu--disclosure-1 caption-large motion-reduce" role="list">
-        <div class="nav-title-mobile text-center"><span class="icon-dropdown"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="long-arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon-arrow-nav"><path fill="currentColor" d="M136.97 380.485l7.071-7.07c4.686-4.686 4.686-12.284 0-16.971L60.113 273H436c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H60.113l83.928-83.444c4.686-4.686 4.686-12.284 0-16.971l-7.071-7.07c-4.686-4.686-12.284-4.686-16.97 0l-116.485 116c-4.686 4.686-4.686 12.284 0 16.971l116.485 116c4.686 4.686 12.284 4.686 16.97-.001z" class=""></path></svg></span>Sale</div>
-        <li class="menu-lv-item menu-lv-2 text-left navigation_all_mobile d-none"><a href="/collections/sale" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect"><span class="text p-relative">Shop All Sale</span></a></li>
-            <li class="menu-lv-item menu-lv-2 text-left   menu-lv-blink"><a href="/collections/womens-sale" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect"><span class="text p-relative">Women's Sale </span></a></li>
-            <li class="menu-lv-item menu-lv-2 text-left   menu-lv-blink"><a href="/collections/mens-sale" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect"><span class="text p-relative">Men's Sale </span></a></li>
-            <li class="menu-lv-item menu-lv-2 text-left   menu-lv-blink"><a href="/collections/womens-under-25" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect"><span class="text p-relative">Women's Under $25</span></a></li>
-            <li class="menu-lv-item menu-lv-2 text-left   menu-lv-blink"><a href="/collections/mens-under-25" class="menu-lv-2__action header__menu-item list-menu__item link link--text focus-inset caption-large link-effect"><span class="text p-relative">Men's Under $25</span></a></li></ul></li>
-</ul>
-                            </nav></div>
-                </div>
-            </div></div>
-</div>
-
-</div>-->
-
-
-<!--
-<style>
- #shopify-section-sections--23782881853474__f17f78f8-86f4-49c8-b5df-452f6888545d.section-header-navigation 
- {border-bottom: 1px solid #e9e9e9;} </style>
- </div>
--->
-
    {{{ conteiner }}}
 
 <footer>
@@ -338,5 +121,5 @@
 </footer>
 
 </body>
- <script src="/script_page.js"></script>
+
 </html>

@@ -9,30 +9,28 @@ export type CustomRequest = Request & {
 
 export default function (role:string){
 
-    return function(request: CustomRequest, response: Response, next: NextFunction){
-          if(request.method === 'OPTIONS')
-            return next();
+return function  (request: CustomRequest, response: Response, next: NextFunction){
     try{
+        if(request.method === 'OPTIONS')
+            return next();
+
+        const authUser = {'authName':'', 'authEmail':''};
         if(!request.headers || !request.headers.authorization)
             return next(ApiError.forbidden('Не авторизован'));
 
         const token = request.headers.authorization.split(' ')[1];
-        if (!token) {
+        if(!token)
             return next(ApiError.forbidden('Не авторизован'));
-        }
 
-
-        const decoded = jwt.verify(token, process.env.SECRET_KEY || 'default_secret_key')  as ICurrentUser;
-
-        if(decoded.role != role){
-             return next(ApiError.forbidden('Нет доступа'));
-        }
-
+        const decoded = jwt.verify(token, process.env.SECRET_KEY || 'default_secret_key') as ICurrentUser
+       // console.log(decoded);
         request.user = decoded;
-         return next();
-    } catch(er : any){
-        return next(ApiError.forbidden('Не авторизован или токен устарел'));
-    } 
+        authUser['authName'] = decoded.name;
+        authUser['authEmail'] = decoded.email;
+        response.json({authUser});
+        return next();
+    } catch(er){
+        response.status(401).json({message: 'Не авторизован'});
     }
- 
+}
 }

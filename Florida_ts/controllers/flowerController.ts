@@ -2,7 +2,7 @@ import { Flowers } from '../models/models';
 import ApiError from '../error/ApiError';
 import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
-
+import { ParamsDictionary } from 'express-serve-static-core';
 
 interface CreateFlowerRequestBody {
     name: string,
@@ -25,9 +25,9 @@ interface GetAllFlowersQuery {
     page?: string;
 }
 
-interface GetOneFlowerParams {
-    id: string; // В Express все параметры URL всегда строки!
-}
+type GetOneFlowerParams = ParamsDictionary & {
+    id?: string;
+};
 
 class FlowerController{
 
@@ -86,7 +86,7 @@ class FlowerController{
             
             // Если база ответила успешно, но вернула null — вот теперь товара нет
             if (!flower) {
-                return next(ApiError.badRequest('Товар с таким ID не найден')); 
+                return next(ApiError.notFound('Товар с таким ID не найден')); 
             }
 
         return response.json(flower);
@@ -113,7 +113,7 @@ class FlowerController{
             const [rowsUpdated] = await Flowers.update(updateData, { where: { id } });
             
             if (rowsUpdated === 0) {
-                return next(ApiError.badRequest('Цветок с таким ID не найден или данные идентичны'));
+                return next(ApiError.notFound('Цветок с таким ID не найден или данные идентичны'));
             }
             return response.json({ change: 'ok' });               
         }catch(error: any){
@@ -121,15 +121,17 @@ class FlowerController{
         }
     }
 
-    async delete(request: Request<{}, {}, DeleteFlowerRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
-        const {id} = request.body;
-        try{
-            if(!id)
-                return next(ApiError.internal('Идентификатор ID обязателен для удаления товара'));
+    async delete(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction): Promise<Response | void>{
+    try{
+        const id = Number(request.params.id);    
+        if(isNaN(id))
+            return next(ApiError.badRequest('Идентификатор ID обязателен для удаления товара'));
+
+
         const deletedRowsCount = await Flowers.destroy({ where: { id } });
 
         if (deletedRowsCount === 0) {
-            return next(ApiError.badRequest('Товар с таким ID не найден для удаления'));
+            return next(ApiError.notFound('Товар с таким ID не найден для удаления'));
         }
 
         return response.json({ change: 'ok' });

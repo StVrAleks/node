@@ -50,7 +50,7 @@ interface changeRequestBody{
 const generateJWT = (id : number, name : string, email: string, role:string) =>{
   return  jwt.sign(
             {id, name, email, role},
-             process.env.SECRET_KEY,
+             process.env.SECRET_KEY || 'default_secret_key',
              {expiresIn: '24h'});
 };
 
@@ -104,11 +104,11 @@ async login(request: Request<{}, {}, LoginUserRequestBody>,  response: Response,
     if(hashPassword != user.password)
         return next(ApiError.badRequest('Пользователь с таким email и паролем не найден'));
 
-    const basket = await Basket.findOne({where: {userId: user.id}});
-    if(!basket)
-        return next(ApiError.badRequest('Пользователь с таким email и паролем не найден'));
-
-    await Basket.create({userId: user.id});
+    let basket = await Basket.findOne({where: {userId: user.id}});
+    if(!basket){
+        basket = await Basket.create({ userId: user.id });
+        logger.info(`Создана отсутствующая корзина для пользователя ID: ${user.id}`);
+    }
 
     const token = generateJWT(user.id,user.name, user.email, user.role);
     response.statusCode = 302;
@@ -215,10 +215,9 @@ const { rows, count } =  await User.findAndCountAll({
     }
   }
 
-  async authUser(request,  response: Response, next: NextFunction): Promise<Response | void>{
-  
+ async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
     try{
-       
+        const {email, password} = request.body;       
     }catch(error:any){
         return next(ApiError.internal('Ошибка сервера при аутентификации пользователя'));
     }

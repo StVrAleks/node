@@ -58,7 +58,7 @@ class ImgController{
             const rows = await FlowerImgs.findOne({where: {id}});
 
             if (!rows) 
-                return next(ApiError.badRequest('Изображение с таким ID не найдено'));     
+                return next(ApiError.notFound('Изображение с таким ID не найдено'));     
 
             return response.json(rows);
         }catch(error:any){
@@ -73,6 +73,7 @@ class ImgController{
             try{
                 if(!id)
                     return next(ApiError.internal('Не найден такой товар'));
+
                 const deletedImgs = await FlowerImgs.destroy({where: {id: id}});
 
                 if (deletedImgs === 0) 

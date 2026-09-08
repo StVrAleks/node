@@ -2,7 +2,7 @@ import { Favorite } from '../models/models';
 import ApiError from '../error/ApiError';
 import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
-
+import { ParamsDictionary } from 'express-serve-static-core';
 
 interface CreateFavoritesRequestBody {
     userId: number,
@@ -14,9 +14,9 @@ interface GetAllFavoritesRequestBody {
     page?: string
 }
 
-interface GetOneFavoriteParams {
-    id: string;
-}
+type GetOneFavoriteParams = ParamsDictionary & {
+    id?: string;
+};
 
 class FavoritesController {
     async create(request: Request<{}, {}, CreateFavoritesRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{

@@ -24,33 +24,33 @@
   </div>
       
         
-  <style>
-    #form-login-user{
-        max-width: 400px;
-        margin: 0;
-        background-color: #fff;
-        padding: 20px;
-        padding-top: 50px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        position: absolute;
-        left:50%;
-        transform: translateX(-50%);
+<style>
+#form-login-user{
+    max-width: 400px;
+    margin: 0;
+    background-color: #fff;
+    padding: 20px;
+    padding-top: 50px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: absolute;
+    left:50%;
+    transform: translateX(-50%);
     }
-    label{
-        font-size: 16px;
-        color: #333;
-        display: block;
-        margin-bottom: 8px;
+label{
+    font-size: 16px;
+    color: #333;
+    display: block;
+    margin-bottom: 8px;
     }
-    .u-full-width{
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 16px;
+.u-full-width{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
     }
 #pasLogin, #regLogin{
     background-color: #4caf50;
@@ -64,38 +64,8 @@
 }
 #pasLogin:hover
 {
-background-color: #45a049;
+    background-color: #45a049;
 }
-  </style>
+</style>
 
-  <script>
-function openReg(){
-     window.location.href = '/registration_user.html';
-}
-
-const formLogin= document.getElementById('form-login-user');
-function sendLogin(){
-let email= document.getElementById('email').value;
-let password=document.getElementById('password').value;
-
-fetch('api/user/login',{
-        method: "POST",
-        headers: {"content-Type": "application/json"},
-        body: JSON.stringify({"email": email,"password": password})
-        }).then((response) => response.json())
-        .then(data =>{
-           if(data.mes)
-             document.getElementById('mist').innerHTML = data.mes;
-            else if(data.key) 
-            {
-              localStorage.setItem('floweridaKey', data.key);
-              window.location.href = '/home.html';
-            } 
-        }).catch((error)=> console.log(error));
-}
-formLogin.addEventListener('submit', (e) =>{
-    e.preventDefault();
-    sendLogin();
-    return true;
-});
-  </script>
+  <script src="../scripts/login.ts"></script>

@@ -34,6 +34,8 @@ class InfoController{
         const {flowerId, title, discription} =  request.body;
         if(!flowerId || !title)
             return next(ApiError.badRequest('Не указан цветок или название блока с описанием'));
+
+
         const inforow = await FlowerInfo.create({flowerId, title, discription});
         logger.info(`/добавили новый блок описания для цветка ${flowerId} с загаловком: ${title}`);
         return response.status(201).json(inforow);
@@ -83,7 +85,7 @@ class InfoController{
 
             const rows = await FlowerInfo.findOne({where: {id}});
             if (!rows) 
-                return next(ApiError.badRequest('Описание с таким ID не найдено')); 
+                return next(ApiError.notFound('Описание с таким ID не найдено')); 
             return response.json(rows);
         }
         catch(error:any){
@@ -98,9 +100,10 @@ class InfoController{
             if(isNaN(id))
                 return next(ApiError.badRequest('Некорректный формат ID'));
 
+
             const deletedRows = await FlowerInfo.destroy({where: {id: id}});
             if (deletedRows === 0) 
-                return next(ApiError.badRequest('Описание с таким ID не найдено'));
+                return next(ApiError.notFound('Описание с таким ID не найдено'));
            return response.json({change: 'ok'});           
         }catch(error:any){
             return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
@@ -120,7 +123,7 @@ class InfoController{
                 const [rowsUpdated] = await FlowerInfo.update(updateData,{where: {id: id}});
 
                 if (rowsUpdated === 0) 
-                    return next(ApiError.badRequest('Описание с таким ID не найдено или данные идентичны'));
+                    return next(ApiError.notFound('Описание с таким ID не найдено или данные идентичны'));
 
                     return response.json({change: 'ok'});           
             }catch(error:any){

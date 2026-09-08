@@ -2,6 +2,7 @@ import {Vid} from '../models/models';
 import ApiError from '../error/ApiError';
 import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 interface CreateCategoryRequestBody {
     name: string;
@@ -16,9 +17,9 @@ interface ChangeCategoryRequestBody {
     name: string
 }
 
-interface GetOneCategoryParams {
-    id: string;
-}
+type GetOneCategoryParams = ParamsDictionary & {
+    id?: string;
+};
 
 class VidController {
     async create(request: Request<{}, {}, CreateCategoryRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
@@ -26,6 +27,7 @@ class VidController {
         try{
             if(!name)
                 return next(ApiError.badRequest('Не заполнено поле "name"'));
+          
             const vid = await Vid.create({name});
             logger.info(`/создали новый вид: ${name}`);
             return response.status(201).json(vid);
@@ -69,7 +71,7 @@ class VidController {
             const [resUpdate] = await Vid.update({name: name},{where: {id: id}});
 
             if(resUpdate === 0){        
-                return next(ApiError.badRequest('Вид с таким ID не найден'));
+                return next(ApiError.notFound('Вид с таким ID не найден'));
             }
             return response.json({ change: 'ok' });           
         }catch(error: any){
@@ -86,7 +88,7 @@ class VidController {
 
            const deletedRows = await Vid.destroy({where: {id: id}});
             if (deletedRows === 0) {
-                return next(ApiError.badRequest('Категория с таким ID не найдена'));
+                return next(ApiError.notFound('Категория с таким ID не найдена'));
             }           
                 return response.json({change: 'ok'});            
         }catch(error){
@@ -103,7 +105,7 @@ class VidController {
             return next(ApiError.badRequest('Некорректный формат ID'));       
         const rows = await Vid.findOne({where: {id}});
         if (!rows) 
-            return next(ApiError.badRequest('Категория с таким ID не найдена')); 
+            return next(ApiError.notFound('Категория с таким ID не найдена')); 
         return response.json(rows);
         }
         catch(error){ return next(ApiError.internal('Ошибка сервера при выполнении запроса')); }

@@ -5,7 +5,7 @@ import checkRole from '../middleware/checkRoleMiddleware';
 
 router.post('/create',checkRole('ADMIN'), flowerController.create);
 router.put('/change',checkRole('ADMIN'), flowerController.change);
-router.delete('/delete', checkRole('ADMIN'), flowerController.delete);
+router.delete('/delete/:id', checkRole('ADMIN'), flowerController.delete);
 router.get('/getAll', flowerController.getAll);
 router.get('/getOne/:id', flowerController.getOne);
 
