@@ -2,6 +2,7 @@ import {FlowerImgs} from '../models/models';
 import ApiError from '../error/ApiError';
 import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 interface CreateImgRequestBody {
     flowerId: number,
@@ -14,9 +15,9 @@ interface GetAllImgQuery {
     page?: string
 }
 
-interface GetOneImgParams {
-    id: string;
-}
+type GetOneFlowerParams = ParamsDictionary & {
+    id?: string;
+};
 
 class ImgController{
 
@@ -49,7 +50,7 @@ class ImgController{
             return next(ApiError.internal('Внутренняя ошибка сервера при чтении галереи изображений'));
             }
     }
-    async getOne(request: Request<GetOneImgParams>, response: Response, next: NextFunction){
+    async getOne(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction){
         try{
         const id = Number(request.params.id);
 
@@ -66,13 +67,13 @@ class ImgController{
         }
     }
     
-    async delete(request: Request<GetOneImgParams>, response: Response, next: NextFunction){
+    async delete(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction){
              const id = Number(request.params.id);
              if(isNaN(id))
                 return next(ApiError.badRequest('Некорректный формат ID'));
             try{
                 if(!id)
-                    return next(ApiError.internal('Не найден такой товар'));
+                    return next(ApiError.internal('Не найдено такое изображение'));
 
                 const deletedImgs = await FlowerImgs.destroy({where: {id: id}});
 

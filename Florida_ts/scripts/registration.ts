@@ -12,20 +12,20 @@ if(subForm) subForm.disabled = true;
 pasForm1?.addEventListener('blur', (event : Event) : void =>
   { 
    try{
-   if(subForm) subForm.disabled = true;
-   const valInput = pasForm1? pasForm1.value : '';
-   if (erPas1) erPas1.innerHTML = '';
-   if(valInput.length < 5)
-    { if (erPas1) erPas1.innerHTML = "Количество символов должно быть больше 5";}
-   else if(checkLatinLetters(valInput) === false)  
-     {if (erPas1) erPas1.innerHTML = "Пароль может содержать только латинские буквы и цифры";}
-   else 
-    {
-     if (erPas1) erPas1.innerHTML = '';
-     if(subForm) subForm.disabled = false;
-     }
+      if(subForm) subForm.disabled = true;
+      const valInput = pasForm1? pasForm1.value : '';
+      if (erPas1) erPas1.innerHTML = '';
+      if(valInput.length < 5)
+        { if (erPas1) erPas1.innerHTML = "Количество символов должно быть больше 5";}
+      else if(checkLatinLetters(valInput) === false)  
+        {if (erPas1) erPas1.innerHTML = "Пароль может содержать только латинские буквы и цифры";}
+      else 
+        {
+        if (erPas1) erPas1.innerHTML = '';
+        if(subForm) subForm.disabled = false;
+        }
 
-   }catch(err){
+    }catch(err){
     console.error('Валидация формы прошла не успешно');
     }}
 );

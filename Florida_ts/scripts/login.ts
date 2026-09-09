@@ -4,9 +4,7 @@ declare global {
     }
 }
 
-function openReg() : void{
-     window.location.href = '/registration_user.html';
-}
+
 
 document.addEventListener('DOMContentLoaded', () : void => {
 
@@ -16,8 +14,12 @@ function sendLogin(){
 const email = (document.getElementById('email') as HTMLInputElement) || null;
 const password = (document.getElementById('password') as HTMLInputElement) || null;
 const mist = (document.getElementById('mist') as HTMLElement) || null;
+const regLogin = document.getElementById('regLogin') as HTMLElement || null;
 
 if (!email || !password) return;
+
+if(regLogin)
+    regLogin.addEventListener('click', (event : Event) => {window.location.href = '/registration_user.html';})
 
 fetch('api/user/login',{
         method: "POST",

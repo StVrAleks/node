@@ -79,7 +79,7 @@ class VidController {
     }
 
 
-    async delete(request:  Request<GetOneCategoryParams>,  response: Response, next: NextFunction): Promise<Response | void>{
+    async delete(request: Request<GetOneCategoryParams>,  response: Response, next: NextFunction): Promise<Response | void>{
         
         try{
             const id = Number(request.params.id);    
@@ -96,7 +96,7 @@ class VidController {
     }
 
 
-    async getOne(request: Request<GetOneCategoryParams>,  response: Response, next: NextFunction): Promise<Response | void>
+    async getOne(request: Request<GetOneCategoryParams>, response: Response, next: NextFunction): Promise<Response | void>
         {
         try{ 
         const id = Number(request.params.id);

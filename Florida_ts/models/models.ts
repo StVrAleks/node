@@ -61,7 +61,7 @@ const BasketFlower = sequelize.define<Model<BasketFlowerAttributes, BasketFlower
 
 //описание цветов
 
-interface FlowerAttributes {
+export interface FlowerAttributes {
     id: number,
     name: string,
     price: number,
@@ -86,7 +86,7 @@ const Flowers = sequelize.define<Model<FlowerAttributes, FlowerCreationAttribute
     }
 );
 //роза, ромашка, кактус
-interface VidAttributes {
+export interface VidAttributes {
     id: number,
     name: string
 };
@@ -115,7 +115,7 @@ const Favorite = sequelize.define<Model<FavoriteAttributes , FavoriteCreationAtt
     }
 );
 
-interface FlowerInfoAttributes {
+export interface FlowerInfoAttributes {
     id: number,
     title: string,
     discription: string | undefined,
@@ -138,7 +138,7 @@ const FlowerInfo = sequelize.define<Model<FlowerInfoAttributes, FlowerInfoCreati
 );
 
 //картинки цветов
-interface FlowerImgsAttributes {
+export interface FlowerImgsAttributes {
     id: number,
     num?: number,
     img: string,
@@ -158,6 +158,14 @@ const FlowerImgs = sequelize.define<Model<FlowerImgsAttributes, FlowerImgsCreati
                     },
                 onDelete: 'CASCADE'}
 });
+
+
+export interface ApiResponse<T = any> {
+    mes?: string;
+    message?: string;
+    rows?: T[];
+}
+
 
 //у покупателя м.б. много позиций в карзине, 1 карзина принадлежит 1 покупателю
 User.hasOne(Basket, { foreignKey: 'userId' });

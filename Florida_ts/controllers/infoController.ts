@@ -2,6 +2,7 @@ import { FlowerInfo} from '../models/models';
 import ApiError from '../error/ApiError';
 import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 interface CreateInfoRequestBody {
     flowerId: number,
@@ -24,9 +25,10 @@ interface ChangeInfoRequestBody {
     discription?: string    
 }
 
-interface GetOneInfoParams {
-    id: string;
-}
+type GetOneCategoryParams = ParamsDictionary & {
+    id?: string;
+};
+
 
 class InfoController{
     async create(request: Request<{}, {}, CreateInfoRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
@@ -76,7 +78,7 @@ class InfoController{
     }
 
 
-    async getOne(request: Request<GetOneInfoParams>, response: Response, next: NextFunction): Promise<Response | void>{
+    async getOne(request: Request<GetOneCategoryParams>, response: Response, next: NextFunction): Promise<Response | void>{
         try{
             const id = Number(request.params.id);
 
@@ -94,7 +96,7 @@ class InfoController{
     }
 
 
-    async delete(request:  Request<GetOneInfoParams>, response: Response, next: NextFunction): Promise<Response | void>{
+    async delete(request:  Request<GetOneCategoryParams>, response: Response, next: NextFunction): Promise<Response | void>{
         try{
             const id = Number(request.params.id);    
             if(isNaN(id))
