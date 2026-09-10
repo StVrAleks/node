@@ -10,7 +10,7 @@ interface CreateImgRequestBody {
 }
 
 interface GetAllImgQuery {
-    flowerId: number,
+    flowerId?: number,
     limit?: string,
     page?: string
 }
@@ -36,19 +36,22 @@ class ImgController{
             }
     }
 
-    async getAll(request : Request<{}, {}, GetAllImgQuery> , response: Response, next: NextFunction){
+    async getAll(request : Request<{}, any, any, GetAllImgQuery> , response: Response, next: NextFunction){
         try{
         var {flowerId} = request.query;
         if(!flowerId)
             return next(ApiError.badRequest('Параметр flowerId обязателен для получения описаний'));
         
-            const rows = await FlowerImgs.findAndCountAll({where: {
+            const result = await FlowerImgs.findAndCountAll({where: {
                 flowerId: Number(flowerId)},
-                order: [['id', 'ASC']]});
-            return response.json(rows);
+                order: [ ['num', 'ASC'], 
+                         ['id', 'ASC']]});
+
+            return response.json({count: result.count,
+                                 rows: result.rows});
         }catch(error:any){
-            return next(ApiError.internal('Внутренняя ошибка сервера при чтении галереи изображений'));
-            }
+        return next(ApiError.internal('Внутренняя ошибка сервера при чтении галереи изображений'));
+        }
     }
     async getOne(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction){
         try{

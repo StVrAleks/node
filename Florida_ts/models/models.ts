@@ -161,6 +161,9 @@ const FlowerImgs = sequelize.define<Model<FlowerImgsAttributes, FlowerImgsCreati
 
 
 export interface ApiResponse<T = any> {
+    total?: number;
+    pages?: number;
+    currentPage?: number;
     mes?: string;
     message?: string;
     rows?: T[];
