@@ -166,6 +166,7 @@ export interface ApiResponse<T = any> {
     currentPage?: number;
     mes?: string;
     message?: string;
+    change?: string;
     rows?: T[];
 }
 
