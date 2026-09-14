@@ -7,7 +7,7 @@ import checkRole from '../middleware/checkRoleMiddleware';
 
 router.post('/create', checkRole('ADMIN'), imgController.create);
 router.delete('/delete/:id', checkRole('ADMIN'), imgController.delete);
-router.get('/getAll', imgController.getAll);
+router.get('/getAll/:id', imgController.getAll);
 router.get('/getOne/:id', imgController.getOne);
 
 
