@@ -7,7 +7,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 interface CreateInfoRequestBody {
     flowerId: number,
     title: string,
-    discription?: string | undefined
+    description?: string | undefined
 }
 interface UpdateInfoRequestBody extends Partial<CreateInfoRequestBody> {
     id: number;
@@ -22,7 +22,7 @@ interface ChangeInfoRequestBody {
     id: number,
     flowerId: number,
     title?: string,
-    discription?: string    
+    description?: string    
 }
 
 type GetOneCategoryParams = ParamsDictionary & {
@@ -33,49 +33,42 @@ type GetOneCategoryParams = ParamsDictionary & {
 class InfoController{
     async create(request: Request<{}, {}, CreateInfoRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
     try {       
-        const {flowerId, title, discription} =  request.body;
+        const {flowerId, title, description} =  request.body;
         if(!flowerId || !title)
             return next(ApiError.badRequest('Не указан цветок или название блока с описанием'));
 
 
-        const inforow = await FlowerInfo.create({flowerId, title, discription});
+        const inforow = await FlowerInfo.create({flowerId, title, description});
         logger.info(`/добавили новый блок описания для цветка ${flowerId} с загаловком: ${title}`);
         return response.status(201).json(inforow);
         }
     catch(error: any){
+        logger.error('Ошибка в InfoController.create:', error.message);
         return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
         }
     }
 
-    async getAll(request: Request<{}, {},{}, GetAllInfoQuery>, response: Response, next: NextFunction): Promise<Response | void>{
-        try{
-
-            var {flowerId, limit:queryLimit, page:queryPage} = request.query;
-            if(!flowerId)
-                return next(ApiError.badRequest('Параметр flowerId обязателен для получения описаний'));
-    
-            const page = Math.max(1, Number(queryPage) || 1);
-            const rawLimit = Number(queryLimit) || 9;
-            const limit = rawLimit > 50 ? 9 : rawLimit; 
-            const offset = (page - 1) * limit;  
-
-            const {rows, count} = await FlowerInfo.findAndCountAll({
-                where: {flowerId: Number(flowerId)},
-                limit: limit,
-                offset: offset,
-                order: [['id', 'ASC'], ['title', 'ASC']] 
-            });
-
-            return response.json({
-                total: count, // Всего товаров в базе по этому фильтру
-                pages: Math.ceil(count / limit), // Сколько всего страниц получилось
-                currentPage: page,
-                rows: rows // Сами товары - ранее возвращали только ***rows***
-            });
-        }catch(error:any){
-            return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
+async getAll(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+    try {
+        // Получаем flowerId напрямую из параметров запроса
+        const { flowerId } = request.query;
+        
+        if (!flowerId) {
+            return next(ApiError.badRequest('Параметр flowerId обязателен'));
         }
+
+        // Находим абсолютно все описания для конкретного цветка без лимитов и смещений
+        const rows = await FlowerInfo.findAll({
+            where: { flowerId: Number(flowerId) }
+        });
+
+        // Возвращаем клиенту чистый массив строк (как у картинок)
+        return response.json({ rows: rows });
+    } catch (error: any) {
+        logger.error('Ошибка в InfoController.getAll:', error.message);
+        return next(ApiError.internal('Внутренняя ошибка сервера при получении описаний'));
     }
+}
 
 
     async getOne(request: Request<GetOneCategoryParams>, response: Response, next: NextFunction): Promise<Response | void>{
@@ -91,6 +84,7 @@ class InfoController{
             return response.json(rows);
         }
         catch(error:any){
+             logger.error('Ошибка в InfoController.getOne:', error.message);
              return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));           
         }
     }
@@ -108,19 +102,20 @@ class InfoController{
                 return next(ApiError.notFound('Описание с таким ID не найдено'));
            return response.json({change: 'ok'});           
         }catch(error:any){
+            logger.error('Ошибка в InfoController.delete:', error.message);
             return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
         }
         }
 
     async update(request: Request<{}, {}, ChangeInfoRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
             try{
-                const {id, flowerId, title, discription} = request.body;
+                const {id, flowerId, title, description} = request.body;
                 if(!id || !flowerId)
                 return next(ApiError.badRequest('Не корректно указан идентификатор'));
 
                 const updateData: Partial<CreateInfoRequestBody> = {};
                 if (title !== undefined) updateData.title = title;
-                if (discription !== undefined) updateData.discription = discription;
+                if (description !== undefined) updateData.description = description;
 
                 const [rowsUpdated] = await FlowerInfo.update(updateData,{where: {id: id}});
 
@@ -129,6 +124,7 @@ class InfoController{
 
                     return response.json({change: 'ok'});           
             }catch(error:any){
+                logger.error('Ошибка в InfoController.update:', error.message);
                 return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
             }
         }    

@@ -118,16 +118,16 @@ const Favorite = sequelize.define<Model<FavoriteAttributes , FavoriteCreationAtt
 export interface FlowerInfoAttributes {
     id: number,
     title: string,
-    discription: string | undefined,
+    description: string | undefined,
     flowerId: number
 };
 
-type FlowerInfoCreationAttributes = Optional<FlowerInfoAttributes, 'id' | 'discription'>;
+type FlowerInfoCreationAttributes = Optional<FlowerInfoAttributes, 'id' | 'description'>;
 
 const FlowerInfo = sequelize.define<Model<FlowerInfoAttributes, FlowerInfoCreationAttributes> & FlowerInfoAttributes>( 'flower_info', {
         id: {type:DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
         title: {type:DataTypes.STRING, allowNull: false},
-        discription: {type:DataTypes.STRING, allowNull: true},
+        description: {type:DataTypes.STRING, allowNull: true},
         flowerId: {type:DataTypes.INTEGER,  allowNull: false,
             references: {
                 model: 'flowers', // Имя таблицы видов в базе данных

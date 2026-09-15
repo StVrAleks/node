@@ -1,93 +1,110 @@
-import {FlowerImgs} from '../models/models';
+import { FlowerImgs } from '../models/models';
 import ApiError from '../error/ApiError';
 import logger from '../middleware/winston';
 import { Request, Response, NextFunction } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
+// ИСПРАВЛЕНО: Добавили поле num, которое прилетает с фронтенда для сортировки
 interface CreateImgRequestBody {
-    flowerId: number,
-    img: string
+    flowerId: number;
+    img: string;
+    num: number;
 }
 
-interface GetAllImgQuery {
-    flowerId?: number,
-    limit?: string,
-    page?: string
-}
-
-type GetOneFlowerParams = ParamsDictionary & {
+// Тип для параметров пути, содержащих flowerId или id картинки
+type FlowerParams = ParamsDictionary & {
+    flowerId?: string;
     id?: string;
 };
 
-class ImgController{
+class ImgController {
 
-    async create(request : Request<{}, {}, CreateImgRequestBody> , response: Response, next: NextFunction){
-    try {       
-        const {flowerId, img} =  request.body;
-        if(!flowerId || !img)
-             return next(ApiError.badRequest('Не указан идентификатор цветка или не добавлена ссылка на изображение'));
-
-        let flrows = await FlowerImgs.create({flowerId, img});
-        logger.info(`/добавили новое изображение для цветка с ИД: ${flowerId}`);
-        return response.status(201).json(flrows);
-        }
-     catch(error:any){
-            return next(ApiError.internal('Внутренняя ошибка сервера при сохранении изображения'));
+    // 1. Создание записи картинки в MySQL
+    async create(request: Request<{}, {}, CreateImgRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
+        try {       
+            const { flowerId, img, num } = request.body;
+            if (!flowerId || !img || !num) {
+                 return next(ApiError.badRequest('Не указан идентификатор цветка, номер или не добавлено имя изображения'));
             }
-    }
 
-    async getAll(request : Request<{}, any, any, GetAllImgQuery> , response: Response, next: NextFunction){
-        try{
-        var {flowerId} = request.query;
-        if(!flowerId)
-            return next(ApiError.badRequest('Параметр flowerId обязателен для получения описаний'));
-        
-            const result = await FlowerImgs.findAndCountAll({where: {
-                flowerId: Number(flowerId)},
-                order: [ ['num', 'ASC'], 
-                         ['id', 'ASC']]});
-
-            return response.json({count: result.count,
-                                 rows: result.rows});
-        }catch(error:any){
-        return next(ApiError.internal('Внутренняя ошибка сервера при чтении галереи изображений'));
+            // ИСПРАВЛЕНО: Передаем num в базу данных
+            const flrows = await FlowerImgs.create({ flowerId, img, num });
+            logger.info(`/добавили новое изображение для цветка с ИД: ${flowerId}, позиция: ${num}`);
+            return response.status(201).json(flrows);
+        } catch (error: any) {
+            logger.error('Ошибка в ImgController.create:', error.message);
+            return next(ApiError.internal('Внутренняя ошибка сервера при сохранении изображения'));
         }
     }
-    async getOne(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction){
-        try{
-        const id = Number(request.params.id);
 
-            if(isNaN(id))
+    // 2. Получение всех картинок цветка (ИСПРАВЛЕНО под путь /api/imgs/getAll/:flowerId)
+    async getAll(request: Request<FlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            // ИСПРАВЛЕНО: Читаем flowerId из params, как у вас написано в fetch(`/api/imgs/getAll/\${flowerId}`)
+            const { flowerId } = request.params;
+            
+            if (!flowerId) {
+                return next(ApiError.badRequest('Параметр flowerId в пути обязателен'));
+            }
+        
+            const result = await FlowerImgs.findAndCountAll({
+                where: { flowerId: Number(flowerId) },
+                order: [
+                    ['num', 'ASC'], 
+                    ['id', 'ASC']
+                ]
+            });
+
+            return response.json({
+                count: result.count,
+                rows: result.rows
+            });
+        } catch (error: any) {
+            logger.error('Ошибка в ImgController.getAll:', error.message);
+            return next(ApiError.internal('Внутренняя ошибка сервера при чтении галереи изображений'));
+        }
+    }
+
+    // 3. Получение одной картинки
+    async getOne(request: Request<FlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const id = Number(request.params.id);
+
+            if (isNaN(id)) {
                 return next(ApiError.badRequest('Некорректный формат ID изображения')); 
-            const rows = await FlowerImgs.findOne({where: {id}});
+            }
+            const rows = await FlowerImgs.findOne({ where: { id } });
 
-            if (!rows) 
+            if (!rows) {
                 return next(ApiError.notFound('Изображение с таким ID не найдено'));     
+            }
 
             return response.json(rows);
-        }catch(error:any){
+        } catch (error: any) {
+            logger.error('Ошибка в ImgController.getOne:', error.message);
             return next(ApiError.internal('Внутренняя ошибка сервера при поиске изображения'));
         }
     }
     
-    async delete(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction){
-             const id = Number(request.params.id);
-             if(isNaN(id))
-                return next(ApiError.badRequest('Некорректный формат ID'));
-            try{
-                if(!id)
-                    return next(ApiError.internal('Не найдено такое изображение'));
-
-                const deletedImgs = await FlowerImgs.destroy({where: {id: id}});
-
-                if (deletedImgs === 0) 
-                    return next(ApiError.badRequest('Картинки с таким ID не найдено'));
-
-                    return response.json({change: 'ok'});           
-            }catch(error:any){
-                return next(ApiError.internal('Внутренняя ошибка сервера при удалении изображения'));
-            }
+    // 4. Удаление картинки
+    async delete(request: Request<FlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
+        const id = Number(request.params.id);
+        if (isNaN(id)) {
+            return next(ApiError.badRequest('Некорректный формат ID'));
         }
- 
+        try {
+            const deletedImgs = await FlowerImgs.destroy({ where: { id: id } });
+
+            if (deletedImgs === 0) {
+                return next(ApiError.badRequest('Картинки с таким ID не найдено'));
+            }
+
+            return response.json({ change: 'ok' });           
+        } catch (error: any) {
+            logger.error('Ошибка в ImgController.delete:', error.message);
+            return next(ApiError.internal('Внутренняя ошибка сервера при удалении изображения'));
+        }
+    }
 }
-   export default new  ImgController();
+
+export default new ImgController();

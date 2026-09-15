@@ -1,7 +1,7 @@
 import { ApiResponse, UserAttributes, VidAttributes, FlowerAttributes, FlowerImgsAttributes, FlowerInfoAttributes } from '../models/models';
 
 // Глобальные переменные для пагинации и режимов админки
-let currentMode: 'flowers' | 'vids' | 'flowersPhoto' | 'flowersDiscription' | 'users' = 'users';
+let currentMode: 'flowers' | 'vids' | 'flowersPhoto' | 'flowersDescription' | 'users' = 'users';
 let currentPage: number = 1;
 const itemsPerPage: number = 9;
 
@@ -113,8 +113,7 @@ async function correctFlowers(page: number = 1): Promise<void> {
         butAdd.style.background = 'none';
         butAdd.value = '⊕ Добавить товар(цветок)';
     table.appendChild(butAdd);   
- //   const addFlbutton = document.getElementById('addNewItemFlower_but') as HTMLButtonElement || null;  
-    document.getElementById('addNewItemFlower_but')?.addEventListener('click', event => {addItemUniversal(event)}, false);    
+    document.getElementById('addNewItemFlower_but')?.addEventListener('click', (event : Event) => {addItemUniversal(event)}, false);    
   }
 
 
@@ -138,7 +137,7 @@ async function correctFlowers(page: number = 1): Promise<void> {
                   trHead.className = 'newTr'
 
               //добавили заголовки
-            const headers = ['Удалить', 'Изменить', 'Название', 'Цена', 'Вид', 'Изображения', 'Описание', 'mKeyWords', 'mDiscription'];
+            const headers = ['Удалить', 'Изменить', 'Название', 'Цена', 'Вид', 'Изображения', 'Описание', 'mKeyWords', 'mDescription'];
                     headers.forEach(text => {
                         const th = document.createElement("th");
                         th.innerHTML = text;
@@ -170,7 +169,7 @@ async function correctFlowers(page: number = 1): Promise<void> {
                 document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e); });    
 
                 document.getElementById(`butChangeImg${num}`)?.addEventListener('click', (event : Event) => {imgItemFlower(event)}, false);   
-                document.getElementById(`butChangeDisc${num}`)?.addEventListener('click',  (event : Event) => {discItemFlower(event)}, false);
+                document.getElementById(`butChangeDisc${num}`)?.addEventListener('click',  (event : Event) => {descItemFlower(event)}, false);
 
             });   
                   
@@ -355,59 +354,100 @@ function imgItemFlower(event :Event) : void{
 currentMode = 'flowersPhoto';
 showChange(event);
 
-// Навешиваем клик на созданную кнопку
-  const btnAdd = document.getElementById('modalAddPhotoBtn') as HTMLInputElement | null;
-  const fileInput = document.getElementById('modalAddPhotoInput') as HTMLInputElement | null;
+const target = event.target as HTMLElement | null;
+    if (!target) return;
 
-  btnAdd?.addEventListener('click', () => fileInput?.click());
-    
-  fileInput?.addEventListener('change', (e: Event) => {
-        addFileUniversal(e, linkId, event); // Передаем исходный event, чтобы потом обновить окно
+    const targetId = target.id;
+    const linkIdChange = targetId.replace('butChangeImg', '');
+    const flowerId = linkIdChange ? parseInt(linkIdChange) + 1 : 0;  
+
+    // Навешиваем клик на кнопку добавления раздела (она уже есть в DOM после showChange)
+    const btnAddPart = document.getElementById('modalAddPhotoPart') as HTMLInputElement | null;
+    btnAddPart?.addEventListener('click', (e: Event) => { 
+        addItemUniversal(e); 
+        
+    // Как только открылась форма добавления из addItemUniversal,
+    // СРАЗУ подписываемся на появившиеся кнопки выбора и отправки файла!
+    const btnAdd = document.getElementById('modalAddPhotoBtn') as HTMLInputElement | null;
+    const fileInput = document.getElementById('modalAddPhotoInput') as HTMLInputElement | null;
+
+    if (btnAdd) btnAdd.onclick = () => fileInput?.click();
+    if (fileInput) {
+        fileInput.onchange = (changeEvent: Event) => {
+            addFileUniversal(changeEvent, flowerId, event);
+        };
+    }
     });
 
-  const target = event.target as HTMLElement | null;
-  if (!target) return;
+    const table = document.getElementById('myModalTableFlowerImg') as HTMLTableElement | null;
+    if (table) {
+        while (table.rows.length > 0) {
+            table.deleteRow(0);
+        }
+    }
 
-  let targetId = target.id;
-  let linkIdChange = targetId.replace('butChangeImg', '');
-  let flowerId =  linkIdChange ? parseInt(linkIdChange) + 1 : 0;  
-
-  let table = document.getElementById('myModalTableFlowerImg') as HTMLTableElement | null;;
-  if (table) {
-      while (table.rows.length > 0) {
-          table.deleteRow(0);
-      }
-  }
-
-
-const localToken = localStorage.getItem('floweridaKey');
-fetch(`/api/imgs/getAll/${flowerId}`,{
+    const localToken = localStorage.getItem('floweridaKey');
+    fetch(`/api/imgs/getAll/${flowerId}`, {
         method: "GET",
-        headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
-        })
-        .then((response) => response.json())
-        .then((data :ApiResponse<FlowerImgsAttributes>) =>{
-            if(data.mes || data.message){
-              const mistake = document.getElementById('modalMistake') as HTMLElement || null;
-              if(mistake) mistake.innerHTML = String(data.mes || data.message);
-              return ;
-            }
-           if (table && data.rows) {
+        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` },
+    })
+    .then((response) => response.json())
+    .then((data: ApiResponse<FlowerImgsAttributes>) => {
+        if (data.mes || data.message) {
+            const mistake = document.getElementById('modalMistake') as HTMLElement | null;
+            if (mistake) mistake.innerHTML = String(data.mes || data.message);
+            return;
+        }
+        
+        if (table && data.rows) {
             data.rows.forEach((images, index) => {
                 const numImg = index + 1;
-                const tr = document.createElement("tr");
-                tr.className = 'newTr';
-                tr.innerHTML = `
-                    <td><input type="button" class="class_control_button" value="Удалить" id="delImg${numImg}"></td>
+
+                // СТРОКА 1: ID цветка
+                const trId = document.createElement("tr");
+                trId.className = 'newTr';
+                trId.innerHTML = `
+                    <td>ID описываемого цветка</td>
+                    <td class="spanFlowerId">${flowerId}</td>
+                `;
+                table.appendChild(trId);
+
+                // СТРОКА 2: Фото и скрытые метаданные
+                const trPhoto = document.createElement("tr");
+                trPhoto.className = 'newTr';
+                trPhoto.innerHTML = `
+                    <td>Фото</td>
                     <td>
-                        <div><img id="img${numImg}" src="/imgStoreMINI/${images.img}" width="50"></div>
+                        <div><img id="img${numImg}" src="/imgStoreMINI/${images.img}" width="50" alt="flower"></div>
                         <span id="spanID${numImg}" style="display:none">${images.id || ''}</span>
                         <span id="spanName${numImg}" style="display:none">${images.img}</span>
                     </td>
-                    <td style="padding-bottom:25px">${images.num}</td>
                 `;
-                table.appendChild(tr);
-                document.getElementById('delImg' + numImg)?.addEventListener('click', (e: Event) => { delOneImgDB(e); });
+                table.appendChild(trPhoto);
+
+                // СТРОКА 3: Последовательность
+                const trNum = document.createElement("tr");
+                trNum.className = 'newTr';
+                trNum.innerHTML = `
+                    <td>Последовательность отображения</td>
+                    <td class="spanFlowerNum" style="padding-bottom:25px">${images.num}</td>
+                `;
+                table.appendChild(trNum);
+
+                // СТРОКА 4: Управление и удаление 
+                const trControls = document.createElement("tr");
+                trControls.className = 'newTr';
+                trControls.style.borderBottom = '2px solid #ccc'; // Визуально отделяем карточки цветов друг от друга
+                trControls.innerHTML = `
+                    <td colspan="1"></td>
+                    <td><input type="button" class="class_control_button" value="Удалить" id="delImg${numImg}" style="margin-bottom: 25px;"></td>
+                `;
+                table.appendChild(trControls);
+                
+                // Теперь ID ('delImg' + numImg) существует железно и без опечаток!
+                document.getElementById('delImg' + numImg)?.addEventListener('click', (e: Event) => { 
+                    delOneImgDB(e); 
+                });
             });  
         }  
     })
@@ -525,11 +565,14 @@ const localToken = localStorage.getItem('floweridaKey');
 
 
 ////Нажали Добавить-описание товара
-async function discItemFlower(event): Promise<void> {
-  currentMode = 'flowersDiscription';
+async function descItemFlower(event : Event): Promise<void> {
+  currentMode = 'flowersDescription';
   showChange(event);
 
-  const btnAdd = document.getElementById('modalAddDiscriptionBtn') as HTMLInputElement | null;
+  const btnAdd = document.getElementById('modalAddDescriptionBtn') as HTMLInputElement | null;
+  if (btnAdd) {
+    btnAdd.onclick = (e: Event) => { addItemUniversal(e); };
+  }
 
   btnAdd?.addEventListener('click', (event) => {addItemUniversal(event);});
 
@@ -548,13 +591,12 @@ async function discItemFlower(event): Promise<void> {
   }
 
 const mistake = document.getElementById('modalMistake') as HTMLElement || null;
- if(flowerId != 0) {
-  mistake.innerHTML = 'Не указан товар. Добавление описания товара не возможно!';
-
-}
- else{
+    if (flowerId === 0) {
+        if (mistake) mistake.innerHTML = 'Не указан товар. Добавление описания товара невозможно!';
+        return;
+    }
     const localToken = localStorage.getItem('floweridaKey');
-  fetch('/api/info/getAll/${flowerId}',{
+    fetch('/api/info/getAll/${flowerId}',{
         method: "GET",
         headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
         })
@@ -568,29 +610,41 @@ const mistake = document.getElementById('modalMistake') as HTMLElement || null;
             if (table && data.rows) {
               data.rows.forEach((info, index) => {
                 const numInf = index + 1;
-                const tr = document.createElement("tr");
-                tr.className = 'newTr';
-                tr.innerHTML = `
-                    <td><input type="button" class="class_control_button" value="Название блока" id="delImg${numInf}">${info.title}</td>
-                    <td class="countBlocks"><input type="text" class="inputInfo" id="title${numInf}"></td>
-
+                const trTitle = document.createElement("tr");
+                trTitle.className = 'newTr';
+                trTitle.innerHTML = `
+                    <td>Название блока</td>
+                    <td class="countBlocks"><input type="text" class="inputInfo" id="title${numInf}" value="${info.title}"></td>
                 `;
-                table.appendChild(tr);
-                document.getElementById('delImg' + numImg)?.addEventListener('click', (e: Event) => { delOneImgDB(e); });
+                table.appendChild(trTitle);
+                const trDescr  = document.createElement("tr");
+                trDescr.className = 'newTr';
+                trDescr.innerHTML = `
+                    <td>Описание блока</td>
+                    <td class="countBlocks"><textarea class="inputInfo" id="discr${numInf}" value="${info.description}"></textarea></td>
+                `;
+                table.appendChild(trDescr);
+                const trControls   = document.createElement("tr");
+                trControls .className = 'newTr';                
+                trControls .innerHTML = `
+                    <td><span class="flowerIdDiscr" style='opacity:0'>${flowerId}</span></td>
+                    <td class="countBlocks"><input type="button" class="class_control_button" id="link${info.id}" value='Удалить блок' style="marginBottom:15px"></td>
+                `;
+                trControls .style.borderBottom = '2px solid grey';
+                trControls .style.padding = '7px 0';
+                trControls .style.textAlign = 'center';
+                table.appendChild(trControls );
+                                document.getElementById('link' + numInf)?.addEventListener('click', (e: Event) => { 
+                    deleteItemUniversal(e); 
+                });
             });  
-        }  
-    })
-    .catch((error) => console.error('Ошибка загрузки картинок:', error));
-
+            }     
+        })
+        .catch((error) => console.error('Ошибка загрузки описаний Flowerida:', error));
+      
 }
 
-function addDiscr(){
-getDiscr();
-document.querySelector('#table_flower_info > tr:last-child > td:nth-child(2) > input').addEventListener('click', event => {delOneDiscription(event);});
-
-
-}
-function delOneDiscription(event){
+function delOneDescription(event){
   let targetId = event.target.id;
   let linkId = targetId.replace('link', '');
   linkId = parseInt(linkId); 
@@ -600,352 +654,6 @@ for(var i=linkId; i>linkId-3; i--)
     table.removeChild(table.rows[linkId-3]);
   
 }
-//добавить одно описание - нажали кнопку Добавить
-async function getDiscr(){
-let count = document.querySelectorAll('#table_flower_info > tr').length;
-count = count+3;
-   var trTitle = document.createElement("tr");
-   var tdTitle1 = document.createElement("td");
-       tdTitle1.innerHTML = 'Название блока';
-       trTitle.appendChild(tdTitle1);
-   var tdTitle11 = document.createElement("td");       
-       tdTitle11.className = 'countBlocks';
-   var inputTitle = document.createElement("input");
-       inputTitle.type = 'text';
-       inputTitle.className = 'inputInfo';
-       inputTitle.id = 'title' + count;
-
-       tdTitle11.appendChild(inputTitle);
-       trTitle.appendChild(tdTitle11);
-
-  var trTitle2 = document.createElement("tr");    
-  var tdTitle2 = document.createElement("td");      
-      tdTitle2.innerHTML = 'Описание блока';
-      trTitle2.appendChild(tdTitle2);
-  var tdTitle22 = document.createElement("td");      
-  var areaDisc = document.createElement("textarea");
-      areaDisc.className = 'inputInfo';
-      areaDisc.id = 'discr' + count;
-      tdTitle22.appendChild(areaDisc);
-      trTitle2.appendChild(tdTitle22);
-
-  var trTitle3 = document.createElement("tr"); 
-      trTitle3.style.borderBottom = '2px solid grey';
-      trTitle3.style.padding = '7px 0';
-      trTitle3.style.textAlign = 'center';
-  var tdTitle3 = document.createElement("td");
-  var span = document.createElement("span");
-      span.style.opacity = 0;
-   //   tdTitle3.colSpan = '2';
-  var tdTitle33 = document.createElement("td");
-  var inputLink = document.createElement("input");   
-      inputLink.type = 'button';
-      inputLink.id = 'link' + count;
-      inputLink.className = 'class_control_button';
-      inputLink.style.marginBottom = '15px';
-      inputLink.value = 'Удалить блок';
-      tdTitle3.appendChild(span);
-      tdTitle33.appendChild(inputLink);
-      trTitle3.appendChild(tdTitle3);
-      trTitle3.appendChild(tdTitle33);      
-
-  document.getElementById('table_flower_info').appendChild(trTitle);
-  document.getElementById('table_flower_info').appendChild(trTitle2);
-  document.getElementById('table_flower_info').appendChild(trTitle3);
-
-}
-
-//сохранить добавленные описания товара - нажали кнопку Сохранить описание 
-async function updateItemFlowerInfo(){
-let flowerId = document.getElementById('modal_flower_id_info').innerHTML;
-let countRowTable = document.querySelectorAll('#table_flower_info > tr').length;
-countRowTable = countRowTable/3;
-let allInfo = new Array, allInfoNew = new Array, allInfoId = new Array;
-let rowIndex = 1;
-  for(var i = 0; i < countRowTable; i++)
-  {
-    allInfo[i]=({['flowerId'] : flowerId,
-                ['title'] : document.querySelector('#table_flower_info > tr:nth-child('+[rowIndex]+') > td:nth-child(2) > input').value,
-                ['discription'] : document.querySelector('#table_flower_info > tr:nth-child('+[rowIndex+1]+') > td:nth-child(2) > textarea').value,
-    });
-    allInfoId[i] = ({['id'] :document.querySelector('#table_flower_info > tr:nth-child('+[rowIndex+2]+') > td:nth-child(1) > span').innerHTML});
-    rowIndex = rowIndex+3;
-  }
-
-
-  if(allInfo.length === 0)
-    document.getElementById('mist7').innerHTML ='Нет описания товара';
-  else
-  {
-    const localToken = localStorage.getItem('floweridaKey');
-
-    fetch('/api/info/getAll',{
-        method: "POST",
-        headers: {"content-Type": "application/json", "Authorization": localToken},
-        body: JSON.stringify({'flowerId':allInfo[0]['flowerId']})
-        })
-        .then((response) => response.json())
-        .then(data =>{
-           if(data.mes || data.message)
-             document.getElementById('mist7').innerHTML = data.mes || data.message;
-
-          console.log(allInfo.length);
-           for(var i=0; i<allInfo.length; i++)
-             {
-            //  console.log(data.rows);
-              let flag = 0;
-              for(var j=0; j< data.rows.length; j++)
-                {
-                  if(data.rows[j]['id'] === parseInt(allInfoId[i]['id']))
-                      {
-                        flag=1;
-                        fetch('/api/info/update',{
-                              method: "POST",
-                              headers: {"content-Type": "application/json", "Authorization": localToken},
-                              body: JSON.stringify({'id':parseInt(allInfoId[i]['id']),'flowerId':allInfo[i]['flowerId'],'title':allInfo[i]['title'], 'discription':allInfo[i]['discription']})
-                              })
-                        .then((response) => response.json())
-                        .then(data =>{
-                                if(data.mes || data.message)
-                                  document.getElementById('mist7').innerHTML = data.mes || data.message;
-                                else{
-                                    allInfoId[i]={['id']:0};
-                                    console.log('заенил');   
-                                    console.log(i, allInfoId);  
-                                   }
-                        });
-                       }  
-                }    
-                if(flag === 0){
-                    fetch('/api/info/create',{
-                    method: "POST",
-                    headers: {"content-Type": "application/json", "Authorization": localToken},
-                    body: JSON.stringify({'flowerId':allInfo[i]['flowerId'], 'title':allInfo[i]['title'], 'discription':allInfo[i]['discription']})
-                    })
-                    .then((response) => response.json())
-                    .then(data =>{
-                      if(data.mes || data.message)
-                        document.getElementById('mist7').innerHTML = data.mes || data.message;
-                      else
-                          closeItem('myModalDisc');
-                    });   
-                   }
-                   else{
-                    closeItem('myModalDisc');
-                   }
-                }
-               });     
-             }
-     //   }
-            /* for(var i=0; i<allInfoId.length; i++)
-                {
-                  if(allInfoId[i]['id'] != 0)
-                  {
-                    console.log('allInfoId[i]', allInfoId[i]['id']);
-                    allInfoNew.push(allInfo[i]);
-                  } 
-                }*/
-         // }
-        //  console.log(allInfoNew, allInfoId);
-         // if(allInfoNew.length > 0)
-        //return allInfoNew;
-       // });
-      //  .then(data =>{
-       //   console.log('data', data);
-         /* for(var i=0; i<allInfoId.length; i++){
-            if(allInfoId[i]['id'] != 0)
-            {
-              console.log('allInfoId[i]', allInfoId[i]['id']);
-              allInfoNew.push(allInfo[i]);
-            } 
-          }*/
-     /*     console.log(allInfoNew, allInfoId);
-          if(allInfoNew.length > 0)
-          {
-        fetch('/api/info/create',{
-                method: "POST",
-                headers: {"content-Type": "application/json", "Authorization": localToken},
-                body: JSON.stringify({'allInfo':allInfoNew})
-                })
-                .then((response) => response.json())
-                .then(data =>{
-                  if(data.mes || data.message)
-                    document.getElementById('mist7').innerHTML = data.mes || data.message;
-                  else
-                      closeItem('myModalDisc');
-                });   
-          }     
-        });*/
-        
-
-     }
-  //}  
-
-//сохранили форму с описанием
-async function saveItemDisc(){}
-
-async function delOneDiscriptionDB(event){
-  const localToken = localStorage.getItem('floweridaKey');
-  let targetId = event.target.id;
-  let linkId = targetId.replace('link', '');
-  linkId = parseInt(linkId);  
-  let id = document.querySelector('#table_flower_info > tr:nth-child('+linkId +') > td:nth-child(1) > span').innerHTML;
- // let flowerId = document.getElementById('modal_flower_id_info').innerHTML;
- fetch('/api/info/delete',{
-          method: "POST",
-          headers: {"content-Type": "application/json", "Authorization": localToken},
-          body: JSON.stringify({'id':id})//, 'flowerId':flowerId})
-          })
-          .then((response) => response.json())
-          .then(data =>{
-            if(data.mes || data.message)
-              document.getElementById('mist7').innerHTML = data.mes || data.message;
-            else 
-                {
-                  delOneDiscription(event);
-                }
-          });
-
-}
-/*-----------------*/
-//нажали кнопку +добавить вид
-/*
-async function addNewVid()
-{
-  document.getElementById('myModalVid').style.display = 'block';
-  document.getElementById('myModalVid').style.height = '400px';
-  document.getElementById('Itd').style.display = 'none';
-  //document.getElementById('control_div_table').style.display = 'block';
-  document.getElementById('service_add').style.display = 'block';
-    document.getElementById('pageView').style.display = 'block';
-
-  document.getElementById('modal_new_vid').value = '';
-   if(document.getElementById('control_modal_save_vid'))
-      document.getElementById('control_modal_save_vid').remove;
-
-  if(document.getElementById('control_modal_save_vid') === null)
-    {
-     let place = document.getElementById('control_modal_vid'); 
-      var butSave = document.createElement("input");
-          butSave.type = 'button';
-          butSave.value = 'Сохранить';
-          butSave.id = 'control_modal_save_vid';
-          butSave.className = 'control_modal_close';
-      place.appendChild(butSave);          
-      document.getElementById('control_modal_save_vid').addEventListener('click', event => {addItemVid();})
-    }
-}*/
-
-//нажали кнопку cохранить новый вид
-/*
-async function addItemVid(){
-document.getElementById('control_modal_save_vid').remove;  
-const localToken = localStorage.getItem('floweridaKey');
-let name = document.getElementById('modal_new_vid').value;
-if(!name)
-  document.getElementById('mist5').innerHTML = 'Не заполнено поле вид!';
-else{ 
-  fetch('/api/vid/create',{
-          method: "POST",
-          headers: {"content-Type": "application/json", "Authorization": localToken},
-          body: JSON.stringify({'name':name})
-          })
-          .then((response) => response.json())
-          .then(data =>{
-            if(data.mes || data.message)
-              document.getElementById('mist5').innerHTML = data.mes || data.message;
-            else 
-                {
-                correctVid();
-                closeItem('myModalVid');
-                }
-          });
-}
-}*/
-
-//нажали кнопку изменить вид
-/*
-async function vidChange(event){
-  document.getElementById('myModalVid').style.display = 'block';
-  document.getElementById('myModalVid').style.height = '400px';
-  document.getElementById('Itd').style.display = 'block';
-
-   if(document.getElementById('control_modal_save_vid1'))
-      document.getElementById('control_modal_save_vid1').remove;
-
- let place = document.getElementById('control_modal_vid');
- if(document.getElementById('control_modal_save_vid1') === null)
- {
-  var butSave = document.createElement("input");
-      butSave.type = 'button';
-      butSave.value = 'Сохранить';
-      butSave.id = 'control_modal_save_vid1';
-      butSave.className = 'control_modal_close';
-  place.appendChild(butSave);          
-  document.getElementById('control_modal_save_vid1').addEventListener('click', event => {changeItemVid();})
- }
-
-  let trId = event.target.id;
-  let trNum = trId.replace('butChange', '');
-  trNum = parseInt(trNum) +1;
-  console.log(trNum);
- // console.log(document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML);
-  document.getElementById('modal_vid_name').innerHTML = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML;
-  document.getElementById('modal_new_vid').value = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(4)').innerHTML;
-
-}*/
-/*
-async function changeItemVid(){
-  const localToken = localStorage.getItem('floweridaKey');
-  let id = document.getElementById('modal_vid_name').innerHTML;
-  let name =  document.getElementById('modal_new_vid').value;
-
-fetch('/api/vid/change',{
-        method: "POST",
-        headers: {"content-Type": "application/json", "Authorization": localToken},
-        body: JSON.stringify({'id':id, 'name':name})
-        })
-        .then((response) => response.json())
-        .then(data =>{
-          if(data.change === 'ok')
-          {
-            document.getElementById('control_modal_save_vid1').remove;
-             correctVid();
-             closeItem('myModalVid');
-          }  
-          else{
-            document.getElementById('mist5').innerHTML = data.mes || data.message;
-          }   
-        });
-
-}*/
-//нажали кнопку удалить вид
-/*
-async function vidDelete(event){
-  const localToken = localStorage.getItem('floweridaKey');
-  let trId = event.target.id;
-  let trNum = trId.replace('delChange', '');
-  trNum = parseInt(trNum) +1;  
-  let id = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)').innerHTML;
-//console.log('delID', id);
-  fetch('/api/vid/delete',{
-          method: "POST",
-          headers: {"content-Type": "application/json", "Authorization": localToken},
-          body: JSON.stringify({'id':id})
-          })
-          .then((response) => response.json())
-          .then(data =>{
-            if(data.mes || data.message)
-              document.getElementById('mist5').innerHTML = data.mes || data.message;
-            else 
-                {
-                correctVids();
-                closeItem('myModalVid');
-                }
-          });
-}*/
-
-
 
 
 //нажали кнопку Пользователи - изменить
@@ -1022,33 +730,25 @@ else if (currentMode === 'flowers') {
           <tr><td>Название</td><td ><input id="modal_flower_name" type="text" value="${name}"></td></tr>
           <tr><td>Цена</td><td><input id="modal_flower_price" type="text">${price}</td></tr>
           <tr><td>mKey</td><td><input id="modal_flower_key" type="text">${mKeyWords}<span class="textMeta">Значение key для метатега </span></td></tr>   
-          <tr><td>mDiscription </td><td><input id="modal_flower_mDis" type="text">${mDiscript}<span class="textMeta">Значение discription для метатега </span> </td></tr>   
+          <tr><td>mDescription </td><td><input id="modal_flower_mDis" type="text">${mDescript}<span class="textMeta">Значение description для метатега </span> </td></tr>   
         </table>
     `;
 }
 else if (currentMode === 'flowersPhoto') {
   contentTarget.innerHTML = `
      <div id="uploadPhotoContainer" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
-        <!-- Скрытый инпут для выбора файла, чтобы не портить внешний вид -->
-        <input type="file" id="modalAddPhotoInput" accept="image/*" style="display: none;">
         
         <!-- Красивая кнопка, которая будет триггерить скрытый инпут -->
-        <input type="button" id="modalAddPhotoBtn" class="class_control_button" value="⊕ Добавить фото" style="background-color: #4caf50; color: white;">
-        
-        <!-- Сюда будем выводить статус загрузки -->
-        <span id="uploadStatus" style="font-size: 14px; color: #666;"></span>
+        <input type="button" id="modalAddPhotoPart" class="class_control_button" value="⊕ Добавить раздел с фото" style="background-color: #4caf50; color: white;">
       </div>
      <table id="myModalTableFlowerImg" style="padding-top: 25px; width: 100%;">
      </table>
   `;
 }
-else if (currentMode === 'flowersDiscription') {
+else if (currentMode === 'flowersDescription') {
   contentTarget.innerHTML = `
-     <div id="uploadPhotoContainer" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
-        
-        <!-- Красивая кнопка, которая будет триггерить скрытый инпут -->
-        <input type="button" id="modalAddDiscriptionBtn" class="class_control_button" value="⊕ Добавить описание" style="background-color: #4caf50; color: white;">
-       
+     <div id="uploadDescrContainer" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
+         <input type="button" id="modalAddDescriptionBtn" class="class_control_button" value="⊕ Добавить описание" style="background-color: #4caf50; color: white;">    
       </div>
      <table id="myModalTableFlowerDis" style="padding-top: 25px; width: 100%;">
      </table>
@@ -1158,7 +858,7 @@ const localToken = localStorage.getItem('floweridaKey');
 const target = event.target as HTMLInputElement;
  if(!target) return ;
 //-------------------------------------------------------------
-//-----Удаляем вид---------------------------------------------
+//-----Удаляем vids---------------------------------------------
 
 if (currentMode === 'vids') {   
     const trId = target.id;
@@ -1184,7 +884,7 @@ if (currentMode === 'vids') {
           });
 }
 //--------------------------------------------------------------
-//--------------------------------------------------------------
+//-----Удаляем flowers---------------------------------------------
 if (currentMode === 'flowers') { 
    const trId = target.id;
    let trNum0 = trId.replace('butDelete', '');
@@ -1207,14 +907,20 @@ if (currentMode === 'flowers') {
             correctFlowers(currentPage);    
           });
       }
-
+//-----Удаляем flowersPhoto---------------------------------------------
 if (currentMode === 'flowersPhoto') { 
    const trId = target.id;
    let trNum0 = trId.replace('delImg', '');
-   const trNum = Number(parseInt(trNum0) - 1);  
-   const idForm = document.querySelector('#myModalTableFlowerImg > #spanID('+ trNum+')') as HTMLElement || null;
-   if (!idForm) return;
-   const id = idForm? idForm.innerHTML : '';
+   const trNum = parseInt(trNum0);  
+   const idPhoto = document.querySelector('#myModalTableFlowerImg > #spanID('+ trNum+')') as HTMLElement || null;
+   if (!idPhoto) {
+
+     return; 
+   }
+    
+  
+   const id = idPhoto? idPhoto.innerHTML : '';
+
    
    fetch(`/api/imgs/delete/${id}`,{
           method: "DELETE",
@@ -1229,7 +935,34 @@ if (currentMode === 'flowersPhoto') {
             }
             imgItemFlower(event);    
           });
-      }      
+      }   
+      
+//-----Удаляем flowersDescription---------------------------------------------    
+if (currentMode === 'flowersDescription') { 
+const targetId = target.id;
+const infoIdFull = targetId.replace('link', '');
+const infoId = parseInt(infoIdFull) || 0;  
+
+ if(!infoId || infoId === 0){
+   const table = document.getElementById('myModalTable') as HTMLTableElement || null;
+   if(table) table.remove();
+   return ;        
+ }
+   
+ fetch(`/api/info/delete/${infoId}`,{
+          method: "DELETE",
+          headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+          })
+          .then((response) => response.json())
+          .then(data =>{
+            if(data.mes || data.message){
+              const mistake = document.getElementById('mist3') as HTMLElement || null;
+              if(mistake) mistake.innerHTML = String(data.mes || data.message);
+              return ;
+            }
+           descItemFlower(event);  
+          });
+}  
 }
 
 async function addItemUniversal(event: Event): Promise<void>  {
@@ -1237,8 +970,12 @@ async function addItemUniversal(event: Event): Promise<void>  {
 const contentTarget = document.getElementById('modalDynamicContent');
 if (!contentTarget) return;
 
+const target = event.target as HTMLInputElement;
+ if(!target) return ;
+
 // Показываем подложку единого окна
 const universalModal = document.getElementById('adminUniversalModal');
+
 if (universalModal) {
     universalModal.style.display = 'flex'; // Используем flex для центрирования
     universalModal.style.height = 'auto'; // Окно само подстроится под контент
@@ -1271,7 +1008,7 @@ if (currentMode === 'flowers') {
               <td>mKey</td><td><input id="modal_flower_key" type="text"><span class="textMeta">Значение key для метатега </span></td>
             </tr>   
             <tr>
-              <td>mDiscription </td><td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение discription для метатега </span> </td>
+              <td>mDescription </td><td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение description для метатега </span> </td>
             </tr>   
         </table>
     `;
@@ -1279,9 +1016,65 @@ if (currentMode === 'flowers') {
 }
 
 else if (currentMode === 'flowersPhoto') {
+ const flowerId = document.querySelectorAll('#myModalTableFlowerImg > .spanFlowerId') as NodeListOf<Element> || null;
+ let flowerItem;
+ if(flowerId && flowerId.length > 0) flowerItem = flowerId[0].innerHTML || '';
+  contentTarget.innerHTML = `
+        <table id="myModalTable" style="padding-top: 25px; width: 100%;">
 
+           <tr>
+              <td>ID описываемого цветка</td>
+              <td class="spanFlowerId" id="flowerID_modal">${flowerId}</td>
+           </tr>
+
+           <tr>
+            <td>
+              <!-- Скрытый инпут для выбора файла, чтобы не портить внешний вид -->
+              <input type="file" id="modalAddPhotoInput" accept="image/*" style="display: none;">
+              
+              <!-- Красивая кнопка, которая будет триггерить скрытый инпут -->
+              <input type="button" id="modalAddPhotoBtn" class="class_control_button" value="Выбрать фото" style="background-color: #181d19; color: white;">
+              </td>
+              <td>
+                <!-- Сюда будем выводить статус загрузки -->
+                <span id="uploadStatus" style="font-size: 14px; color: #666;"></span>
+              </td>
+            </tr>
+
+           <tr>            
+            <td>Последовательность отображения</td>
+            <td class="spanFlowerNum"><input type="text" id="modal_flower_num_img"></td> 
+           </tr>
+
+           <tr>
+            <td collaps:collaps><input type="button" class="class_control_button" value="Удалить" id="modal_delImg"></td>
+            <td style="padding-bottom:25px"></td>
+           </tr> 
+        </table>
+    `;
 }
-
+else if (currentMode === 'flowersDescription') {
+ const flowerId = document.querySelectorAll('#myModalTableFlowerDis > .flowerIdDiscr') as NodeListOf<Element> || null;
+ let flowerItem;
+ if(flowerId && flowerId.length > 0) flowerItem = flowerId[0].innerHTML || '';
+  contentTarget.innerHTML = `
+        <table id="myModalTable" style="padding-top: 25px; width: 100%;">
+                <tr>
+                  <td>ID описываемого цветка</td><td class="id_flower_modal">${flowerItem}</td>
+                </tr> 
+                <tr>
+                  <td>Название блока</td><td><input class="modal_title" type="text" class="inputInfo"></td>
+                </tr> 
+                <tr>
+                  <td>Описание блока</td><td><textarea class="modal_discr" type="text" class="inputInfo"></textarea></td>
+                </tr> 
+                <tr style="border-bottom:'2px solid grey'; padding: '7px 0'; textAlign: 'center'">
+                  <td><span style="opacity:0"></span></td>
+                  <td class="countBlocks"><input type="button" class="class_control_button modal_link"></td>
+                </tr> 
+        </table>
+    `;
+}
 }
 async function addItemSaveUniversal(){
 const localToken = localStorage.getItem('floweridaKey');
@@ -1347,6 +1140,33 @@ else if (currentMode === 'flowers') {
                   }
             });
   }
+else if (currentMode === 'flowersPhoto') {
+  const nameForm = document.getElementById('modal_new_vid') as HTMLInputElement || null;
+
+  let name = nameForm? nameForm.value : ''
+  if(!name){
+    if (mistakeForm) mistakeForm.innerHTML = 'Не заполнено поле вид!';
+    return ;
+  } 
+  
+    fetch('/api/vid/create',{
+            method: "POST",
+            headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+            body: JSON.stringify({'name': name})
+            })
+            .then((response) => response.json())
+            .then((data : ApiResponse<VidAttributes>) =>{
+              if(data.mes || data.message){
+                if (mistakeForm) mistakeForm.innerHTML = data.mes || data.message || '';
+                return ;
+                }
+              if (data.rows && data.rows.length > 0){
+                  correctVids(currentPage);                  
+                  closeItem('myModalVid');
+                  }
+            });
+ 
+}
 }
 
 //модальное окно - отмена
