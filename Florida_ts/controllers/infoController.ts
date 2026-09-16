@@ -128,5 +128,43 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
                 return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
             }
         }    
+    async updateBlocks(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { flowerId, descriptions } = request.body;
+
+            if (!flowerId || !Array.isArray(descriptions)) {
+                return next(ApiError.badRequest('Не указан идентификатор цветка или передан неверный формат данных'));
+            }
+
+            // Цикл обработки прилетевших блоков контента
+            for (const block of descriptions) {
+                if (block.id) {
+                    // Сценарий 1: Запись существует — обновляем только текстовые поля
+                    await FlowerInfo.update(
+                        { 
+                            title: block.title, 
+                            description: block.description
+                        },
+                        { where: { id: Number(block.id), flowerId: Number(flowerId) } }
+                    );
+                } else {
+                    // Сценарий 2: Это новый блок — создаем чистую запись в MySQL
+                    await FlowerInfo.create({
+                        flowerId: Number(flowerId),
+                        title: block.title,
+                        description: block.description
+                    });
+                }
+            }
+
+            logger.info(`/Flowerida_Бэк: Успешно сохранена группа описаний для цветка с ИД: ${flowerId}`);
+            return response.json({ change: 'ok' });
+
+        } catch (error: any) {
+            logger.error('Ошибка в InfoController.updateBlocks:', error.message);
+            return next(ApiError.internal('Внутренняя ошибка сервера при пакетном сохранении блоков описаний'));
+        }
+    }      
 }
+
     export default new InfoController();

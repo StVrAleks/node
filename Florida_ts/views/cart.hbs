@@ -1,0 +1,21 @@
+<form id="checkout-form" class="checkout-form-container">
+    <h3>Оформление доставки букета</h3>
+    
+    <div id="cart-error-msg" style="color: red; margin-bottom: 10px; font-size: 14px;"></div>
+
+    <div class="form-field">
+        <label for="cart-phone">Телефон получателя</label>
+        <input type="text" id="cart-phone" placeholder="+375 (29) 111-11-11" required>
+    </div>
+
+    <div class="form-field">
+        <label for="cart-address">Адрес доставки в г. Могилев</label>
+        <input type="text" id="cart-address" placeholder="Улица, дом, квартира" required>
+    </div>
+
+    <button type="submit" id="checkout-submit-btn" class="class_control_button" style="background-color: #181d19; color: white; width: 100%; margin-top: 15px;">
+        Подтвердить и заказать букет
+    </button>
+</form>
+
+<script src="../scripts/carts.ts"></script>

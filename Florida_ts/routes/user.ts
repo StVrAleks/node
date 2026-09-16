@@ -13,7 +13,7 @@ router.get('/verify',userController.verify);
 router.post('/logout',userController.logout);
 router.get('/allUsers',checkRole('ADMIN'), userController.allUsers);
 router.put('/changeUser', checkRole('ADMIN'), userController.changeUser);
-
+router.put('/updateProfile', authMiddleware, userController.updateProfile);
 
 
 export default router;

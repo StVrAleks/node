@@ -17,6 +17,11 @@ type FlowerParams = ParamsDictionary & {
     id?: string;
 };
 
+interface UpdateImgNumRequestBody {
+    num: number;
+}
+
+
 class ImgController {
 
     // 1. Создание записи картинки в MySQL
@@ -105,6 +110,45 @@ class ImgController {
             return next(ApiError.internal('Внутренняя ошибка сервера при удалении изображения'));
         }
     }
+
+async saveGalleryGroup(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+    try {
+        const { flowerId, existingImages, newImagesNum } = request.body;
+        const files = request.files as Express.Multer.File[] || [];
+
+        // 1. Обновляем порядок существующих картинок
+        if (existingImages) {
+            const oldImgs = JSON.parse(existingImages);
+            for (const img of oldImgs) {
+                await FlowerImgs.update({ num: Number(img.num) }, { where: { id: Number(img.id) } });
+            }
+        }
+
+        // 2. Создаем новые картинки на основе загруженных файлов
+        if (newImagesNum && files.length > 0) {
+            const nums = JSON.parse(newImagesNum);
+            for (let i = 0; i < files.length; i++) {
+                // Здесь вызывается ваша утилита нарезки через GraphicsMagick (если есть), 
+                // сохраняющая файл в финальное имя (например, files[i].filename)
+                const finalImgName = files[i].filename; 
+
+                await FlowerImgs.create({
+                    flowerId: Number(flowerId),
+                    img: finalImgName,
+                    num: Number(nums[i] || 0)
+                });
+            }
+        }
+
+        logger.info(`/Групповое сохранение галереи для цветка ${flowerId} успешно выполнено`);
+        return response.json({ change: 'ok' });
+    } catch (error: any) {
+        logger.error('Ошибка в ImgController.saveGalleryGroup:', error.message);
+        return next(ApiError.internal('Ошибка сервера при групповом сохранении галереи'));
+    }
 }
+
+}
+
 
 export default new ImgController();

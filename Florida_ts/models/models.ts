@@ -6,6 +6,8 @@ export interface UserAttributes  {
     id: number,
     name: string,
     email: string,
+    phone?: string;
+    address?: string;
     password?: string,
     user_status: string,
     created_user: number,
@@ -17,6 +19,8 @@ const User = sequelize.define<Model<UserAttributes, UserCreationAttributes> & Us
         id: {type:DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
         name: {type:DataTypes.STRING},
         email: {type:DataTypes.STRING, unique:true},
+        phone: {type:DataTypes.STRING, unique:true},
+        address: {type:DataTypes.STRING, unique:true},
         password: {type:DataTypes.STRING},
         user_status: {type:DataTypes.STRING, defaultValue: 'disable'},
         created_user: {type: DataTypes.INTEGER,defaultValue: Math.floor(Date.now() / 1000)},
@@ -65,12 +69,13 @@ export interface FlowerAttributes {
     id: number,
     name: string,
     price: number,
-    vidId: number,    
+    vidId: number,   
+    status?: string; 
     mKeyWords?: string | undefined,
-    mDiscript?: string | undefined
+    mDescript?: string | undefined
 };
 
-type FlowerCreationAttributes = Optional<FlowerAttributes, 'id' | 'mKeyWords' | 'mDiscript'>;
+type FlowerCreationAttributes = Optional<FlowerAttributes, 'id' | 'mKeyWords' | 'mDescript'>;
 
 const Flowers = sequelize.define<Model<FlowerAttributes, FlowerCreationAttributes> & FlowerAttributes>( 'flowers', {
         id: {type:DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -82,7 +87,7 @@ const Flowers = sequelize.define<Model<FlowerAttributes, FlowerCreationAttribute
                 key: 'id'
             }},        
         mKeyWords: {type:DataTypes.STRING},
-        mDiscript: {type:DataTypes.STRING}
+        mDescript: {type:DataTypes.STRING}
     }
 );
 //роза, ромашка, кактус
@@ -169,6 +174,70 @@ export interface ApiResponse<T = any> {
     change?: string;
     rows?: T[];
 }
+// --- 1. ИНТЕРФЕЙСЫ ДЛЯ ORDER (ЗАКАЗ) ---
+export interface OrderAttributes {
+    id: number;
+    userId: number;
+    totalPrice: number;
+    phone: string;
+    address: string;
+    status: 'Новый' | 'Готовится' | 'В пути' | 'Доставлено' | 'Отменен';
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+export interface OrderCreationAttributes extends Optional<OrderAttributes, 'id' | 'status'> {}
+
+export class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
+    public id!: number;
+    public userId!: number;
+    public totalPrice!: number;
+    public phone!: string;
+    public address!: string;
+    public status!: 'Новый' | 'Готовится' | 'В пути' | 'Доставлено' | 'Отменен';
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
+}
+
+// --- 2. ИНТЕРФЕЙСЫ ДЛЯ ORDERFLOWER (СОСТАВ ЗАКАЗА) ---
+export interface OrderFlowerAttributes {
+    id: number;
+    orderId: number;
+    flowerId: number;
+    quantity: number;
+    price: number; // Фиксируем цену на момент покупки!
+}
+export interface OrderFlowerCreationAttributes extends Optional<OrderFlowerAttributes, 'id'> {}
+
+export class OrderFlower extends Model<OrderFlowerAttributes, OrderFlowerCreationAttributes> implements OrderFlowerAttributes {
+    public id!: number;
+    public orderId!: number;
+    public flowerId!: number;
+    public quantity!: number;
+    public price!: number;
+}
+
+// --- 3. ИНИЦИАЛИЗАЦИЯ МОДЕЛЕЙ В SEQUELIZE ---
+Order.init({
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.INTEGER, allowNull: false },
+    totalPrice: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+    phone: { type: DataTypes.STRING, allowNull: false },
+    address: { type: DataTypes.STRING, allowNull: false },
+    status: { 
+        type: DataTypes.STRING, 
+        allowNull: false, 
+        defaultValue: 'Новый',
+        validate: { isIn: [['Новый', 'Готовится', 'В пути', 'Доставлено', 'Отменен']] }
+    }
+}, { sequelize, modelName: 'order' });
+
+OrderFlower.init({
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    orderId: { type: DataTypes.INTEGER, allowNull: false },
+    flowerId: { type: DataTypes.INTEGER, allowNull: false },
+    quantity: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+    price: { type: DataTypes.DECIMAL(10, 2), allowNull: false }
+}, { sequelize, modelName: 'order_flower', timestamps: false });
 
 
 //у покупателя м.б. много позиций в карзине, 1 карзина принадлежит 1 покупателю
@@ -201,6 +270,19 @@ FlowerImgs.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
 Favorite.hasOne(Flowers);
 Flowers.belongsTo(Favorite);
+
+// --- 4. ОПИСАНИЕ СВЯЗЕЙ (Обычно внизу файла моделей) ---
+// Связь Пользователь -> Заказы (Запрещаем каскадное удаление заказов при удалении юзера)
+User.hasMany(Order, { foreignKey: 'userId', onDelete: 'RESTRICT' });
+Order.belongsTo(User, { foreignKey: 'userId' });
+
+// Связь Заказ -> Позиции цветов в заказе (Каскадное удаление позиций при удалении самого заказа)
+Order.hasMany(OrderFlower, { foreignKey: 'orderId', onDelete: 'CASCADE' });
+OrderFlower.belongsTo(Order, { foreignKey: 'orderId' });
+
+// Связь Цветок -> Позиция в заказе (Запрещаем удалять цветок из каталога, если он есть в истории покупок)
+Flowers.hasMany(OrderFlower, { foreignKey: 'flowerId', onDelete: 'RESTRICT' });
+OrderFlower.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
 export {
     User,

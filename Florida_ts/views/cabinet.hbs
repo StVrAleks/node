@@ -1,0 +1,121 @@
+<div class="cabinet-container">
+    <!-- Боковое меню управления (Вкладки) -->
+    <aside class="cabinet-sidebar">
+        <h2>Мой аккаунт</h2>
+        <nav class="cabinet-menu">
+            <button id="tab-profile" class="cabinet-menu__btn cabinet-menu__btn--active">Личные данные</button>
+            <button id="tab-orders" class="cabinet-menu__btn">История заказов</button>
+            <button id="tab-security" class="cabinet-menu__btn">Безопасность</button>
+        </nav>
+    </aside>
+
+    <!-- Основной динамический контент кабинета -->
+    <main class="cabinet-content">
+        <div id="cabinet-error-msg" style="color: red; margin-bottom: 15px;"></div>
+
+        <!-- 1. СЕКЦИЯ: ЛИЧНЫЕ ДАННЫЕ -->
+        <section id="sec-profile" class="cabinet-section">
+            <h3>Профиль пользователя</h3>
+            <div class="cabinet-form">
+                <div class="cabinet-form__group">
+                    <label for="user-name">Ваше имя</label>
+                    <input type="text" id="user-name" value="{{user.name}}">
+                </div>
+                <div class="cabinet-form__group">
+                    <label for="user-email">Email (Логин)</label>
+                    <!-- Email блокируем, так как это уникальный идентификатор -->
+                    <input type="email" id="user-email" value="{{user.email}}" readonly class="input-disabled">
+                </div>
+                <div class="cabinet-form__group">
+                    <label for="user-phone">Телефон для связи</label>
+                    <input type="text" id="user-phone" value="{{user.phone}}" placeholder="+375 (__) ___-__-__">
+                </div>
+                <div class="cabinet-form__group">
+                    <label for="user-address">Адрес доставки в г. Могилев</label>
+                    <input type="text" id="user-address" value="{{user.address}}" placeholder="Улица, дом, квартира">
+                </div>
+                <button id="save-profile-btn" class="class_control_button" style="background-color: #181d19; color: white;">Сохранить изменения</button>
+            </div>
+        </section>
+
+        <!-- 2. СЕКЦИЯ: ИСТОРИЯ ЗАКАЗОВ (КОМПАКТНЫЙ ВИД) -->
+        <section id="sec-orders" class="cabinet-section" style="display: none;">
+            <h3>Ваши заказы</h3>
+            <div class="compact-orders-wrapper">
+                <table class="compact-orders-table">
+                    <thead>
+                        <tr>
+                            <th>Заказ</th>
+                            <th>Дата</th>
+                            <th>Сумма</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-rows-container">
+
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. СЕКЦИЯ: БЕЗОПАСНОСТЬ -->
+        <section id="sec-security" class="cabinet-section" style="display: none;">
+            <h3>Смена пароля</h3>
+            <div class="cabinet-form">
+                <div class="cabinet-form__group">
+                    <label for="old-password">Текущий пароль</label>
+                    <input type="password" id="old-password" placeholder="••••••••">
+                </div>
+                <div class="cabinet-form__group">
+                    <label for="new-password">Новый пароль</label>
+                    <input type="password" id="new-password" placeholder="Минимум 6 символов">
+                </div>
+                <button id="save-password-btn" class="class_control_button" style="background-color: #181d19; color: white;">Обновить пароль</button>
+            </div>
+        </section>
+    </main>
+</div>
+<style>
+.compact-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.compact-orders-table th {
+    background-color: #f5f5f5;
+    padding: 8px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #ccc;
+}
+.order-summary-row {
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.order-summary-row:hover {
+    background-color: #f9f9f9;
+}
+.order-summary-row td {
+    padding: 10px 8px;
+}
+.order-details-content {
+    background-color: #fafafa;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin: 5px 8px 15px 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+.status--delivery { background-color: #fff3cd; color: #856404; }
+.status--done { background-color: #d4edda; color: #155724; }
+</style> 
+
+<script src="../scripts/catalog.ts"></script>

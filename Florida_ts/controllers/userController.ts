@@ -47,6 +47,13 @@ interface changeRequestBody{
     role: string;
 };
 
+interface UpdateProfileRequestBody {
+    name: string;
+    phone?: string;
+    address?: string;
+}
+
+
 const generateJWT = (id : number, name : string, email: string, role:string) =>{
   return  jwt.sign(
             {id, name, email, role},
@@ -198,7 +205,7 @@ const { rows, count } =  await User.findAndCountAll({
 }
 }
 
-  async changeUser(request: Request<{}, {}, changeRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
+async changeUser(request: Request<{}, {}, changeRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
     const {email, role} = request.body;
     try{
         if(!email || !role)
@@ -211,11 +218,11 @@ const { rows, count } =  await User.findAndCountAll({
             }
         return response.json({change: 'ok'});           
     }catch(error:any){
-        return next(ApiError.internal('Ошибка сервера при изменении данных пользователя'));;
+        return next(ApiError.internal('Ошибка сервера при изменении данных пользователя'));
     }
   }
 
- async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
+async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
     try{
         const {email, password} = request.body;       
     }catch(error:any){
@@ -223,5 +230,44 @@ const { rows, count } =  await User.findAndCountAll({
     }
   }
  
+  async updateProfile(request: Request<{}, {}, UpdateProfileRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
+    try {
+        const { name, phone, address } = request.body;
+        
+        // request.user должен быть заполнен вашим authMiddleware после верификации JWT-токена
+        // Извлекаем id или email пользователя
+        const userId = (request as any).user?.id; 
+        const userEmail = (request as any).user?.email;
+
+        if (!userId && !userEmail) {
+            return next(ApiError.forbidden('Пользователь не авторизован'));
+        }
+
+        if (!name) {
+            return next(ApiError.badRequest('Имя пользователя обязательно для заполнения'));
+        }
+
+        // Обновляем поля в таблице User по id (или по email, в зависимости от вашей первичной структуры)
+        const [rowsUpdated] = await User.update(
+            { 
+                name: name, 
+                phone: phone || "", 
+                address: address || "" 
+            }, 
+            { 
+                // Используйте userId, если в токене зашит ID, либо { email: userEmail }
+                where: { id: userId } 
+            }
+        );
+        
+        logger.info(`/пользователь ${userEmail || userId} успешно обновил данные своего профиля`);
+        return response.json({ change: 'ok' });           
+        
+    } catch (error: any) {
+        logger.error('Ошибка в UserController.updateProfile:', error.message);
+        return next(ApiError.internal('Ошибка сервера при обновлении данных профиля'));
+    }
+  }
+
 }
     export default  new userController();

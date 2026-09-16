@@ -26,7 +26,9 @@ import ApiError  from './error/ApiError';
 import { promises as fsPromises } from 'fs';
 
 const publicPath = path.join(__dirname, 'public') as string;
+import cabinetController from './controllers/CabinetController';
 
+router.get('/cabinet', authMiddleware, cabinetController.renderCabinet);
 
 app.use(cookieParser());
 app.use(cors());
