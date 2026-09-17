@@ -8,10 +8,13 @@ import gm from 'gm';
 import authMiddleware from '../middleware/authMiddleware.js';
 import ApiError from '../error/ApiError.js';
 import logger from '../middleware/winston.js';
+import { fileURLToPath } from 'url';
 
 const router = Router();
 
 // Папка во внешнем корне проекта для временных оригиналов
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const publicPathM: string = path.join(__dirname, '..', 'pictures');
 
 // Убедимся, что временная папка существует, чтобы multer не падал

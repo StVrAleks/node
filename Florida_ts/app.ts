@@ -21,7 +21,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Кэширование и раздача статических файлов (css, изображения, JS фронтенда)
-const publicPath = path.join(__dirname, '..', 'public');
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicPath = path.join(import.meta.dirname, '..', 'public');
+
+const ROOT_DIR = process.cwd(); 
+
 app.use('/public', express.static(publicPath, {
   maxAge: '1d',
   setHeaders: (res, path) => {
@@ -30,10 +36,10 @@ app.use('/public', express.static(publicPath, {
     }
   }
 }));
-app.use('/dist/src', express.static(path.join(__dirname, 'src'))); 
-app.use('/css', express.static(path.join(__dirname, '..', 'css')));
-app.use('/images', express.static(path.join(__dirname, '..', 'images')));
-app.use('/imgStoreMINI', express.static(path.join(__dirname, '..', 'imgStoreMINI')));
+app.use('/dist/src', express.static(path.join(ROOT_DIR, 'src'))); 
+//app.use('/css', express.static(path.join(import.meta.dirname, '..', 'css')));
+app.use('/images', express.static(path.join(import.meta.dirname, '..', 'images')));
+app.use('/imgStoreMINI', express.static(path.join(import.meta.dirname, '..', 'imgStoreMINI')));
 app.use(express.json());
 // 3. Подключение единой точки маршрутизации (включая API и ваш viewRouter страниц)
 app.use('/api', router);
@@ -44,8 +50,9 @@ app.use(errorHandler);
 const start = async () => {
      try {
         await sequelize.authenticate();
+    //    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
         await sequelize.sync(); // База синхронизирована
-        
+     //   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
         logger.info('База данных Flowerida успешно подключена и синхронизирована');
 
         // ========================================================

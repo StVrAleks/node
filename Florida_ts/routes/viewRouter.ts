@@ -10,6 +10,10 @@ import favoriteSSRController from '../controllers/FavoriteSSRController.js';
 import cabinetController from '../controllers/cabinetController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // SSR-страницы для браузера
 router.get('/cabinet', authMiddleware, cabinetController.renderCabinet);
 router.get('/favorites', authMiddleware, favoriteSSRController.renderFavorites); // <--- ПОДВЯЗАЛИ SSR ТУДА
