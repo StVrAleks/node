@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', (): void => {
                             <div class="card__botoom">
                                 <div class="full_title" data-id="${flower.id}">${flower.name}</div>
                                 <div class="price">${flower.price} ₽</div>
-                                <div class="discriptionId">${flower.mDiscript || ''}</div>
+                                <div class="descriptionId">${flower.mDescript || ''}</div>
                             </div>
                             <div class="card_control">
                                 <input type="button" value="Купить" class="cardGood" style="padding-left: 23px;">

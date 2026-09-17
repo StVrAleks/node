@@ -36,8 +36,8 @@ fetch(`/api/flower/getOne/${idFl}`,{
             const mDescription = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
             const mkeyWords= document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
 
-            if(mDescription && data?.mDiscript)
-                mDescription.content = mDescription.content + ' ' + data['mDiscript'];
+            if(mDescription && data?.mDescript)
+                mDescription.content = mDescription.content + ' ' + data['mDescript'];
             else 
                 console.log('Предупреждение: мета-тег description не найден на странице');
 
@@ -73,7 +73,7 @@ fetch(`/api/imgs/getAll/${idFl}`,{
         } catch(err : any){console.error('Ошибка при получении всех изображений товара:' + err);}
        });    
 
-const discr = document.getElementById('discr') as HTMLElement | null;
+const descr = document.getElementById('descr') as HTMLElement | null;
 
 
     fetch(`/api/info/getOne/${idFl}`,{
@@ -98,9 +98,9 @@ const discr = document.getElementById('discr') as HTMLElement | null;
                         div1.style.fontWeight = '500';
                         div1.style.paddingBottom = '15px';
                         const div2 = document.createElement("div") as HTMLElement;  
-                        div2.innerHTML = String(data.rows[i]['discription']);
-                        discr?.appendChild(div1);   
-                        discr?.appendChild(div2);  
+                        div2.innerHTML = String(data.rows[i]['description']);
+                        descr?.appendChild(div1);   
+                        descr?.appendChild(div2);  
                     }
                 } 
             } catch(err : any){console.error('Ошибка при получении описания товара:' + err);}

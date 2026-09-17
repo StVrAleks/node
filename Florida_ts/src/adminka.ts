@@ -1123,7 +1123,7 @@ else if (currentMode === 'flowersDescription') {
                   <td>Название блока</td><td><input class="modal_title" type="text" class="inputInfo"></td>
                 </tr> 
                 <tr>
-                  <td>Описание блока</td><td><textarea class="modal_discr" type="text" class="inputInfo"></textarea></td>
+                  <td>Описание блока</td><td><textarea class="modal_descr" type="text" class="inputInfo"></textarea></td>
                 </tr> 
                 <tr style="border-bottom:'2px solid grey'; padding: '7px 0'; textAlign: 'center'">
                   <td><span style="opacity:0"></span></td>

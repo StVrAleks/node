@@ -9,7 +9,7 @@ interface CreateFlowerRequestBody {
     price: number,
     vidId: number,
     mKeyWords?: string | undefined,
-    mDiscript?: string | undefined
+    mDescript?: string | undefined
 };
 interface UpdateFlowerRequestBody extends Partial<CreateFlowerRequestBody> {
     id: number;
@@ -33,11 +33,11 @@ class FlowerController{
 
     async create(request: Request<{}, {}, CreateFlowerRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
         try {       
-            const {name, price, vidId, mKeyWords, mDiscript} =  request.body;
+            const {name, price, vidId, mKeyWords, mDescript} =  request.body;
             //создаем строку с цветком
             logger.info(`/создали новый цветок: ${name}`);
 
-            const flower = await Flowers.create({name, price, vidId: vidId, mKeyWords, mDiscript});
+            const flower = await Flowers.create({name, price, vidId: vidId, mKeyWords, mDescript});
             return response.status(201).json(flower);
             }
         catch(error: any){
@@ -98,7 +98,7 @@ class FlowerController{
     }
 
     async change(request: Request<{}, {}, UpdateFlowerRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
-        const {id, name, price, vidId, mKeyWords, mDiscript} = request.body;
+        const {id, name, price, vidId, mKeyWords, mDescript} = request.body;
         try{
             if(!id)
                 return next(ApiError.badRequest('Не найден такой цветок'));
@@ -108,7 +108,7 @@ class FlowerController{
             if (price !== undefined) updateData.price = price;
             if (vidId !== undefined) updateData.vidId = vidId;
             if (mKeyWords !== undefined) updateData.mKeyWords = mKeyWords;
-            if (mDiscript !== undefined) updateData.mDiscript = mDiscript;
+            if (mDescript !== undefined) updateData.mDescript = mDescript;
 
             const [rowsUpdated] = await Flowers.update(updateData, { where: { id } });
             

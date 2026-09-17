@@ -1,6 +1,13 @@
 {
    "name": "helloapp",
    "version": "1.0.0",
+   "description": "Flowerida e-commerce project",
+   "main": "dist/index.js",
+   "scripts": {
+      "build": "tsc",
+      "start": "node dist/index.js",
+      "dev": "nodemon index.js"
+   },
    "dependencies": {
       "cookie-parser": "^1.4.7",
       "cors": "^2.8.5",
@@ -38,6 +45,9 @@
       "@types/multer": "^2.2.0",
       "@types/node": "^26.4.0",
       "@types/nodemailer": "^8.0.1",
-      "@types/pg": "^8.23.1"
+      "@types/pg": "^8.23.1",
+      "typescript": "^5.0.0",
+      "ts-node": "^10.9.2",
+      "nodemon": "^3.1.0"
    }
 }
