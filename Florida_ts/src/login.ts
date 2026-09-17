@@ -21,7 +21,7 @@ if (!email || !password) return;
 if(regLogin)
     regLogin.addEventListener('click', (event : Event) => {window.location.href = '/registration_user.html';})
 
-fetch('api/user/login',{
+fetch('/api/user/login',{
         method: "POST",
         headers: {"content-Type": "application/json"},
         body: JSON.stringify({"email": email.value, "password": password.value})

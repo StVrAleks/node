@@ -1,7 +1,7 @@
 import Router from 'express';
 const router = Router();
-import flowerController from '../controllers/flowerController';
-import checkRole from '../middleware/checkRoleMiddleware';
+import flowerController from '../controllers/flowerController.js';
+import checkRole from '../middleware/checkRoleMiddleware.js';
 
 router.post('/create',checkRole('ADMIN'), flowerController.create);
 router.put('/change',checkRole('ADMIN'), flowerController.change);

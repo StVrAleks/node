@@ -1,6 +1,6 @@
 import Router from 'express';
 const router = Router();
-import basketUserController from '../controllers/basketUserController';
+import basketUserController from '../controllers/basketUserController.js';
 
 
 router.get('/getByUserId', basketUserController.getByUserId);

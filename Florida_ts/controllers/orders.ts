@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Basket, BasketFlower, Flowers, Order, OrderFlower } from '../models/models';
-import ApiError from '../error/ApiError';
-import logger from '../middleware/winston';
+import { Basket, BasketFlower, Flowers, Order, OrderFlower } from '../models/models.js';
+import ApiError from '../error/ApiError.js';
+import logger from '../middleware/winston.js';
 
 interface CreateOrderRequestBody {
     phone: string;

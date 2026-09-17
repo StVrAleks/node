@@ -1,5 +1,5 @@
     //allDataDB();
-import { ApiResponse, FlowerImgsAttributes, FlowerAttributes, VidAttributes } from '../models/models';
+import { ApiResponse, FlowerImgsAttributes, FlowerAttributes, VidAttributes } from './types.js';
 
 // 1. Создаем строгий фронтенд-интерфейс для связки с картинками (БЕЗ any!)
 interface IFlowerWithImages extends FlowerAttributes {

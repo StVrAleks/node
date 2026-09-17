@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import ApiError from '../error/ApiError';
+import ApiError from '../error/ApiError.js';
 
 // Одна чистая функция с 4 аргументами
 export default function (error: any, request: Request, response: Response, next: NextFunction) {

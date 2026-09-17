@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../db';
+import sequelize from '../db.js';
 
 //покупатель
 export interface UserAttributes  {
@@ -46,7 +46,7 @@ const Basket = sequelize.define<Model<BasketAttributes, BasketCreationAttributes
         }
     });
 
-interface BasketFlowerAttributes {
+export interface BasketFlowerAttributes {
     id: number,
     basketId: number;
     flowerId: number;
@@ -105,7 +105,7 @@ const Vid = sequelize.define<Model<VidAttributes, VidCreationAttributes> & VidAt
 );
 
 //избранное пользователя
-interface FavoriteAttributes  {
+export interface FavoriteAttributes  {
     id: number;
     userId: number;
     flowerId: number;

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
-import {ICurrentUser} from '../controllers/userController'
+import {ICurrentUser} from '../controllers/userController.js'
 import { Request, Response, NextFunction } from 'express';
-import ApiError from '../error/ApiError';
+import ApiError from '../error/ApiError.js';
 
 export type CustomRequest = Request & {
     user: ICurrentUser; // строго в рамках этого типа user обязан быть

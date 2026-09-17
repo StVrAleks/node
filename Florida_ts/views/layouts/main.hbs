@@ -100,9 +100,11 @@
         <a href="/catalog">⋙ Каталог</a>
         
      </div>
+    {{#ifEquals user.role "ADMIN"}}
     <div id="single_line_admin">
         <a href="/adminka"> ⋙ Админка</a>
     </div>
+    {{/ifEquals}}
 </div>
    {{{ conteiner }}}
 

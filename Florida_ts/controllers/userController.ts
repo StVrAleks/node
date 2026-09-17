@@ -1,13 +1,13 @@
-import ApiError from '../error/ApiError';
+import ApiError from '../error/ApiError.js';
 import { sha256 } from 'js-sha256';
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
-import {User, Basket} from '../models/models';
+import {User, Basket} from '../models/models.js';
 //import { UserAttributes } from '../models/models';
 
-import mailServise from '../service/user_mail';
-import logger from '../middleware/winston';
+import mailServise from '../service/user_mail.js';
+import logger from '../middleware/winston.js';
 declare global {
     namespace Express {
         interface Request {

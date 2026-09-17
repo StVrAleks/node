@@ -2,8 +2,8 @@ import Router from 'express';
 const router = Router();
 import multer from 'multer';
 const upload = multer({ dest: 'static/uploads/' }); 
-import imgController from '../controllers/imgController';
-import checkRole from '../middleware/checkRoleMiddleware';
+import imgController from '../controllers/imgController.js';
+import checkRole from '../middleware/checkRoleMiddleware.js';
 
 
 

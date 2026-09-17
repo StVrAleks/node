@@ -1,4 +1,4 @@
-import { ApiResponse } from '../models/models';
+import { ApiResponse } from './types.js';
 
 let favCurrentPage: number = 1;
 const favItemsPerPage: number = 9;

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { User } from '../models/models';
-import ApiError from '../error/ApiError';
-import logger from '../middleware/winston';
+import { User } from '../models/models.js';
+import ApiError from '../error/ApiError.js';
+import logger from '../middleware/winston.js';
 
 class CabinetController {
     /**

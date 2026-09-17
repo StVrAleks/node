@@ -1,9 +1,9 @@
 import Router from 'express';
 const router = Router();
-import userController from '../controllers/userController';
-import authMiddleware from '../middleware/authMiddleware';
-import authMiddlewareUser from '../middleware/authMiddlewareUser';
-import checkRole from '../middleware/checkRoleMiddleware';
+import userController from '../controllers/userController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import authMiddlewareUser from '../middleware/authMiddlewareUser.js';
+import checkRole from '../middleware/checkRoleMiddleware.js';
 
 router.post('/registration',userController.registration);
 router.post('/login',userController.login);

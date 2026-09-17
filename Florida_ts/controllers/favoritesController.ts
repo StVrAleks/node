@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Favorite, Flowers, FlowerImgs } from '../models/models';
-import ApiError from '../error/ApiError';
-import logger from '../middleware/winston';
+import { Favorite, Flowers, FlowerImgs } from '../models/models.js';
+import ApiError from '../error/ApiError.js';
+import logger from '../middleware/winston.js';
 
 interface ToggleFavoriteRequestBody {
     flowerId: number;

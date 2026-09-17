@@ -1,7 +1,7 @@
 import Router from 'express';
 const router = Router();
-import vidController from '../controllers/vidController';
-import checkRole from '../middleware/checkRoleMiddleware';
+import vidController from '../controllers/vidController.js';
+import checkRole from '../middleware/checkRoleMiddleware.js';
 
 router.post('/create', checkRole('ADMIN'), vidController.create);
 router.delete('/delete/:id', checkRole('ADMIN'), vidController.delete);

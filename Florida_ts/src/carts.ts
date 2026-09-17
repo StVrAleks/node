@@ -1,5 +1,5 @@
 
-import { ApiResponse } from '../models/models';
+import { ApiResponse } from './types.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Автоматически предзаполняем поля формы из профиля пользователя

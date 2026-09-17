@@ -1,4 +1,4 @@
-import { ApiResponse, OrderAttributes, OrderFlowerAttributes } from '../models/models';
+import { ApiResponse, OrderAttributes, OrderFlowerAttributes } from './types.js';
 
 // Расширяем тип для прилетающих с бэкенда данных (с учетом инклудов)
 interface OrderFlowerWithDetails extends OrderFlowerAttributes {

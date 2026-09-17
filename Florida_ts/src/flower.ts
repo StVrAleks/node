@@ -1,4 +1,4 @@
-import { ApiResponse, FlowerAttributes, FlowerInfoAttributes, FlowerImgsAttributes } from '../models/models';
+import { ApiResponse, FlowerAttributes, FlowerInfoAttributes, FlowerImgsAttributes } from './types.js';
 
 document.addEventListener('DOMContentLoaded', (): void => {
 const elFl = document.getElementById('idFl') as HTMLElement | null;
