@@ -4,92 +4,102 @@ import path from 'path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import router from './routes/index.js'; // Главный роутер, куда мы всё перенесли
-import errorHandler from './middleware/errorHandlingMiddleware.js'; // Ваша middleware ошибок
+import router from './routes/index.js'; 
+import viewRouter from './routes/viewRouter.js';
+import errorHandler from './middleware/errorHandlingMiddleware.js'; 
 import logger from './middleware/winston.js';
 import sequelize from './db.js';
-import './models/models.js'; // Импорт для инициализации связей в MySQL
+import './models/models.js'; 
 import { sha256 } from 'js-sha256'; 
 import { User, Basket } from './models/models.js';
+
 dotenv.config();
 const PORT = process.env.PORT || 8181;
 const app = express();
-import viewRouter from './routes/viewRouter.js';
+
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Кэширование и раздача статических файлов (css, изображения, JS фронтенда)
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const publicPath = path.join(import.meta.dirname, '..', 'public');
-
 const ROOT_DIR = process.cwd(); 
+const publicPath = path.join(ROOT_DIR, 'public');
 
+// ==========================================
+// 1. РАЗДАЧА СТАТИКИ (Строго ДО маршрутизации роутов)
+// ==========================================
+
+// Папка public (стили, картинки интерфейса)
 app.use('/public', express.static(publicPath, {
   maxAge: '1d',
-  setHeaders: (res, path) => {
-    if (path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png')) {
-      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Кэш на год для картинок
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') || filePath.endsWith('.png')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); 
     }
   }
 }));
-app.use('/dist/src', express.static(path.join(ROOT_DIR, 'src'))); 
-//app.use('/css', express.static(path.join(import.meta.dirname, '..', 'css')));
-app.use('/images', express.static(path.join(import.meta.dirname, '..', 'images')));
-app.use('/imgStoreMINI', express.static(path.join(import.meta.dirname, '..', 'imgStoreMINI')));
-app.use(express.json());
-// 3. Подключение единой точки маршрутизации (включая API и ваш viewRouter страниц)
-app.use('/api', router);
+
+// ЖЕСТКАЯ РАЗДАЧА СКОМПИЛИРОВАННОГО ФРОНТЕНДА БЕЗ ПЕРЕХВАТА РОУТАМИ
+// Теперь types.js и adminka.js будут отдаваться как чистый javascript
+app.use('/dist/src', express.static(path.join(ROOT_DIR, 'src', 'dist'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript'); // Гарантия для ESM модулей браузера
+    }
+  }
+}));
+
+app.use('/images', express.static(path.join(publicPath, 'images')));
+app.use('/imgStoreMINI', express.static(path.join(publicPath, 'imgStoreMINI')));
+app.use('/imgStore', express.static(path.join(publicPath, 'imgStore')));
+// ==========================================
+// 2. МАРШРУТИЗАЦИЯ API И СТРАНИЦ HBS
+// ==========================================
+app.use('/api', router); 
 app.use('/', viewRouter); 
-// 4. Последний рубеж — обработка ошибок (обязано идти в самом конце после роутов!)
+
+// 3. Обработка несуществующих роутов
+app.use((req, res, next) => {
+  res.status(404).send(`Маршрут ${req.originalUrl} не найден на сервере. Проверьте viewRouter.`);
+});
+
+// 4. Логгер ошибок
 app.use(errorHandler);
 
 const start = async () => {
      try {
         await sequelize.authenticate();
-    //    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
-        await sequelize.sync(); // База синхронизирована
-     //   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
-        logger.info('База данных Flowerida успешно подключена и синхронизирована');
+        logger.info('База данных Flowerida успешно подключена (без опасного метода sync)');
 
-        // ========================================================
-        // СИДЕР: АВТО-СОЗДАНИЕ АДМИНИСТРАТОРА С СОЛЬЮ
-        // ========================================================
+        // СИДЕР: АВТО-СОЗДАНИЕ АДМИНИСТРАТОРА
         const adminEmail = 'admin@flowerida.by';
-        const adminPasswordRaw = 'admin12345'; // Ваш пароль в чистом виде для формы входа
+        const adminPasswordRaw = 'admin12345'; 
 
-        // Проверяем, есть ли уже этот админ в базе
         const adminExists = await User.findOne({ where: { email: adminEmail } });
         
         if (!adminExists) {
-            // Генерируем хэш СТРОГО по правилам вашего userController
+            // Исправлен приоритет сложения строк в скобках
             const salt = process.env.SALT || '';
             const userPas = adminPasswordRaw + salt;
             const hashedPassword = sha256(userPas);
 
-            // Создаем администратора
             const newAdmin = await User.create({
-                name: 'Главный Администратор',
+                name: 'Главный Administrator',
                 email: adminEmail,
                 password: hashedPassword,
                 role: 'ADMIN',
-                user_status: 'активен', // Проверьте точный статус, если в модели перечисление
+                user_status: 'enable', 
                 created_user: 1
             });
 
-            // Сразу создаем для него пустую корзину, чтобы бэкенд не ругался при логине
             await Basket.create({ userId: newAdmin.id });
-            
+          
             console.log('==================================================');
-            console.log(`[Flowerida] База была пуста. Авто-создан аккаунт:`);
+            console.log(`[Flowerida] Авто-создан аккаунт администратора:`);
             console.log(`Логин: ${adminEmail}`);
             console.log(`Пароль: ${adminPasswordRaw}`);
             console.log('==================================================');
-        }
-        // ========================================================
+          }
 
         app.listen(PORT, () => {
             logger.info(`Сервер Flowerida успешно запущен на порту ${PORT}`);
@@ -97,10 +107,9 @@ const start = async () => {
         });
 
     } 
-    catch (e : any){
+    catch (e: any){
         logger.error('Критическая ошибка при запуске сервера Flowerida:', e.message);
         console.error(e);
     }
 }
 start();
-

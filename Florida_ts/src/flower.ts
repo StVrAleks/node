@@ -99,6 +99,7 @@ const descr = document.getElementById('descr') as HTMLElement | null;
                         div1.style.paddingBottom = '15px';
                         const div2 = document.createElement("div") as HTMLElement;  
                         div2.innerHTML = String(data.rows[i]['description']);
+                        div2.style.paddingBottom = '25px';
                         descr?.appendChild(div1);   
                         descr?.appendChild(div2);  
                     }

@@ -121,7 +121,8 @@ Basket.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Favorite);
 Favorite.belongsTo(User);
 Basket.hasMany(BasketFlower);
-BasketFlower.belongsTo(User);
+BasketFlower.belongsTo(Basket, { foreignKey: 'basketId' });
+//BasketFlower.belongsTo(User);
 Vid.hasMany(Flowers, { foreignKey: 'vidId' });
 Flowers.belongsTo(Vid, { foreignKey: 'vidId' });
 // Связь M:N — В корзине много цветов, цветы могут быть во многих корзинах

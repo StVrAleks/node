@@ -33,7 +33,6 @@ interface LoginUserRequestBody{
     password: string
 };
 
-
 interface VerifyUserQuery {
     email?:string
 };
@@ -98,38 +97,67 @@ async registration(request: Request<{}, {}, RegistrationUserRequestBody>, respon
         return next(ApiError.internal('Ошибка сервера при регистрации пользователя'));}
 }
 
-async login(request: Request<{}, {}, LoginUserRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
-    const {email, password} = request.body;
-    try{
-    logger.info('авторизация пользователя', email);    
-    const user = await User.findOne({where: {email:email}});
-    if(!user)
-        return next(ApiError.badRequest('Пользователь с таким email и паролем не найден'));
-
-    const userPas = password + process.env.SALT || '';
-    const hashPassword = sha256(userPas);
-    if(hashPassword != user.password)
-        return next(ApiError.badRequest('Пользователь с таким email и паролем не найден'));
-
-    let basket = await Basket.findOne({where: {userId: user.id}});
-    if(!basket){
-        basket = await Basket.create({ userId: user.id });
-        logger.info(`Создана отсутствующая корзина для пользователя ID: ${user.id}`);
-    }
-
-    const token = generateJWT(user.id,user.name, user.email, user.role);
-    response.statusCode = 302;
-    response.setHeader('Content-Type', 'text/html');
-    return response.json({key: 'Bearer '+ token});
-    } catch (error:any){
-        return next(ApiError.internal('Ошибка сервера при попытке войти'));
+async login(request: Request<{}, {}, LoginUserRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
+    const { email, password } = request.body;
+    try {
+        logger.info('Авторизация пользователя', email); 
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return next(ApiError.badRequest('Пользователь с таким email и паролем не найден'));
         }
 
+        const userPas = password + (process.env.SALT || '');
+        const hashPassword = sha256(userPas);
+        if (hashPassword !== user.password) {
+            return next(ApiError.badRequest('Пользователь с таким email и паролем не найден'));
+        }
+
+        let basket = await Basket.findOne({ where: { userId: user.id } });
+        if (!basket) {
+            basket = await Basket.create({ userId: user.id });
+            logger.info(`Создана отсутствующая корзина для пользователя ID: ${user.id}`);
+        }
+
+        const token = generateJWT(user.id, user.name, user.email, user.role);
+        
+        // Запекаем куку
+        response.cookie('floweridaKey', `Bearer ${token}`, {
+            httpOnly: true,
+            secure: false, // true для https в продакшене
+            maxAge: 24 * 60 * 60 * 1000 // 1 день
+        });
+
+        // СУРОВО: Возвращаем чистый 200 JSON для фронтенда fetch, БЕЗ статус-кодов 302!
+        return response.json({ change: 'ok', name: user.name, role: user.role });
+        
+    } catch (error: any) {
+        return next(ApiError.internal('Ошибка сервера при попытке войти'));
+    }
+}
+
+async logout(request: Request<{}, {}, {}>, response: Response, next: NextFunction): Promise<Response | void> {
+    try {
+        // ИСПРАВЛЕНО: Стираем именно ту куку, которую создавали при логине!
+        response.clearCookie('floweridaKey', {
+            httpOnly: true,
+            secure: false
+        });
+
+        return response.json({ change: 'ok', message: 'Вы успешно вышли из системы' });
+    } catch (error: any) {
+        return next(ApiError.internal('Ошибка сервера при завершении сессии'));
+    }
 }
 
 async check(request: Request<{}, {}, {}>,  response: Response, next: NextFunction): Promise<Response | void>{
         try {
             const token = generateJWT(request.user.id, request.user.name, request.user.email, request.user.role);
+            response.cookie('floweridaKey', `Bearer ${token}`, {
+                httpOnly: true, // Защищает токен от кражи через XSS-скрипты фронтенда
+                secure: false,  // Поставьте true, когда сайт перейдет на https. Для localhost оставляем false
+                maxAge: 24 * 60 * 60 * 1000 // Срок действия куки — 1 день (совпадает со статикой)
+            });
+          //  return response.json({ change: 'ok', name: user.name, role: user.role });
             return response.json({ token });
         } catch (error: any) {
             return next(ApiError.internal('Ошибка сервера при проверке авторизации'));
@@ -170,19 +198,7 @@ async verify (request: Request<{}, {}, {}, VerifyUserQuery >,  response: Respons
         return next(ApiError.internal('Ошибка сервера при регистрации пользователя'));
     }
 }
-async logout(request: Request<{}, {}, {}>,  response: Response, next: NextFunction): Promise<Response | void>{
-try{
-        response.clearCookie('tokenJWT', {
-            httpOnly: true,
-            secure: true, // если используете https
-            sameSite: 'strict'
-        });
 
-    return response.json({ message: 'Вы успешно вышли из системы' });
-    } catch (error:any){
-        return next(ApiError.internal('Ошибка сервера при разъединении соединения'));
-    }
-}
 async allUsers(request: Request<{}, {}, GetAllUsersQuery>,  response: Response, next: NextFunction): Promise<Response | void>{
 try{   
 const {limit: queryLimit, page: queryPage} = request.query;

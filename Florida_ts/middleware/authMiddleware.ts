@@ -12,16 +12,26 @@ export default function (role?: string){
 
 return function (request: CustomRequest, response: Response, next: NextFunction){
     try{
-        if(request.method === 'OPTIONS')
-            return next();
+        let token: string | null = null;
+        const authHeader = request.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+        } 
+        // 2. Если заголовка нет, берем из куки floweridaKey (для обычных переходов по ссылкам)
+        else if (request.cookies && request.cookies.floweridaKey) {
+            const cookieValue = request.cookies.floweridaKey;
+            // Убираем префикс Bearer из куки, если он там запечен
+            token = cookieValue.startsWith('Bearer ') ? cookieValue.split(' ')[1] : cookieValue;
+        }
 
-        if(!request.headers || !request.headers.authorization)
-            return next(ApiError.forbidden('Не авторизован: отсутствует заголовок Authorization'));
 
-        const token = request.headers.authorization.split(' ')[1];
-        if(!token)
-            return next(ApiError.forbidden('Не авторизован'));
-
+       if (!token) {
+            // Если браузер запрашивал HTML-страницу, плавно редиректим на страницу входа
+            if (request.accepts('html') && request.method === 'GET') {
+                return response.redirect('/login');
+            }
+            return response.status(401).json({ message: "Пользователь не авторизован" });
+        }
         const decoded =  jwt.verify(token, process.env.SECRET_KEY || 'default_secret_key') as ICurrentUser;
 
         if (role && decoded.role !== role) {

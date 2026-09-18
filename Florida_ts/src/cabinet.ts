@@ -12,6 +12,12 @@ interface OrderWithItems extends OrderAttributes {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+ const hasCookie = document.cookie.includes('floweridaKey');
+    if (!hasCookie) {
+        window.location.href = '/login';
+        return;
+    }
+
     // Инициализируем табы личного кабинета
     initCabinetTabs();
 
@@ -71,11 +77,11 @@ async function loadUserOrders(): Promise<void> {
     const localToken = localStorage.getItem('floweridaKey');
 
     try {
-        const response = await fetch('/api/orders/my-orders', {
+        const response = await fetch('/api/order/my-orders', {
             method: "GET",
             headers: { 
                 "Content-Type": "application/json", 
-                "Authorization": `Bearer ${localToken}` 
+             //   "Authorization": `Bearer ${localToken}` 
             }
         });
 
@@ -169,21 +175,22 @@ async function updateCabinetProfile(): Promise<void> {
         return;
     }
 
-    const localToken = localStorage.getItem('floweridaKey');
+  //  const localToken = localStorage.getItem('floweridaKey');
 
     try {
-        const response = await fetch('/api/user/updateProfile', {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localToken}`
-            },
-            body: JSON.stringify({
-                name: nameVal,
-                phone: phoneVal,
-                address: addressVal
-            })
-        });
+const response = await fetch('/api/user/changeUser', { // Было /api/user/updateProfile
+    method: "PUT", // Метод PUT, как у вас и настроено на бэкенде
+    headers: {
+        "Content-Type": "application/json",
+      //  "Authorization": `Bearer ${localToken}`
+    },
+    body: JSON.stringify({
+        // Передаем параметры, которые ожидает бэкенд-контроллер для обновления
+        name: nameVal,
+        phone: phoneVal,
+        address: addressVal
+    })
+});
 
         const data = await response.json();
 

@@ -1,7 +1,12 @@
-
 import { ApiResponse } from './types.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Подстраховка на случай, если гость умудрился зайти в корзину
+    if (!document.cookie.includes('floweridaKey')) {
+        window.location.href = '/login';
+        return;
+    }
+
     // 1. Автоматически предзаполняем поля формы из профиля пользователя
     autoFillContactInfo();
 
@@ -16,14 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
  * Функция автозаполнения полей телефона и адреса на основе данных профиля
  */
 async function autoFillContactInfo(): Promise<void> {
-    const localToken = localStorage.getItem('floweridaKey');
-    if (!localToken) return; // Гость, автозаполнение не требуется
-
     try {
-        // Делаем запрос к вашему эндпоинту проверки авторизации / текущего юзера
+        // Делаем запрос к эндпоинту проверки авторизации / текущего юзера
+        // Заголовок Authorization УДАЛЕН — куки подставятся автоматически
         const response = await fetch('/api/user/auth', {
             method: "GET",
-            headers: { "Authorization": `Bearer ${localToken}` }
+            headers: { "Content-Type": "application/json" }
         });
         
         const data = await response.json();
@@ -64,22 +67,16 @@ async function handleOrderCheckout(event: Event): Promise<void> {
         return;
     }
 
-    const localToken = localStorage.getItem('floweridaKey');
-    if (!localToken) {
-        if (mistakeEl) mistakeEl.innerHTML = 'Ошибка: Оформлять заказы могут только авторизованные пользователи!';
-        return;
-    }
-
     try {
         // Блокируем кнопку отправки, чтобы пользователь не нажал её дважды
         const submitBtn = document.getElementById('checkout-submit-btn') as HTMLButtonElement | null;
         if (submitBtn) submitBtn.disabled = true;
 
-        const response = await fetch('/api/orders/create', {
+        const response = await fetch('/api/order/create', {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localToken}`
+                "Content-Type": "application/json"
+                // Заголовок Authorization УДАЛЕН
             },
             body: JSON.stringify({
                 phone: phoneVal,
@@ -91,21 +88,17 @@ async function handleOrderCheckout(event: Event): Promise<void> {
 
         if (data.change === 'ok') {
             alert(`Заказ успешно оформлен! Номер вашего заказа: #${data.orderId}`);
-            
-            // Перенаправляем пользователя в личный кабинет на вкладку истории заказов
             window.location.href = '/cabinet'; 
         } else {
-            // Разблокируем кнопку в случае ошибки бэкенда
             if (submitBtn) submitBtn.disabled = false;
             if (mistakeEl) mistakeEl.innerHTML = data.mes || data.message || 'Произошла ошибка при оформлении заказа';
         }
-
-    } catch (error) {
+    } catch (error: any) {
         console.error('Критическая ошибка при отправке заказа:', error);
+        const mistakeEl = document.getElementById('cart-error-msg') as HTMLElement | null;
         if (mistakeEl) mistakeEl.innerHTML = 'Ошибка соединения с сервером. Попробуйте позже.';
         
         const submitBtn = document.getElementById('checkout-submit-btn') as HTMLButtonElement | null;
         if (submitBtn) submitBtn.disabled = false;
     }
 }
-

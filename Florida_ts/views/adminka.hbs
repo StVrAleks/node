@@ -3,9 +3,9 @@
   <div id="conteiner" >
     <div id="conteiner_services">
      <div id="control_services">
-      <input type="button" id="control_services_flower" onclick="correctFlower();" value="Цветы">
-      <input type="button" id="control_services_vid" onclick="correctVid();" value="Виды цветов">
-      <input type="button" id="control_services_user" onclick="correctUsers();" value="Пользователи">
+      <input type="button" id="control_services_flower" value="Цветы">
+      <input type="button" id="control_services_vid"  value="Виды цветов">
+      <input type="button" id="control_services_user" value="Пользователи">
      </div>
      <div id="control_div_table">
       <span id="mist3" class="mistake"></span>
@@ -30,154 +30,12 @@
       
       <div id="control_modal" style="padding-top: 20px; text-align: right;">
         <!-- Общие кнопки управления -->
-        <input type="button" id="control_modal_save" onclick="correctItem();" value="Сохранить">
-        <input type="button" id="control_modal_cancel" class="control_modal_close" onclick="closeItem('adminUniversalModal');" value="Отменить">
+        <input type="button" id="control_modal_save"  value="Сохранить">
+        <input type="button" id="control_modal_cancel" class="control_modal_close" value="Отменить">
       </div>
   </div>
 </div>
 
-<!--добавить роли-->
-    <div class="hystmodal" id="myModal">
-      <div class="hystmodal__window">  
-          <span id="mist4"  class="mistake"></span>
-          <table id="myModalTable" style="padding-top: 25px;">
-            <tr>
-              <td>Имя пользователя</td>
-              <td id="modal_user_name"></td>
-            </tr>
-            <tr>
-              <td>Email пользователя</td>
-              <td  id="modal_user_email"></td>
-            </tr>
-            <tr>
-              <td>Роль пользователя</td>
-              <td ><input id="modal_user_role" type="text"></td>
-            </tr>
-            <tr>
-              <td>Статус пользователя</td>
-              <td id="modal_user_status"></td>
-            </tr>
-          </table>
-          <div id="control_modal">
-            <input type="button" id="control_modal_save" onclick="correctItem();" value="Сохранить">
-            <input type="button" class="control_modal_close" onclick="closeItem('myModal');" value="Отменить">
-          </div>
-      </div>
-    </div>
-<!--добавить вид-->
-     <div class="hystmodal" id="myModalVid">
-      <div class="hystmodal__window">  
-          <span id="mist5" class="mistake"></span>
-          <table id="myModalTable2">
-            <tr id="Itd">
-              <td>Id</td>
-              <td id="modal_vid_name"></td>
-            </tr>
-            <tr>
-              <td>Название вида</td>
-              <td id="modal_vid_name"><input id="modal_new_vid" type="text"> </td>
-            </tr>
-          </table>
-          <div id="control_modal_vid" style="padding-top: 40px;">
-           <!-- <div id="placeSave" ></div>
-            <input type="button" id="control_modal_save" onclick="correctItem();" value="Сохранить"> -->
-            <input type="button" class="control_modal_close" onclick="closeItem('myModalVid');" value="Отменить">
-          </div>
-      </div>
-    </div>
-<!--добавить цветок-->
-    <div class="hystmodal" id="myModalFlower">
-      <div class="hystmodal__window">  
-          <span id="mist6" class="mistake"></span>
-          <table id="myModalTableFlower">
-            <tr id="Itd2">
-              <td>ID</td>
-              <td id="modal_flower_id"></td>
-            </tr>
-            <tr>
-              <td>Вид</td>
-              <td><select id="modal_flower_vid_id"></select></td>
-            </tr>
-            <tr>
-              <td>Название</td>
-              <td ><input id="modal_flower_name" type="text"></td>
-            </tr>
-            <tr>
-              <td>Цена</td>
-              <td><input id="modal_flower_price" type="text"></td>
-            </tr>
-            <tr>
-              <td>mKey</td>
-              <td><input id="modal_flower_key" type="text"><span class="textMeta">Значение key для метатега </span></td>
-            </tr>   
-            <tr>
-              <td>mDiscription </td>
-              <td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение description для метатега </span> </td>
-            </tr>                      
-          </table>
-          <div id="control_modal_flower">
-               <input type="button" class="control_modal_close" onclick="closeItem('myModalFlower');" value="Отменить">
-          </div>
-      </div>
-    </div>
-
-<!--добавить описание товара-->
-     <div class="hystmodal" id="myModalDisc">
-      <div class="hystmodal__window">  
-          <span id="mist7" class="mistake"></span>
-          <table id="table_myModalDisc">
-            <tr id="Itd2">
-              <td>ID товара</td>
-              <td id="modal_flower_id_info"></td>
-            </tr>
-            <tr>
-              <td>Название товара</td>
-              <td id="modal_flower_name_info"></td>
-            </tr>
-            </table>
-            <div id="flower_info">
-                <table id="table_flower_info"></table>
-            </div>
-            <div style="padding: 20px 0;">
-              <input type="button" id="adddescFlower" class="control_modal_close" value="+ Добавить описание" onclick="addDiscr()">
-            </div>
-          <div id="control_modal_flower">    
-               <input type="button" class="control_modal_close" onclick = "updateItemFlowerInfo();" value = "Сохранить">              
-               <input type="button" class="control_modal_close" onclick = "closeItem('myModalDisc');" value = "Отменить">
-          </div>
-      </div>
-    </div>
-    <!---->
-    <div class="hystmodal" id="myModalImg" style="padding-top: 0;">
-      <div class="hystmodal__window">  
-      <div style="width: 100%;">
-        <div style="padding-left: 93%;">
-          <input type="button" name="close" value=" X " style="background-color: red; color: white; line-height: 20px; cursor:pointer;" onclick = closeItem('myModalImg');>
-        </div>
-      </div>  
-          <span id="mist8" class="mistake"></span>
-          <table id="table_myModalImg">
-            <tr id="Itd3">
-              <td>ID товара</td>
-            </tr>
-            <tr>
-              <td id="modal_flower_id_img"></td>
-            </tr>
-             <tr>
-              <td id="modal_flower_form">           
-            <h3>Загрузка файла</h3>
-                <input type="file" name="ChoiseFile" id="newFile"/><br><br>
-                <input type="submit" class="control_modal_close" value="Загрузить" onclick="addFile();"/>
-              </td>
-            </tr>          
-            </table>
-
-            <div id="flower_img">
-                <table id="table_flower_img"></table>
-            </div>
-      </div>
-    </div>
-  </div>
 
 <style>
 /* Фоновая темная подложка, закрывающая весь экран */
@@ -209,5 +67,5 @@
 }
 </style>
 
-<script  type="module" src ='../dist/src/adminka.js'></script>    
+<script  type="module" src ='/dist/src/adminka.js'></script>    
         

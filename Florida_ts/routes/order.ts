@@ -1,6 +1,6 @@
 import Router from 'express';
 const router = Router();
-import orderController from '../controllers/orders.js';
+import orderController from '../controllers/order.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
 // Маршрут для оформления заказа по кнопке из Корзины

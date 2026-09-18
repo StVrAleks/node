@@ -14,37 +14,39 @@ if(exitLogout)
     exitLogout.addEventListener('click', (event : Event) : void => {window.location.href = '/home.html';});
 
 const logout = document.getElementById('logout') as HTMLElement | null;
-if(logout)
-    logout.addEventListener('click', (event : Event) : void => {
-        if(localToken)
-            {
-                localStorage.removeItem('floweridaKey');
-            }
-        window.location.href = '/home.html';             
+if (logout) {
+    logout.addEventListener('click', (event: Event): void => {
+        localStorage.removeItem('floweridaKey');
+        document.cookie = "floweridaKey=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // Чистим куку!
+        window.location.href = '/'; // Уходим на корень             
     });
+}
 
-
-if(!localToken)
-    window.location.href = '/login_user.html';
-else{
-    fetch('/api/user/check', {
+// 2. Если токена нет — бережно уводим на чистый роут входа
+if (!localToken) {
+    window.location.href = '/login';
+} else {
+    // Исправлено: шлем запрос на правильный эндпоинт аутентификации бэкенда
+    fetch('/api/user/auth', { 
         method: "GET",
-        headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` }
     })
     .then((response) => response.json())
-    .then((data: IAuthResponse) =>{
+    .then((data: any) => {
         const mistake = document.getElementById('mist2') as HTMLElement | null;
-        if(data.mes && mistake)
-            mistake.innerHTML = data.mes;
-        else if(data.authUser) 
-        {
+        if ((data.mes || data.message) && mistake) {
+            mistake.innerHTML = data.mes || data.message;
+        } 
+        // Подстраиваемся под структуру ответа вашего UserController (объект user прилетает плоско)
+        else if (data && data.name && data.email) {
             const nameSpan = document.getElementById('logOutUserName') as HTMLElement | null;
             const emailSpan = document.getElementById('logOutUserEmail') as HTMLElement | null;
-            if (nameSpan) nameSpan.innerHTML = data.authUser.authName;
-            if (emailSpan) emailSpan.innerHTML = data.authUser.authEmail;
+            if (nameSpan) nameSpan.innerHTML = data.name;
+            if (emailSpan) emailSpan.innerHTML = data.email;
         }
-    }).catch((error : any)=> console.log(error));
- }
+    })
+    .catch((error: any) => console.log(error));
+}
 });
 
 

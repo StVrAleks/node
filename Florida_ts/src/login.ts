@@ -33,8 +33,8 @@ fetch('/api/user/login',{
             }
             else if(data.key) 
             {
-                localStorage.setItem('floweridaKey', data.key);
-                window.location.href = '/home.html';
+              //  localStorage.setItem('floweridaKey', data.key);
+                window.location.href = '/';
             } 
         }).catch((error)=> console.log(error));
 }

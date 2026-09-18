@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Basket, BasketFlower, Flowers, Order, OrderFlower } from '../models/models.js';
 import ApiError from '../error/ApiError.js';
 import logger from '../middleware/winston.js';
+import { Op } from 'sequelize';
 
 interface CreateOrderRequestBody {
     phone: string;
@@ -44,7 +45,9 @@ class OrderController {
 
             // 2. Получаем все цветы, которые сейчас лежат в корзине
             const basketItems = await BasketFlower.findAll({
-                where: { basketId: userBasket.id },
+                where: { 
+                    basketId: userBasket.id,
+                    quantity: { [Op.gt]: 0 } },
                 include: [{ model: Flowers, attributes: ['price'] }], // Подтягиваем текущую цену цветка
                 transaction
             });
@@ -84,7 +87,9 @@ class OrderController {
 
             // 6. Очищаем корзину пользователя (удаляем связи из BasketFlower, где количество > 0)
             await BasketFlower.destroy({
-                where: { basketId: userBasket.id },
+                where: { 
+                    basketId: userBasket.id,
+                    quantity: { [Op.gt]: 0 } },
                 transaction
             });
 
@@ -101,32 +106,36 @@ class OrderController {
             return next(ApiError.internal('Внутренняя ошибка сервера при оформлении заказа'));
         }
     }
-     async getMyOrders(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
-        try {
-            const userId = (request as any).user?.id;
+async getMyOrders(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+    try {
+        const userId = (request as any).user?.id;
 
-            if (!userId) {
-                return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
-            }
-
-            // Находим все заказы пользователя со всем вложенным составом цветов
-            const orders = await Order.findAll({
-                where: { userId: userId },
-                order: [['createdAt', 'DESC']], // Новые покупки вверху списка
-                include: [
-                    {
-                        model: OrderFlower,
-                        include: [{ model: Flowers, attributes: ['name'] }] // Тянем имя цветка для аккордеона
-                    }
-                ]
-            });
-
-            return response.json({ rows: orders });
-        } catch (error: any) {
-            logger.error('Ошибка в OrderController.getMyOrders:', error.message);
-            return next(ApiError.internal('Внутренняя ошибка сервера при чтении истории заказов'));
+        if (!userId) {
+            return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
         }
+
+        // Запрашиваем позиции напрямую, чтобы структура подошла под фронтенд
+        const orderItems = await OrderFlower.findAll({
+            include: [
+                {
+                    model: Order,
+                    where: { userId },
+                    attributes: [] // Исключаем поля заказа, чтобы не раздувать трафик
+                },
+                {
+                    model: Flowers,
+                    attributes: ['name', 'price'] // Тянем данные для фронтенда
+                }
+            ],
+            order: [[Order, 'createdAt', 'DESC']] // Сортируем по дате создания заказа
+        });
+
+        return response.json({ rows: orderItems });
+    } catch (error: any) {
+        logger.error('Ошибка в OrderController.getMyOrders:', error.message);
+        return next(ApiError.internal('Внутренняя ошибка сервера при чтении истории заказов'));
     }
+}
 }
 
 export default new OrderController();

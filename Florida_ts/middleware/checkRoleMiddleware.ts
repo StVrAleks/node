@@ -13,10 +13,18 @@ export default function (role:string){
           if(request.method === 'OPTIONS')
             return next();
     try{
-        if(!request.headers || !request.headers.authorization)
-            return next(ApiError.forbidden('Не авторизован'));
+ let token: string | null = null;
+            const authHeader = request.headers.authorization;
 
-        const token = request.headers.authorization.split(' ')[1];
+            // 1. Ищем в заголовках
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];
+            } 
+            // 2. Ищем в куках
+            else if (request.cookies && request.cookies.floweridaKey) {
+                const cookieValue = request.cookies.floweridaKey;
+                token = cookieValue.startsWith('Bearer ') ? cookieValue.split(' ')[1] : cookieValue;
+            }
         if (!token) {
             return next(ApiError.forbidden('Не авторизован'));
         }
@@ -25,7 +33,10 @@ export default function (role:string){
         const decoded = jwt.verify(token, process.env.SECRET_KEY || 'default_secret_key')  as ICurrentUser;
 
         if(decoded.role != role){
-             return next(ApiError.forbidden('Нет доступа'));
+  if (request.accepts('html')) {
+                    return response.send('<h1>Ошибка 403: Доступ запрещен. У вас нет прав администратора.</h1>');
+                }
+                return response.status(403).json({ message: "Нет доступа: недостаточно прав" });
         }
 
         request.user = decoded;
