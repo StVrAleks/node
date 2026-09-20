@@ -37,7 +37,6 @@ return function (request: CustomRequest, response: Response, next: NextFunction)
         if (role && decoded.role !== role) {
             return next(ApiError.forbidden('Нет доступа: недостаточно прав'));
         }
-
         request.user = decoded;
 
         return next();

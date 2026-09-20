@@ -22,6 +22,8 @@ class FavoriteSSRController {
                 attributes: ['id', 'name', 'email', 'role']
             });
 
+            console.log('currentUser ', currentUser);
+
             if (!currentUser) {
                 return next(ApiError.notFound('Пользователь не найден в системе'));
             }
@@ -29,8 +31,9 @@ class FavoriteSSRController {
             // Компилируем и отдаем страницу favorites.hbs внутрь вашего главного макета
             return response.render('favorites', {
                 title: 'Моё Избранное | Flowerida',
-                user: currentUser.toJSON() // Передаем данные пользователя, чтобы в шапке вывелось "Привет, Имя"
+                user: currentUser.toJSON() 
             });
+
 
         } catch (error: any) {
             logger.error('Ошибка в FavoriteSSRController.renderFavorites:', error.message);

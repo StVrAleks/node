@@ -9,17 +9,19 @@ declare global {
 document.addEventListener('DOMContentLoaded', () : void => {
 
 const formLogin= (document.getElementById('form-login-user') as HTMLFormElement) || null;
+const regLogin = document.getElementById('regLogin') as HTMLElement || null;
+if(regLogin)
+    regLogin.addEventListener('click', (event : Event) => {
+    window.location.href = '/registration_user.html';
+})
 
 function sendLogin(){
 const email = (document.getElementById('email') as HTMLInputElement) || null;
 const password = (document.getElementById('password') as HTMLInputElement) || null;
 const mist = (document.getElementById('mist') as HTMLElement) || null;
-const regLogin = document.getElementById('regLogin') as HTMLElement || null;
+
 
 if (!email || !password) return;
-
-if(regLogin)
-    regLogin.addEventListener('click', (event : Event) => {window.location.href = '/registration_user.html';})
 
 fetch('/api/user/login',{
         method: "POST",
@@ -31,9 +33,8 @@ fetch('/api/user/login',{
             if(data.mes){
                 if(mist) mist.innerHTML = data.mes;
             }
-            else if(data.key) 
+            else if(data.change === 'ok') 
             {
-              //  localStorage.setItem('floweridaKey', data.key);
                 window.location.href = '/';
             } 
         }).catch((error)=> console.log(error));

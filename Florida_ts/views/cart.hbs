@@ -1,21 +1,38 @@
-<form id="checkout-form" class="checkout-form-container">
-    <h3>Оформление доставки букета</h3>
+<div class="cart-page-wrapper" style="max-width: 800px; margin: 0 auto; padding: 20px;">
     
-    <div id="cart-error-msg" style="color: red; margin-bottom: 10px; font-size: 14px;"></div>
+    <!-- Сюда JS выведет сообщение "Вы забыли авторизоваться!" или ошибки -->
+    <div id="cart-error-msg" style="color: red; margin-bottom: 15px; font-size: 16px; text-align: center; font-weight: bold;"></div>
 
-    <div class="form-field">
-        <label for="cart-phone">Телефон получателя</label>
-        <input type="text" id="cart-phone" placeholder="+375 (29) 111-11-11" required>
+    <div id="cart-content-wrapper">
+        <h3>Корзина</h3>
+        <!-- Сетка для динамического вывода строк товаров из JS -->
+        <div class="cart-products-list" id="cart-products-grid" style="margin-bottom: 30px;">
+            <!-- Сюда carts.js вставит строки с букетами -->
+        </div>
+
+        <div class="cart-total-score" style="text-align: right; margin-top: 15px; font-size: 18px; font-weight: bold; display: none;" id="total-box">
+            Итого: <span id="cart-final-total-price">0.00</span> BYN
+        </div>
+
+        <!-- Форма оформления заказа для доставки в г. Могилев -->
+        <form id="checkout-form" class="checkout-form-container" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 20px; display: none;">
+            <h3>Оформление доставки букета</h3>
+            
+            <div class="form-field" style="margin-bottom: 15px;">
+                <label for="cart-phone" style="display: block; margin-bottom: 5px; font-weight: 500;">Телефон получателя</label>
+                <input type="text" id="cart-phone" placeholder="+375 (29) 111-11-11" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+
+            <div class="form-field" style="margin-bottom: 15px;">
+                <label for="cart-address" style="display: block; margin-bottom: 5px; font-weight: 500;">Адрес доставки в г. Могилев</label>
+                <input type="text" id="cart-address" placeholder="Улица, дом, квартира" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+
+            <button type="submit" id="checkout-submit-btn" class="class_control_button" style="background-color: #181d19; color: white; width: 100%; margin-top: 15px; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+                Подтвердить и заказать букет
+            </button>
+        </form>
     </div>
+</div>
 
-    <div class="form-field">
-        <label for="cart-address">Адрес доставки в г. Могилев</label>
-        <input type="text" id="cart-address" placeholder="Улица, дом, квартира" required>
-    </div>
-
-    <button type="submit" id="checkout-submit-btn" class="class_control_button" style="background-color: #181d19; color: white; width: 100%; margin-top: 15px;">
-        Подтвердить и заказать букет
-    </button>
-</form>
-
-<script  type="module" src="/dist/src/carts.js"></script>
+<script type="module" src="/dist/src/carts.js"></script>

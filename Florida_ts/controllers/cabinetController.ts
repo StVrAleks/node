@@ -31,8 +31,7 @@ class CabinetController {
             return response.render('cabinet', {
                 title: 'Личный кабинет | Flowerida',
                 user: currentUser.toJSON(), // Переводим инстанс Sequelize в чистый JSON-объект для Handlebars
-                // Если у вас в главном макете layout.hbs (main.hbs) шапка проверяет роли, 
-                // объект user автоматически станет доступен для выражений {{#if user}} и {{user.name}}
+                
             });
 
         } catch (error: any) {

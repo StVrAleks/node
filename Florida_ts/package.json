@@ -5,7 +5,7 @@
    "description": "Flowerida e-commerce project",
    "main": "app/index.js",
    "scripts": {
-      "build": "tsc && tsc -p src/tsconfig.json",
+      "build": "tsc && tsc -p src/tsconfig.json && copyfiles -u 1 \"views/**/*.hbs\" dist/",
       "start": "node --experimental-specifier-resolution=node dist/app.js",
       "dev": "nodemon --experimental-specifier-resolution=node app.ts"
    },
@@ -47,6 +47,7 @@
       "@types/node": "^26.4.0",
       "@types/nodemailer": "^8.0.1",
       "@types/pg": "^8.23.1",
+      "copyfiles": "^2.4.1",
       "nodemon": "^3.1.0",
       "ts-node": "^10.9.2",
       "tsc-alias": "^1.9.5",

@@ -17,6 +17,7 @@ const __dirname = path.dirname(__filename);
 
 // Универсальная функция рендеринга лейаута
 function renderWithLayout(viewName: string, viewData: object, request: any, response: any, next: any) {
+    let currentUser : string | jwt.JwtPayload = '';
     try {
         const viewPath = path.join(__dirname, '..', '..', 'views', `${viewName}.hbs`);
         const layoutPath = path.join(__dirname, '..', '..', 'views', 'layouts', 'main.hbs');
@@ -34,16 +35,17 @@ function renderWithLayout(viewName: string, viewData: object, request: any, resp
             try {
                 const tokenStr = cookieToken.split(' ')[1];
                 // Расшифровываем токен с помощью вашего секретного ключа из .env
-               let currentUser = jwt.verify(tokenStr, process.env.SECRET_KEY || 'secret_fallback');
+               currentUser = jwt.verify(tokenStr, process.env.SECRET_KEY || 'secret_fallback');
             } catch (e) {
                 // Если токен сломан или истек, игнорируем, пользователь останется гостем
             }
         }
+       const finalUser = currentUser || request.user || null;
 
         const viewHTML = viewTemplate(viewData);
         const finalHTML = layoutTemplate({
             conteiner: viewHTML,
-            user: request.user || null // Данные пользователя для шапки сайта
+            user: finalUser // Данные пользователя для шапки сайта
         });
 
         return response.send(finalHTML);
@@ -72,18 +74,18 @@ router.get(['/login', '/login_user.html'], (req, res, next) => {
     renderWithLayout('login', { welcom: 'Пожалуйста, заполните форму', suc: req.query.suc || "" }, req, res, next);
 });
 
-// 4. Корзина (Добавили недостающий маршрут!)
-router.get(['/cart', '/cart.html'], authMiddleware, (req, res, next) => {
-    renderWithLayout('cart', { welcom: 'Ваша корзина' }, req, res, next);
+// 4. Корзина 
+router.get('/cart', authMiddleware(), (req: any, res, next) => {
+    return renderWithLayout('cart', {title: 'Корзина | Flowerida'}, req, res, next);
 });
 
-// 5. Личный кабинет (Оставляем один роут через контроллер)
-router.get('/cabinet', authMiddleware, async (req: any, res, next) => {
+// 5. Личный кабинет 
+router.get('/cabinet', authMiddleware(), async (req: any, res, next) => {
     try {
         const userId = req.user?.id;
         if (!userId) return res.redirect('/login');
 
-        // Вытягиваем свежие данные профиля для Могилева напрямую при рендере страницы
+        // Вытягиваем свежие данные профиля напрямую при рендере страницы
         const currentUser = await User.findByPk(userId, {
             attributes: ['id', 'name', 'email', 'phone', 'address', 'role']
         });
@@ -102,7 +104,9 @@ router.get('/cabinet', authMiddleware, async (req: any, res, next) => {
 });
 
 // 6. Избранное 
-router.get(['/favorites'], authMiddleware, favoriteSSRController.renderFavorites); 
+router.get(['/favorites'], authMiddleware(), (req: any, res, next) => {
+    renderWithLayout('favorites', {title: 'Моё Избранное | Flowerida' }, req, res, next);
+}); 
 
 // 7. Админка (Строгий доступ по роли ADMIN)
 router.get(['/adminka', '/adminka.html'], checkRole('ADMIN'), (req, res, next) => {

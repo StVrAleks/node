@@ -19,4 +19,5 @@ document.addEventListener('DOMContentLoaded', (): void => {
             window.location.href = "/catalog"; 
         });
     }
+    
 });

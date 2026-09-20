@@ -4,11 +4,6 @@ let favCurrentPage: number = 1;
 const favItemsPerPage: number = 9;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Подстраховка: если куки авторизации нет, уводим гостя
-    if (!document.cookie.includes('floweridaKey')) {
-        window.location.href = '/login';
-        return;
-    }
 
     if (document.getElementById('favorites-products-grid')) {
         loadFavoritesPage(favCurrentPage);
@@ -63,7 +58,7 @@ async function loadFavoritesPage(page: number): Promise<void> {
         }
 
         grid.innerHTML = '';
-
+ console.log('data.rows ', data.rows);
         if (!data.rows || data.rows.length === 0) {
             grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding: 40px;">Список избранного пуст. Нажмите сердечко на карточках товаров в каталоге!</p>';
             if (pageInput) pageInput.value = '1';

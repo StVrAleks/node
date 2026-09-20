@@ -115,6 +115,7 @@ OrderFlower.init({
     quantity: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
     price: { type: DataTypes.DECIMAL(10, 2), allowNull: false }
 }, { sequelize, modelName: 'order_flower', timestamps: false });
+
 //у покупателя м.б. много позиций в карзине, 1 карзина принадлежит 1 покупателю
 User.hasOne(Basket, { foreignKey: 'userId' });
 Basket.belongsTo(User, { foreignKey: 'userId' });
@@ -136,8 +137,8 @@ FlowerInfo.belongsTo(Flowers, { foreignKey: 'flowerId' });
 //Flowers.BelongsToMany(FlowerInfo);//, {through: FlowerInfoItem });
 Flowers.hasMany(FlowerImgs, { foreignKey: 'flowerId' });
 FlowerImgs.belongsTo(Flowers, { foreignKey: 'flowerId' });
-Favorite.hasOne(Flowers);
-Flowers.belongsTo(Favorite);
+//Favorite.hasOne(Flowers);
+//Flowers.belongsTo(Favorite);
 // --- 4. ОПИСАНИЕ СВЯЗЕЙ (Обычно внизу файла моделей) ---
 // Связь Пользователь -> Заказы (Запрещаем каскадное удаление заказов при удалении юзера)
 User.hasMany(Order, { foreignKey: 'userId', onDelete: 'RESTRICT' });

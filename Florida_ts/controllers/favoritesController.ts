@@ -8,10 +8,6 @@ interface ToggleFavoriteRequestBody {
 }
 
 class FavoriteController {
-    /**
-     * GET /api/favorites/getAll
-     * Получение всех избранных товаров пользователя с пагинацией
-     */
 async getAll(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
     try {
         const userId = (request as any).user?.id;
