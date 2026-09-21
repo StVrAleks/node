@@ -30,6 +30,7 @@ export interface FlowerAttributes {
     name: string,
     price: number,
     vidId: number,   
+    vidName: string,
     status?: string; 
     mKeyWords?: string | undefined,
     mDescript?: string | undefined

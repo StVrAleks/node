@@ -23,8 +23,12 @@ type GetOneCategoryParams = ParamsDictionary & {
 
 class VidController {
     async create(request: Request<{}, {}, CreateCategoryRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
-        const {name} = request.body;
         try{
+        const userId = (request as any).user?.id; 
+        if (!userId) {
+            return next(ApiError.forbidden('Пользователь не авторизован'));
+        }            
+        const {name} = request.body;            
             if(!name)
                 return next(ApiError.badRequest('Не заполнено поле "name"'));
           
@@ -63,8 +67,12 @@ class VidController {
     }
 
     async change(request: Request<{}, {}, ChangeCategoryRequestBody>,  response: Response, next: NextFunction): Promise<Response | void>{
-        const {name, id} = request.body;
         try{
+        const userId = (request as any).user?.id; 
+        if (!userId) {
+            return next(ApiError.forbidden('Пользователь не авторизован'));
+        }  
+        const {name, id} = request.body;
             if(!id || !name)
                 return next(ApiError.badRequest('Идентификатор ID и новое имя категории обязательны'));
 
@@ -82,6 +90,10 @@ class VidController {
     async delete(request: Request<GetOneCategoryParams>,  response: Response, next: NextFunction): Promise<Response | void>{
         
         try{
+            const userId = (request as any).user?.id; 
+            if (!userId) {
+                return next(ApiError.forbidden('Пользователь не авторизован'));
+            }             
             const id = Number(request.params.id);    
             if(isNaN(id))
                 return next(ApiError.badRequest('Некорректный формат ID'));

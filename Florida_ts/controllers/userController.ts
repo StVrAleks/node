@@ -47,6 +47,7 @@ interface changeRequestBody{
 };
 
 interface UpdateProfileRequestBody {
+    emailField: string;
     name: string;
     phone?: string;
     address?: string;
@@ -248,7 +249,7 @@ async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Respo
  
   async updateProfile(request: Request<{}, {}, UpdateProfileRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
     try {
-        const { name, phone, address } = request.body;
+        const { emailField, name, phone, address } = request.body;
         
         // request.user должен быть заполнен вашим authMiddleware после верификации JWT-токена
         // Извлекаем id или email пользователя
@@ -259,7 +260,7 @@ async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Respo
             return next(ApiError.forbidden('Пользователь не авторизован'));
         }
 
-        if (!name) {
+        if (!name || !emailField) {
             return next(ApiError.badRequest('Имя пользователя обязательно для заполнения'));
         }
 
@@ -267,11 +268,11 @@ async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Respo
         const [rowsUpdated] = await User.update(
             { 
                 name: name, 
+                email: emailField,
                 phone: phone || "", 
                 address: address || "" 
             }, 
             { 
-                // Используйте userId, если в токене зашит ID, либо { email: userEmail }
                 where: { id: userId } 
             }
         );

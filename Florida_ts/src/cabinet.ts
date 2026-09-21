@@ -74,14 +74,13 @@ async function loadUserOrders(): Promise<void> {
     container.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px;">Загрузка истории покупок...</td></tr>';
     if (mistakeEl) mistakeEl.innerHTML = '';
 
-    const localToken = localStorage.getItem('floweridaKey');
+    //const localToken = localStorage.getItem('floweridaKey');
 
     try {
         const response = await fetch('/api/order/my-orders', {
             method: "GET",
             headers: { 
                 "Content-Type": "application/json", 
-             //   "Authorization": `Bearer ${localToken}` 
             }
         });
 
@@ -169,31 +168,27 @@ async function updateCabinetProfile(): Promise<void> {
     const nameVal = (document.getElementById('user-name') as HTMLInputElement).value.trim();
     const phoneVal = (document.getElementById('user-phone') as HTMLInputElement).value.trim();
     const addressVal = (document.getElementById('user-address') as HTMLInputElement).value.trim();
+    const emailVal = (document.getElementById('user-email') as HTMLInputElement).value.trim();
 
-    if (!nameVal) {
-        if (mistakeEl) mistakeEl.innerHTML = 'Поле "Ваше имя" обязательно для заполнения';
+    if (!nameVal || !emailVal) {
+        if (mistakeEl) mistakeEl.innerHTML = 'Поле "Ваше имя" или "Ваша почта" обязательно для заполнения';
         return;
     }
 
-  //  const localToken = localStorage.getItem('floweridaKey');
-
     try {
-const response = await fetch('/api/user/changeUser', { // Было /api/user/updateProfile
+const response = await fetch('/api/user/updateProfile', { 
     method: "PUT", // Метод PUT, как у вас и настроено на бэкенде
     headers: {
-        "Content-Type": "application/json",
-      //  "Authorization": `Bearer ${localToken}`
+        "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        // Передаем параметры, которые ожидает бэкенд-контроллер для обновления
+        emailField: emailVal,
         name: nameVal,
         phone: phoneVal,
         address: addressVal
     })
 });
-
         const data = await response.json();
-
         if (data.change === 'ok') {
             alert('Данные вашего профиля успешно сохранены!');
         } else if (mistakeEl) {

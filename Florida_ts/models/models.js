@@ -34,11 +34,15 @@ const Flowers = sequelize.define('flowers', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
     price: { type: DataTypes.INTEGER, allowNull: false },
+    status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'В наличии' },
     vidId: { type: DataTypes.INTEGER, allowNull: false,
         references: {
-            model: 'flower_vids', // Имя таблицы видов в базе данных
+            model: 'flower_vid', // Имя таблицы видов в базе данных
             key: 'id'
         } },
+    vidName: {type: DataTypes.VIRTUAL,
+        get() { return this.getDataValue('flower_vid')?.name || ''; }
+    },        
     mKeyWords: { type: DataTypes.STRING },
     mDescript: { type: DataTypes.STRING }
 });

@@ -1,4 +1,4 @@
-import { Flowers } from '../models/models.js';
+import { Flowers, Vid } from '../models/models.js';
 import ApiError from '../error/ApiError.js';
 import logger from '../middleware/winston.js';
 import { Request, Response, NextFunction } from 'express';
@@ -7,12 +7,14 @@ import { ParamsDictionary } from 'express-serve-static-core';
 interface CreateFlowerRequestBody {
     name: string,
     price: number,
-    vidId: number,
+    vidName: string,
+    vidId?:number,
     mKeyWords?: string | undefined,
     mDescript?: string | undefined
 };
 interface UpdateFlowerRequestBody extends Partial<CreateFlowerRequestBody> {
     id: number;
+    vidId: number;
 }
 
 interface DeleteFlowerRequestBody {
@@ -33,11 +35,33 @@ class FlowerController{
 
     async create(request: Request<{}, {}, CreateFlowerRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
         try {       
-            const {name, price, vidId, mKeyWords, mDescript} =  request.body;
+            const { name, price, vidName, mKeyWords, mDescript } = request.body;
+
+            if (!vidName || vidName.trim() === "") {
+                   return next(ApiError.badRequest('Укажите вид цветка'));
+            }
             //создаем строку с цветком
             logger.info(`/создали новый цветок: ${name}`);
 
-            const flower = await Flowers.create({name, price, vidId: vidId, mKeyWords, mDescript});
+            const [vidElement, created] = await Vid.findOrCreate({
+                where: { name: vidName.trim() },
+                defaults: { name: vidName.trim() } // Данные для создания, если не найден
+            });
+            
+            
+            if (created) {
+                logger.info(`Создан новый вид цветка: ${vidName}`);
+            }
+            const flower = await Flowers.create({            
+                name,
+                price,
+                vidId: vidElement.id, 
+                mKeyWords,
+                mDescript
+            });
+            await flower.reload({
+                include: [{ model: Vid, as: 'vidInfo', attributes: ['name'] }]
+            });
             return response.status(201).json(flower);
             }
         catch(error: any){
@@ -47,7 +71,7 @@ class FlowerController{
 
     async getAll(request: Request<{}, {}, {}, GetAllFlowersQuery>, response: Response, next: NextFunction): Promise<Response | void>{
        try{ 
-            var {vidId, limit: queryLimit, page: queryPage} = request.query;
+            const {vidId, limit: queryLimit, page: queryPage} = request.query;
             const page = Number(queryPage) || 1;
             const limit = Number(queryLimit) || 9;
             const offset = (page - 1) * limit;
@@ -62,7 +86,14 @@ class FlowerController{
                 limit: limit,
                 offset: offset,
                 // сортировку по цене или ID:
-                order: [['id', 'ASC'],['price', 'ASC'], ['name', 'ASC']] 
+                order: [['id', 'ASC'],['price', 'ASC'], ['name', 'ASC']],
+                 include: [{
+                    model: Vid, 
+                    as: 'vidId',     
+                    attributes: ['name'] 
+                }],
+                // distinct: true гарантирует корректный подсчет count при JOIN-запросах с пагинацией
+                distinct: true                 
             });
 
             // Возвращаем фронтенду и данные, и мета-информацию для отрисовки страниц
@@ -94,9 +125,7 @@ class FlowerController{
         catch(error: any){
                return next(ApiError.internal('Ошибка сервера при выполнении запроса'));
         }
-
     }
-
     async change(request: Request<{}, {}, UpdateFlowerRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
         const {id, name, price, vidId, mKeyWords, mDescript} = request.body;
         try{

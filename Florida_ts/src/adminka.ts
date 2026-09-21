@@ -3,13 +3,13 @@ import { ApiResponse, UserAttributes, VidAttributes, FlowerAttributes, FlowerImg
 let currentMode: 'flowers' | 'vids' | 'flowersPhoto' | 'flowersDescription' | 'users' = 'users';
 let currentPage: number = 1;
 const itemsPerPage: number = 9;
-
+const modalViewItem = 'adminUniversalModal';
 
 document.addEventListener('DOMContentLoaded', () => {
   const cancelBut = document.getElementById('control_modal_cancel');
 if (cancelBut) {
     cancelBut.addEventListener('click', () => {
-        closeItem('adminUniversalModal');
+        closeItem(modalViewItem);
     }, false);
 }
 const saveBut = document.getElementById('control_modal_save');
@@ -31,7 +31,6 @@ if (saveBut) {
         }
     }, false);
   }
-
 
     // Кнопка "Назад" (<<)
     const preBtn = document.getElementById('pre');
@@ -97,30 +96,38 @@ async function correctFlowers(page: number = 1): Promise<void> {
   if (serviceAdd) serviceAdd.style.display = 'none';
   if (pageView) pageView.style.display = 'flex';
 
- let buttonForAdd = document.getElementById('addNewItemFlower_but') as HTMLElement || null;
- if (buttonForAdd) buttonForAdd.remove();
-   
-  
+
   const table = document.getElementById('control_table') as HTMLTableElement | null; 
-  if (table) {
-    while (table.rows.length > 0) {
-        table.deleteRow(0);
-      }
+        if (table) {
+            while (table.rows.length > 0) {
+                table.deleteRow(0);
+            }
+        }
+ let buttonForAdd = document.getElementById('addNewItem_but') as HTMLButtonElement || null;
+ if (!buttonForAdd) 
+   {
     const butAdd = document.createElement("input");
-        butAdd.type = 'button';
-        butAdd.id = 'addNewItemFlower_but';
-        butAdd.style.background = 'none';
-        butAdd.value = '⊕ Добавить товар(цветок)';
-    table.appendChild(butAdd);   
-    document.getElementById('addNewItemFlower_but')?.addEventListener('click', (event : Event) => {addItemUniversal(event)}, false);    
-  }
+          butAdd.type = 'button';
+          butAdd.id = 'addNewItem_but';
+          butAdd.style.background = 'none';
+          butAdd.style.padding = '5px';
+          butAdd.value = '⊕ Добавить товар(цветок)';
+          table?.appendChild(butAdd);   
+   }
+ else{
+    buttonForAdd.value = '⊕ Добавить товар(цветок)';
+    }  
+    document.getElementById('addNewItem_but')?.removeEventListener('click', (event : Event) => {addItemUniversal(event)}, false);    
+    document.getElementById('addNewItem_but')?.addEventListener('click', (event : Event) => {addItemUniversal(event)}, false);    
+   
+ 
 
-
- const localToken = localStorage.getItem('floweridaKey');
+ //const localToken = localStorage.getItem('floweridaKey');
 
   fetch(`/api/flower/getAll?page=${page}&limit=${itemsPerPage}`,{
         method: "GET",
-        headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+        //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+        headers: {"content-Type": "application/json"}
         })
         .then((response) => response.json())
         .then((data : ApiResponse<FlowerAttributes>) =>{
@@ -143,7 +150,15 @@ async function correctFlowers(page: number = 1): Promise<void> {
                         trHead.appendChild(th);
                     });
             table.appendChild(trHead);  
-                             
+            
+            interface typeData{
+                'id': number; 
+                'name': string;
+                'price'?: number;
+                'vidTitle': string;
+                'mKeyWords'?: string;
+                'mDescript'?: string;
+            };                             
             data.rows.forEach((flower, index) => {
                 const num = index + 1;
                 const tr = document.createElement("tr");
@@ -155,17 +170,25 @@ async function correctFlowers(page: number = 1): Promise<void> {
                     <td>${flower.id}</td>
                     <td>${flower.name}</td>
                     <td>${flower.price}</td>
-                    <td>${flower.vidId || ''}</td>
+                    <td>${flower.vidName || ''}</td>
                     <td><input type="button" class="class_control_button" value="⇓ Добавить фото" id="butChangeImg${num}"></td>
                     <td><input type="button" class="class_control_button" value="+ Добавить описание" id="butChangeDisc${num}"></td>
                     <td>${flower.mKeyWords || ''}</td>
                     <td>${flower.mDescript || ''}</td>
                 `;
                 table.appendChild(tr);
-
+  
+                const data : typeData = {
+                    'id': flower.id, 
+                    'name': flower.name,
+                    'price': flower.price,
+                    'vidTitle': flower.vidName || '',
+                    'mKeyWords': flower.mKeyWords,
+                    'mDescript': flower.mDescript
+                };
                 // Активация базовых кнопок строки
                 document.getElementById(`butDelete${num}`)?.addEventListener('click', (e) => { deleteItemUniversal(e); });    
-                document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e); });    
+                document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e, data); });    
 
                 document.getElementById(`butChangeImg${num}`)?.addEventListener('click', (event : Event) => {imgItemFlower(event)}, false);   
                 document.getElementById(`butChangeDisc${num}`)?.addEventListener('click',  (event : Event) => {descItemFlower(event)}, false);
@@ -178,6 +201,7 @@ async function correctFlowers(page: number = 1): Promise<void> {
         }).catch((error)=> console.log(error));
 
 }
+//*********VID */
 async function correctVids(page: number = 1): Promise<void> {
 
 currentPage = page;
@@ -198,28 +222,36 @@ if (serviceAdd) serviceAdd.style.display = 'none';
 if (pageView) pageView.style.display = 'flex';
 
 
-//проверяем - кнопка для добавления нового вида уже есть на странице
-let buttonForAdd = document.getElementById('addNewVidItem_but') as HTMLElement || null;
-  if (buttonForAdd) buttonForAdd.remove();
-   
-  
   const table = document.getElementById('control_table') as HTMLTableElement | null; 
   if (table) {
-    while (table.rows.length > 0) { table.deleteRow(0); }
-  const butAdd = document.createElement("input");
-      butAdd.type = 'button';
-      butAdd.id = 'addNewVidItem_but';
-      butAdd.style.background = 'none';
-      butAdd.value = '⊕ Добавить вид';
-  table.appendChild(butAdd);     
-  table.addEventListener('click', (event : Event) => {addItemUniversal(event);}, false);   
-  }
+    while (table.rows.length > 0) { table.deleteRow(0); }}
 
-  const localToken = localStorage.getItem('floweridaKey');
+
+let buttonForAdd = document.getElementById('addNewItem_but') as HTMLButtonElement || null;
+ if (!buttonForAdd) 
+   {
+    const butAdd = document.createElement("input");
+          butAdd.type = 'button';
+          butAdd.id = 'addNewItem_but';
+          butAdd.style.background = 'none';
+          butAdd.style.padding = '5px';
+          butAdd.value = '⊕ Добавить вид';
+          table?.appendChild(butAdd);   
+   }
+ else{
+    buttonForAdd.value = '⊕ Добавить вид';
+    }  
+    document.getElementById('addNewItem_but')?.removeEventListener('click', (event : Event) => {addItemUniversal(event)}, false);    
+    document.getElementById('addNewItem_but')?.addEventListener('click', (event : Event) => {addItemUniversal(event)}, false);    
+   
+ 
+
+ // const localToken = localStorage.getItem('floweridaKey');
    
    fetch(`/api/vid/getAll?page=${page}&limit=${itemsPerPage}`,{
         method: "GET",
-        headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+      //  headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+        headers: {"content-Type": "application/json"}
         })
         .then((response) => response.json())
         .then((data: ApiResponse<VidAttributes>) =>{
@@ -241,22 +273,26 @@ let buttonForAdd = document.getElementById('addNewVidItem_but') as HTMLElement |
                         trHead.appendChild(th);
                     });
               table.appendChild(trHead);  
-                                    
+                    
+            interface typeData{
+                'id': number; 
+                'name': string;
+            };  
             data.rows.forEach((vid, index) => {
                 const num = index + 1;
                 const tr = document.createElement("tr");
                 tr.className = 'newTr';
 
                 tr.innerHTML = `
-                    <td><input type="button" class="class_control_button" value="Удалить запись" id="delChange${num}"></td>
+                    <td><input type="button" class="class_control_button" value="Удалить запись" id="delChange${vid.id}"></td>
                     <td><input type="button" class="class_control_button" value="Изменить запись" id="butChange${num}"></td>
                     <td>${vid.id}</td>
                     <td>${vid.name}</td>
                 `;
                 table.appendChild(tr);    
-
-                document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e); });
-                document.getElementById(`delChange${num}`)?.addEventListener('click', (e) => { deleteItemUniversal(e); });            
+                const data : typeData = {'id': vid.id, 'name': vid.name};
+                document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e, data); });
+                document.getElementById(`delChange${vid.id}`)?.addEventListener('click', (e) => { deleteItemUniversal(e); });            
             }) 
             }
             const numPageInput = document.getElementById('numPage') as HTMLInputElement | null;
@@ -287,7 +323,9 @@ const pageView = document.getElementById('pageView');
 if (serviceAdd) serviceAdd.style.display = 'none';
 if (pageView) pageView.style.display = 'flex'; // Показываем блок пагинации << 1 >>
 
-const localToken = localStorage.getItem('floweridaKey');
+//const localToken = localStorage.getItem('floweridaKey');
+let buttonForAdd = document.getElementById('addNewItem_but') as HTMLButtonElement || null;
+if(buttonForAdd) buttonForAdd.remove();
 
 const table = document.getElementById('control_table') as HTMLTableElement | null; 
 if (table) {
@@ -298,7 +336,8 @@ if (table) {
 
   fetch(`/api/user/allUsers?page=${page}&limit=${itemsPerPage}`,{
         method: "GET",
-        headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+        //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+        headers: {"content-Type": "application/json"}        
         })
         .then((response) => response.json())
         .then((data: ApiResponse<UserAttributes>) =>{
@@ -320,7 +359,12 @@ if (table) {
                         trHead.appendChild(th);
                     });
             table.appendChild(trHead);  
-
+            interface typeData {
+                'name': string;
+                'email': string;
+                'role': string;
+                'user_status': string;
+            };
             // Заполняем строки данными                                    
             data.rows.forEach((user, index) => {
                 const num = index + 1;
@@ -335,9 +379,14 @@ if (table) {
                     <td>${user.user_status}</td>
                 `;
                 table.appendChild(tr);    
-
+                const data : typeData={
+                    'name': user.name,
+                    'email': user.email,
+                    'role': user.role,
+                    'user_status': user.user_status
+                };
                 // Навешивание обработчика изменений на каждую кнопку индивидуально
-                document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e); });            
+                document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e,data); });            
             });  
             }
             const numPageInput = document.getElementById('numPage') as HTMLInputElement | null;
@@ -351,7 +400,7 @@ if (table) {
 function imgItemFlower(event :Event) : void{
 
 currentMode = 'flowersPhoto';
-showChange(event);
+showChange(event, null);
 
 const target = event.target as HTMLElement | null;
     if (!target) return;
@@ -378,7 +427,8 @@ const linkIdChange = target.id.replace('butChangeImg', '');
     const localToken = localStorage.getItem('floweridaKey');
     fetch(`/api/imgs/getAll/${flowerId}`, {
         method: "GET",
-        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` },
+//        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` },
+     headers: { "content-Type": "application/json" },
     })
     .then((response) => response.json())
     .then((data: ApiResponse<FlowerImgsAttributes>) => {
@@ -438,7 +488,7 @@ async function addFileUniversal(e: Event, flowerId: number, originalEvent: Event
         // Шаг 1: Загружаем картинку на бэкенд для нарезки через GraphicsMagick
         const uploadResponse = await fetch('/uploads', {
             method: "POST",
-            headers: { "Authorization": `Bearer ${localToken}` },
+          //  headers: { "Authorization": `Bearer ${localToken}` },
             body: formData
         });
 
@@ -449,7 +499,7 @@ async function addFileUniversal(e: Event, flowerId: number, originalEvent: Event
             method: "POST",
             headers: { 
                 "content-Type": "application/json", 
-                "Authorization": `Bearer ${localToken}` 
+             //   "Authorization": `Bearer ${localToken}` 
             },
             body: JSON.stringify({
                 'flowerId': flowerId,
@@ -504,7 +554,8 @@ if(!target)
 
  fetch(`/api/imgs/delete/${id}` ,{
           method: "DELETE",
-          headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+     //     headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+          headers: {"content-Type": "application/json"},          
           body: JSON.stringify({'id': id})
           })
           .then((response) => response.json())
@@ -520,7 +571,7 @@ if(!target)
 //Нажали Добавить-описание товара
 async function descItemFlower(event: Event): Promise<void> {
     currentMode = 'flowersDescription';
-    showChange(event);
+    showChange(event, null);
 
     const target = event.target as HTMLElement | null;
     if (!target) return;
@@ -572,7 +623,8 @@ async function descItemFlower(event: Event): Promise<void> {
     // Загружаем сохраненные данные из бэкенда
     fetch(`/api/info/getAll/${flowerId}`, {
         method: "GET",
-        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` }
+//        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` }
+        headers: { "content-Type": "application/json" }        
     })
     .then((response) => response.json())
     .then((data: ApiResponse<FlowerInfoAttributes>) => {
@@ -609,14 +661,14 @@ async function descItemFlower(event: Event): Promise<void> {
 }
 
 //нажали кнопку Пользователи - изменить
-function showChange(event: Event): void {
+function showChange(event: Event, dataVal): void {
 
 // Меняем HTML-разметку внутри ЕДИНОГО окна под нужды сервиса пользователей
 const contentTarget = document.getElementById('modalDynamicContent');
 if (!contentTarget) return;
 
 // Показываем подложку единого окна
-const universalModal = document.getElementById('adminUniversalModal');
+const universalModal = document.getElementById(modalViewItem);
 if (universalModal) {
     universalModal.style.display = 'flex'; // Используем flex для центрирования
     universalModal.style.height = 'auto'; // Окно само подстроится под контент
@@ -625,37 +677,35 @@ if (universalModal) {
 const target = event.target as HTMLInputElement;
 let trId = target.id;
 let trNum = trId.replace('butChange', '');
-let rowIndex = trNum? parseInt(trNum) + 1 : 0;
+let rowIndex = trNum? parseInt(trNum) : 0;
 
 //-------------------------------------------------
 //-------------------------------------------------
 if (currentMode === 'users') {
-    const name = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(2)`)?.innerHTML || '';
+ /*   const name = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(2)`)?.innerHTML || '';
     const email = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(3)`)?.innerHTML || '';
     const role = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(4)`)?.innerHTML || '';
     const status = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(5)`)?.innerHTML || '';
-
+*/
      // Закачиваем разметку полей в единое окно
     contentTarget.innerHTML = `
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-            <tr><td>Имя пользователя</td><td id="modal_user_name">${name}</td></tr>
-            <tr><td>Email пользователя</td><td id="modal_user_email">${email}</td></tr>
-            <tr><td>Role пользователя</td><td><input id="modal_user_role" type="text" value="${role}"></td></tr>
-            <tr><td>Статус пользователя</td><td id="modal_user_status">${status}</td></tr>
+            <tr><td>Имя пользователя</td><td id="modal_user_name">${dataVal.name}</td></tr>
+            <tr><td>Email пользователя</td><td id="modal_user_email">${dataVal.email}</td></tr>
+            <tr><td>Role пользователя</td><td><input id="modal_user_role" type="text" value="${dataVal.role}"></td></tr>
+            <tr><td>Статус пользователя</td><td id="modal_user_status">${dataVal.user_status}</td></tr>
         </table>
     `;
 }
 //-------------------------------------------------
 //-------------------------------------------------
 else if (currentMode === 'vids') {
-   const id = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(2)`)?.innerHTML || '';
-   const name = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(3)`)?.innerHTML || '';
- 
+
      // Закачиваем разметку полей в единое окно
     contentTarget.innerHTML = `
-        <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-            <tr><td>ID вида</td><td id="modal_vid_id">${id}</td></tr>
-            <tr><td>Название вида</td><td id="modal_vid_name"><input type='text'>${name}</td></tr>
+        <table id="myModalTable" style="margin-top: 25px; width: 100%;">
+            <tr><td>ID вида</td><td id="modal_vid_id">${dataVal.id}</td></tr>
+            <tr><td>Название вида</td><td><input type='text' id="modal_vid_name" value="${dataVal.name}"></td></tr>
         </table>
     `;
 }
@@ -710,7 +760,7 @@ else if (currentMode === 'flowersDescription') {
 
 //нажали кнопку изменить Пользователь - модальное окно - Сохранить
 function correctItem(): void {
-const localToken = localStorage.getItem('floweridaKey');
+//const localToken = localStorage.getItem('floweridaKey');
 // ==========================================
 // ВАРИАНТ 1: Сохранение пользователя (Роли)
 // ==========================================
@@ -722,7 +772,8 @@ if (currentMode === 'users') {
 
   fetch('/api/user/changeUser',{
         method: "PUT",
-        headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+        //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+        headers: {"content-Type": "application/json"},        
         body: JSON.stringify({'email': emailEl.innerHTML, 'role':roleEl.value})
     })
     .then((response) => response.json())
@@ -730,7 +781,7 @@ if (currentMode === 'users') {
         if(data.change === 'ok' || !data.mes)
         {
           correctUsers(currentPage);
-          closeItem('adminUniversalModal'); 
+          closeItem(modalViewItem); 
         }  
         else{
         const mist4 = document.getElementById('modalMistake') as HTMLElement || null; // Ошибка выводится в общую область модалки
@@ -750,15 +801,16 @@ if (currentMode === 'vids') {
 
 fetch('/api/vid/change',{
         method: "PUT",
-        headers: {"content-Type": "application/json", "Authorization":  `Bearer ${localToken}`},
+         headers: {"content-Type": "application/json"},
+       // headers: {"content-Type": "application/json", "Authorization":  `Bearer ${localToken}`},
         body: JSON.stringify({'id':idForm.innerHTML, 'name':nameForm.value})
         })
         .then((response) => response.json())
         .then((data: ApiResponse<VidAttributes>) =>{
            if(data.change === 'ok' || !data.mes)
             {
-            correctUsers(currentPage);
-            closeItem('adminUniversalModal');
+            correctVids(currentPage);
+            closeItem(modalViewItem);
             }   
           else{
             const mist4 = document.getElementById('modalMistake') as HTMLElement || null; // Ошибка выводится в общую область модалки
@@ -776,12 +828,18 @@ if (currentMode === 'flowers') {
   const priceForm = document.getElementById('modal_flower_price') as HTMLInputElement || null;
   const mKeyWordsFrom = document.getElementById('modal_flower_key') as HTMLInputElement || null;
   const mDescriptFrom = document.getElementById('modal_flower_mDis') as HTMLInputElement || null;
-  const vidIdFrom = document.getElementById('modal_flower_vid_id') as HTMLInputElement || null;
+  const vidIdFrom = document.getElementById('modal_flower_vid_id') as HTMLSelectElement || null;
   const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null;
+/* const selectedText : string='';
+  if (vidIdFrom && vidIdFrom.selectedIndex !== -1) {
+    const selectedOption = vidIdFrom.options[vidIdFrom.selectedIndex]; 
+    const selectedText = selectedOption.text; 
+}*/
 
 fetch('/api/flower/change',{
         method: "PUT",
-        headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+        //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+        headers: {"content-Type": "application/json"},
         body: JSON.stringify({
           'id':idForm ? idForm.innerHTML : '', 
           'name':nameForm ? nameForm.value : '', 
@@ -795,7 +853,7 @@ fetch('/api/flower/change',{
           if(data.change === 'ok')
           {
              correctFlowers(currentPage);
-             closeItem('adminUniversalModal');
+             closeItem(modalViewItem);
           }  
           else{
             if(mistakeForm) mistakeForm.innerHTML = String(data.mes || data.message);
@@ -840,13 +898,13 @@ if (currentMode === 'flowersPhoto'){
     // Отправляем всё ОДНИМ групповым PUT-запросом
     fetch('/api/imgs/saveGalleryGroup', {
         method: "PUT",
-        headers: { "Authorization": `Bearer ${localToken}` }, // Content-Type браузер выставит сам как multipart/form-data
+     //   headers: { "Authorization": `Bearer ${localToken}` }, // Content-Type браузер выставит сам как multipart/form-data
         body: formData
     })
     .then(res => res.json())
     .then(data => {
         if (data.change === 'ok') {
-            closeItem('adminUniversalModal');
+            closeItem(modalViewItem);
             correctFlowers(currentPage);
         }
     });
@@ -879,13 +937,14 @@ if (currentMode === 'flowersDescription') {
 
     fetch('/api/info/updateBlocks', {
         method: "PUT",
-        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` },
+        //headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` },
+        headers: { "content-Type": "application/json" },
         body: JSON.stringify({ flowerId, descriptions: descriptionsData })
     })
     .then((response) => response.json())
     .then((data) => {
         if (data.change === 'ok') {
-            closeItem('adminUniversalModal');
+            closeItem(modalViewItem);
             correctFlowers(currentPage); // Обновляем основную таблицу
         } else if (mistakeForm) {
             mistakeForm.innerHTML = data.mes || data.message || 'Ошибка при сохранении описаний';
@@ -894,8 +953,11 @@ if (currentMode === 'flowersDescription') {
 }
 }
 
+/*=================================================*/
+/*DELETE*currentMode***vids**flowers**flowersPhoto**flowersDescription**/
+/*=================================================*/
 function deleteItemUniversal(event: Event): void {
-const localToken = localStorage.getItem('floweridaKey');
+//const localToken = localStorage.getItem('floweridaKey');
 const target = event.target as HTMLInputElement;
  if(!target) return ;
 //-------------------------------------------------------------
@@ -904,15 +966,14 @@ const target = event.target as HTMLInputElement;
 if (currentMode === 'vids') {   
     const trId = target.id;
     const trNum0 = trId.replace('delChange', '');
-    const trNum = Number(parseInt(trNum0) + 1);  
+    const trNum = Number(parseInt(trNum0));  
 
-    const idSelector = document.querySelector(`#control_table > tr:nth-child(${trNum}) > td:nth-child(3)`) as HTMLElement || null;
-    if (!idSelector) return;
-
-
-    fetch(`/api/vid/delete/${idSelector.innerHTML}`,{
+    if (!trNum) return;
+    console.log(trNum);
+    fetch(`/api/vid/delete/${trNum}`,{
           method: "DELETE",
-          headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+          //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+          headers: {"content-Type": "application/json"}
           })
           .then((response) => response.json())
           .then((data : ApiResponse<VidAttributes>) =>{
@@ -936,7 +997,8 @@ if (currentMode === 'flowers') {
    
    fetch(`/api/flower/delete/${id}`,{
           method: "DELETE",
-          headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+          //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+          headers: {"content-Type": "application/json"}
           })
           .then((response) => response.json())
           .then((data : ApiResponse<FlowerAttributes>) =>{
@@ -964,7 +1026,8 @@ if (currentMode === 'flowersPhoto') {
    
    fetch(`/api/imgs/delete/${id}`,{
           method: "DELETE",
-          headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+          //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
+          headers: {"content-Type": "application/json"}
           })
           .then((response) => response.json())
           .then((data : ApiResponse<FlowerImgsAttributes>) =>{
@@ -987,7 +1050,8 @@ if (currentMode === 'flowersDescription') {
        
     fetch(`/api/info/delete/${infoId}`, {
         method: "DELETE",
-        headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` }
+        //headers: { "content-Type": "application/json", "Authorization": `Bearer ${localToken}` }
+        headers: { "content-Type": "application/json" }
     })
     .then((response) => response.json())
     .then(data => {
@@ -1002,7 +1066,8 @@ if (currentMode === 'flowersDescription') {
 
  fetch(`/api/info/delete/${infoId}`,{
           method: "DELETE",
-          headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+          //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+          headers: {"content-Type": "application/json"},
           })
           .then((response) => response.json())
           .then(data =>{
@@ -1016,6 +1081,9 @@ if (currentMode === 'flowersDescription') {
 }  
 }
 
+/*=================================================*/
+/*ONLY FORMS *currentMode***vids**flowers**flowersPhoto**/
+/*=================================================*/
 async function addItemUniversal(event: Event): Promise<void>  {
 // Меняем HTML-разметку внутри ЕДИНОГО окна под нужды сервиса пользователей
 const contentTarget = document.getElementById('modalDynamicContent');
@@ -1025,7 +1093,7 @@ const target = event.target as HTMLInputElement;
  if(!target) return ;
 
 // Показываем подложку единого окна
-const universalModal = document.getElementById('adminUniversalModal');
+const universalModal = document.getElementById(modalViewItem);
 
 if (universalModal) {
     universalModal.style.display = 'flex'; // Используем flex для центрирования
@@ -1035,34 +1103,32 @@ if (universalModal) {
 if (currentMode === 'vids') {
     contentTarget.innerHTML = `
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-            <tr><td>Название вида</td><td id="modal_vid_name"><input id="modal_new_vid" type="text"></td></tr>
+            <tr><td>Название вида</td><td><input id="modal_vid_name" type="text"></td></tr>
         </table>
     `;
 }
 //----------Добавление нового цветка
 if (currentMode === 'flowers') {
-    contentTarget.innerHTML = `
-        <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-            <tr id="Itd2">
-              <td>ID</td><td id="modal_flower_id">Новый</td>
-            </tr>
-            <tr>
-              <td>Вид</td><td><select id="modal_flower_vid_id"><option value="">Загрузка видов...</option></select></td>
-            </tr>
-            <tr>
-              <td>Название</td><td ><input id="modal_flower_name" type="text"></td>
-            </tr>
-            <tr>
-              <td>Цена</td><td><input id="modal_flower_price" type="text"></td>
-            </tr>
-            <tr>
-              <td>mKey</td><td><input id="modal_flower_key" type="text"><span class="textMeta">Значение key для метатега </span></td>
-            </tr>   
-            <tr>
-              <td>mDescription </td><td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение description для метатега </span> </td>
-            </tr>   
-        </table>
-    `;
+contentTarget.innerHTML = `
+    <table id="myModalTable" style="margin-top: 25px; width: 100%;">
+      <tr id="Itd2"><td>ID</td><td id="modal_flower_id"></td></tr>
+      
+      <!-- Изменено: текстовое поле с привязкой к datalist -->
+      <tr>
+        <td>Вид</td>
+        <td>
+            <input id="modal_flower_vid_input" type="text" list="vids_list" placeholder="Начните вводить вид...">
+            <datalist id="vids_list"></datalist>
+        </td>
+      </tr>
+      
+      <tr><td>Название</td><td><input id="modal_flower_name" type="text"></td></tr>
+      <!-- Исправлено: значение вставляется внутрь атрибута value, чтобы инпут не был пустым -->
+      <tr><td>Цена</td><td><input id="modal_flower_price" type="text"></td></tr>
+      <tr><td>mKey</td><td><input id="modal_flower_key" type="text"><span class="textMeta">Значение key для метатега </span></td></tr>   
+      <tr><td>mDescription</td><td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение description для метатега </span></td></tr>   
+    </table>
+`;
     await populateVidsDropdown();
 }
 //----------Добавление нового изображения
@@ -1133,12 +1199,16 @@ else if (currentMode === 'flowersDescription') {
     }
 }
 
+/*=================================================*/
+/*CREATE*currentMode***vids**flowers**flowersPhoto**/
+/*=================================================*/
+
 async function addItemSaveUniversal(){
-const localToken = localStorage.getItem('floweridaKey');
+//const localToken = localStorage.getItem('floweridaKey');
 const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null;
 
 if (currentMode === 'vids') {
-  const nameForm = document.getElementById('modal_new_vid') as HTMLInputElement || null;
+  const nameForm = document.getElementById('modal_vid_name') as HTMLInputElement || null;
 
   let name = nameForm? nameForm.value : ''
   if(!name){
@@ -1148,19 +1218,18 @@ if (currentMode === 'vids') {
   
     fetch('/api/vid/create',{
             method: "POST",
-            headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+            //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+            headers: {"content-Type": "application/json"},
             body: JSON.stringify({'name': name})
             })
             .then((response) => response.json())
             .then((data : ApiResponse<VidAttributes>) =>{
               if(data.mes || data.message){
-                if (mistakeForm) mistakeForm.innerHTML = data.mes || data.message || '';
-                return ;
+                    if (mistakeForm) mistakeForm.innerHTML = data.mes || data.message || '';
+                    return ;
                 }
-              if (data.rows && data.rows.length > 0){
-                  correctVids(currentPage);                  
-                  closeItem('myModalVid');
-                  }
+                correctVids(currentPage);              
+                closeItem(modalViewItem);
             });
  
 }
@@ -1169,21 +1238,22 @@ else if (currentMode === 'flowers') {
   const priceForm = document.getElementById('modal_flower_price') as HTMLInputElement || null;
   const mKeyWordsFrom = document.getElementById('modal_flower_key') as HTMLInputElement || null;
   const mDescriptFrom = document.getElementById('modal_flower_mDis') as HTMLInputElement || null;
-  const vidIdFrom = document.getElementById('modal_flower_vid_id') as HTMLInputElement || null;
+  const vidIdFrom = document.getElementById('modal_flower_vid_input') as HTMLInputElement || null;
   let name = nameForm ? nameForm.value : '';
   let price = priceForm ? priceForm.value : '';
   let mKeyWords = mKeyWordsFrom ? mKeyWordsFrom.value : '';
   let mDescript = mDescriptFrom ? mDescriptFrom.value : '';
-  let vidId = vidIdFrom ? vidIdFrom.value : '';
+  let vidName = vidIdFrom ? vidIdFrom.value : '';
 
-  if(!name || !vidId){
+  if(!name || !vidName){
     if (mistakeForm) mistakeForm.innerHTML = 'Не заполнено поле Название или Вид!';
     return;
   }
     fetch('/api/flower/create',{
             method: "POST",
-            headers: {"content-Type": "application/json", "Authorization":  `Bearer ${localToken}`},
-            body: JSON.stringify({'name':name, 'price':price, 'vidId':vidId, 'mKeyWords':mKeyWords, 'mDescript':mDescript})
+            //headers: {"content-Type": "application/json", "Authorization":  `Bearer ${localToken}`},
+            headers: {"content-Type": "application/json"},
+            body: JSON.stringify({'name':name, 'price':price, 'vidName':vidName, 'mKeyWords':mKeyWords, 'mDescript':mDescript})
             })
             .then((response) => response.json())
             .then((data : ApiResponse<FlowerAttributes>) =>{
@@ -1193,10 +1263,10 @@ else if (currentMode === 'flowers') {
               }
               if (data.rows && data.rows.length > 0) {
                   correctFlowers(currentPage);                      
-                  closeItem('myModalFlower');
+                  closeItem(modalViewItem);
                   }
             });
-  }
+}
 else if (currentMode === 'flowersPhoto') {
   const nameForm = document.getElementById('modal_new_vid') as HTMLInputElement || null;
 
@@ -1208,7 +1278,8 @@ else if (currentMode === 'flowersPhoto') {
   
     fetch('/api/vid/create',{
             method: "POST",
-            headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+            //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
+            headers: {"content-Type": "application/json"},
             body: JSON.stringify({'name': name})
             })
             .then((response) => response.json())
@@ -1219,10 +1290,9 @@ else if (currentMode === 'flowersPhoto') {
                 }
               if (data.rows && data.rows.length > 0){
                   correctVids(currentPage);                  
-                  closeItem('myModalVid');
+                  closeItem(modalViewItem);
                   }
             });
- 
 }
 }
 
@@ -1245,16 +1315,16 @@ async function populateVidsDropdown(): Promise<void> {
         });
         
         const data: ApiResponse<VidAttributes> = await response.json();
-
+        const datalist = document.getElementById('vids_list') as HTMLDataListElement | null;
         if (data.mes || data.message) {
             console.error('Ошибка бэкенда при загрузке видов:', data.mes || data.message);
             selectElement.innerHTML = '<option value="">Ошибка загрузки</option>';
             return;
         }
 
-        if (data.rows && data.rows.length > 0) {
+        if (datalist && data.rows && data.rows.length > 0) {
+            datalist.innerHTML = '';
             // Очищаем селект от заглушки "Загрузка..." и добавляем дефолтный пустой вариант
-            selectElement.innerHTML = '<option value="">-- Выберите вид цветка --</option>';
 
             // Пробегаемся по видам из БД и генерируем option
             data.rows.forEach((vid) => {
