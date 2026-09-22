@@ -41,7 +41,10 @@ const Flowers = sequelize.define('flowers', {
             key: 'id'
         } },
     vidName: {type: DataTypes.VIRTUAL,
-        get() { return this.getDataValue('flower_vid')?.name || ''; }
+         get() {
+            const vidInfo = this.flower_vid || this.Vid || this.vid;
+            return vidInfo?.name || ''; }
+       // get() { return this.flower_vid?.name || '';  }
     },        
     mKeyWords: { type: DataTypes.STRING },
     mDescript: { type: DataTypes.STRING }

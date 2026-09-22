@@ -71,6 +71,10 @@ export interface FlowerAttributes {
     price: number,
     vidId: number,   
     status?: string; 
+    vidName?: {name:string}; 
+    flower_vid?: { name: string };
+    vid?: { name: string };
+    Vid?: { name: string };
     mKeyWords?: string | undefined,
     mDescript?: string | undefined
 };
@@ -78,18 +82,24 @@ export interface FlowerAttributes {
 type FlowerCreationAttributes = Optional<FlowerAttributes, 'id' | 'mKeyWords' | 'mDescript'>;
 
 const Flowers = sequelize.define<Model<FlowerAttributes, FlowerCreationAttributes> & FlowerAttributes>( 'flowers', {
-        id: {type:DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-        name: {type:DataTypes.STRING, allowNull: false},
-        price: {type:DataTypes.INTEGER, allowNull: false},
-        vidId: {type:DataTypes.INTEGER,  allowNull: false,
-            references: {
-                model: 'flower_vids', // Имя таблицы видов в базе данных
-                key: 'id'
-            }},        
-        mKeyWords: {type:DataTypes.STRING},
-        mDescript: {type:DataTypes.STRING}
-    }
-);
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    price: { type: DataTypes.INTEGER, allowNull: false },
+    status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'В наличии' },
+    vidId: { type: DataTypes.INTEGER, allowNull: false,
+        references: {
+            model: 'flower_vid', // Имя таблицы видов в базе данных
+            key: 'id'
+        } },
+    vidName: {type: DataTypes.VIRTUAL,
+         get() {
+            const vidInfo = this.flower_vid || this.Vid || this.vid;
+            return vidInfo?.name || ''; }
+       // get() { return this.flower_vid?.name || '';  }
+    },        
+    mKeyWords: { type: DataTypes.STRING },
+    mDescript: { type: DataTypes.STRING }
+});
 //роза, ромашка, кактус
 export interface VidAttributes {
     id: number,
@@ -98,11 +108,13 @@ export interface VidAttributes {
 
 type VidCreationAttributes = Optional<VidAttributes, 'id'>;
 
-const Vid = sequelize.define<Model<VidAttributes, VidCreationAttributes> & VidAttributes>( 'flower_vid', {
-        id: {type:DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-        name: {type:DataTypes.STRING, allowNull: false, unique: true},
-    }
-);
+const Vid = sequelize.define<Model<VidAttributes, VidCreationAttributes> & VidAttributes>('flower_vid', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false, unique: true },
+}, {
+    tableName: 'flower_vid', // <-- ИСПРАВЛЕНО: Жестко заставляем Sequelize использовать единственное число!
+    freezeTableName: true     // Отключает автоматическое превращение во множественное число
+});
 
 //избранное пользователя
 export interface FavoriteAttributes  {
@@ -163,7 +175,6 @@ const FlowerImgs = sequelize.define<Model<FlowerImgsAttributes, FlowerImgsCreati
                     },
                 onDelete: 'CASCADE'}
 });
-
 
 export interface ApiResponse<T = any> {
     total?: number;

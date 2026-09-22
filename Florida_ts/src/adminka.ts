@@ -2,6 +2,7 @@ import { ApiResponse, UserAttributes, VidAttributes, FlowerAttributes, FlowerImg
 // Глобальные переменные для пагинации и режимов админки
 let currentMode: 'flowers' | 'vids' | 'flowersPhoto' | 'flowersDescription' | 'users' = 'users';
 let currentPage: number = 1;
+let totalPages: number = 1;
 const itemsPerPage: number = 9;
 const modalViewItem = 'adminUniversalModal';
 
@@ -25,8 +26,10 @@ if (saveBut) {
         const isEditUser = (currentMode === 'users');
 
         if (isEditFlower || isEditVid || isEditUser) {
+            console.log('save');
             correctItem(); // Вызываем сохранение изменений
         } else {
+            console.log('create');
             addItemSaveUniversal(); // Вызываем создание новой записи
         }
     }, false);
@@ -38,6 +41,7 @@ if (saveBut) {
         preBtn.addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage--;
+                updatePaginationInterface();
                 if (currentMode === 'users') correctUsers(currentPage);
                   else if (currentMode === 'flowers') correctFlowers(currentPage);
                     else if (currentMode === 'vids') correctVids(currentPage);
@@ -50,9 +54,10 @@ if (saveBut) {
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
             currentPage++;
+            updatePaginationInterface();
             if (currentMode === 'users') correctUsers(currentPage);
-            else if (currentMode === 'flowers') correctUsers(currentPage);
-            else if (currentMode === 'vids') correctUsers(currentPage);            
+            else if (currentMode === 'flowers') correctFlowers(currentPage);
+            else if (currentMode === 'vids') correctVids(currentPage);            
         });
     }
 
@@ -73,8 +78,6 @@ if (saveBut) {
         currentMode = 'vids';    // <--- ЗАДАЛИ РЕЖИМ ВИДОВ
         correctVids(1);         // Функция для таблицы видов
     });
-
-
 
 });
 
@@ -130,20 +133,20 @@ async function correctFlowers(page: number = 1): Promise<void> {
         headers: {"content-Type": "application/json"}
         })
         .then((response) => response.json())
-        .then((data : ApiResponse<FlowerAttributes>) =>{
+        .then((data : ApiResponse & FlowerAttributes) =>{
            if(data.mes || data.message){
             const mistake = document.getElementById('mist3') as HTMLElement || null
             if(mistake) mistake.innerHTML = String(data.mes || data.message);
             return ;
            }
-           
+           totalPages = data.pages || 1
            if (table && data.rows) {
               console.log(data);
               var trHead = document.createElement("tr");
                   trHead.className = 'newTr'
 
               //добавили заголовки
-            const headers = ['Удалить', 'Изменить', 'Название', 'Цена', 'Вид', 'Изображения', 'Описание', 'mKeyWords', 'mDescription'];
+            const headers = ['Удалить', 'Изменить', 'Название', 'Цена', 'Статус', 'Вид', 'Изображения', 'Описание', 'mKeyWords', 'mDescription'];
                     headers.forEach(text => {
                         const th = document.createElement("th");
                         th.innerHTML = text;
@@ -155,6 +158,7 @@ async function correctFlowers(page: number = 1): Promise<void> {
                 'id': number; 
                 'name': string;
                 'price'?: number;
+                'status'?: string;
                 'vidTitle': string;
                 'mKeyWords'?: string;
                 'mDescript'?: string;
@@ -165,14 +169,14 @@ async function correctFlowers(page: number = 1): Promise<void> {
                 tr.className = 'newTr';
 
                 tr.innerHTML = `
-                    <td><input type="button" class="class_control_button" value="Удалить запись" id="butDelete${num}"></td>
-                    <td><input type="button" class="class_control_button" value="Изменить запись" id="butChange${num}"></td>
-                    <td>${flower.id}</td>
+                    <td><input type="button" class="class_control_button" value="Удалить запись" id="butDelete${flower.id}"></td>
+                    <td><input type="button" class="class_control_button" value="Изменить запись" id="butChange${flower.id}"></td>
                     <td>${flower.name}</td>
                     <td>${flower.price}</td>
-                    <td>${flower.vidName || ''}</td>
-                    <td><input type="button" class="class_control_button" value="⇓ Добавить фото" id="butChangeImg${num}"></td>
-                    <td><input type="button" class="class_control_button" value="+ Добавить описание" id="butChangeDisc${num}"></td>
+                    <td>${flower.status}</td>
+                    <td>${flower.flower_vid?.name || ''}</td>
+                    <td><input type="button" class="class_control_button" value="⇓ Добавить фото" id="butChangeImg${flower.id}"></td>
+                    <td><input type="button" class="class_control_button" value="+ Добавить описание" id="butChangeDisc${flower.id}"></td>
                     <td>${flower.mKeyWords || ''}</td>
                     <td>${flower.mDescript || ''}</td>
                 `;
@@ -182,16 +186,17 @@ async function correctFlowers(page: number = 1): Promise<void> {
                     'id': flower.id, 
                     'name': flower.name,
                     'price': flower.price,
-                    'vidTitle': flower.vidName || '',
+                    'status': flower.status || '',
+                    'vidTitle': flower.flower_vid?.name || '',
                     'mKeyWords': flower.mKeyWords,
                     'mDescript': flower.mDescript
                 };
                 // Активация базовых кнопок строки
-                document.getElementById(`butDelete${num}`)?.addEventListener('click', (e) => { deleteItemUniversal(e); });    
-                document.getElementById(`butChange${num}`)?.addEventListener('click', (e) => { showChange(e, data); });    
+                document.getElementById(`butDelete${flower.id}`)?.addEventListener('click', (e) => { deleteItemUniversal(e); });    
+                document.getElementById(`butChange${flower.id}`)?.addEventListener('click', (e) => { showChange(e, data); });    
 
-                document.getElementById(`butChangeImg${num}`)?.addEventListener('click', (event : Event) => {imgItemFlower(event)}, false);   
-                document.getElementById(`butChangeDisc${num}`)?.addEventListener('click',  (event : Event) => {descItemFlower(event)}, false);
+                document.getElementById(`butChangeImg${flower.id}`)?.addEventListener('click', (event : Event) => {imgItemFlower(event)}, false);   
+                document.getElementById(`butChangeDisc${flower.id}`)?.addEventListener('click',  (event : Event) => {descItemFlower(event)}, false);
 
             });   
                   
@@ -260,6 +265,7 @@ let buttonForAdd = document.getElementById('addNewItem_but') as HTMLButtonElemen
                  if (mist3) mist3.innerHTML = data.mes || data.message || 'Ошибка';
                  return;
            }
+           totalPages = data.pages || 1
            if (table && data.rows) {
               console.log(data);
               var trHead = document.createElement("tr");
@@ -346,6 +352,7 @@ if (table) {
                  if (mist3) mist3.innerHTML = data.mes || data.message || 'Ошибка';
                  return;
            }
+           totalPages = data.pages || 1
            if (table && data.rows) {
               console.log(data);
               var trHead = document.createElement("tr");
@@ -579,9 +586,9 @@ async function descItemFlower(event: Event): Promise<void> {
     // Вычисляем flowerId из строки таблицы товаров
     const trId = target.id;
     const trNumChange = trId.replace('butChangeDisc', '');
-    const rowIndex = trNumChange ? parseInt(trNumChange) + 1 : 0;
-    const flowerIdSelector = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(3)`) as HTMLElement | null;
-    const flowerId = flowerIdSelector ? parseInt(flowerIdSelector.innerHTML) : 0;
+    const flowerId = trNumChange ? parseInt(trNumChange) : 0;
+    //const flowerIdSelector = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(3)`) as HTMLElement | null;
+    //const flowerId = flowerIdSelector ? parseInt(flowerIdSelector.innerHTML) : 0;
 
     // Прячем ID цветка в шапку модалки для последующего группового сохранения
     const container = document.getElementById('uploadDescrContainer');
@@ -607,7 +614,7 @@ async function descItemFlower(event: Event): Promise<void> {
             <tr><td>Описание блока</td><td><textarea class="inputInfoText"></textarea></td></tr>
             <tr style="border-bottom: 2px solid grey;">
                 <td><span class="flowerIdDiscr" style='opacity:0'>${flowerId}</span></td>
-                <td><input type="button" class="class_control_button" id="linkLocal_${curLength}" value='Удалить форму' style="margin-bottom:15px"></td>
+                <td><input type="button" class="class_control_button" id="linkLocal_${curLength}" value='Удалить описание' style="margin-bottom:15px"></td>
             </tr>
         `;
         table.appendChild(rowGroup);
@@ -682,18 +689,13 @@ let rowIndex = trNum? parseInt(trNum) : 0;
 //-------------------------------------------------
 //-------------------------------------------------
 if (currentMode === 'users') {
- /*   const name = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(2)`)?.innerHTML || '';
-    const email = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(3)`)?.innerHTML || '';
-    const role = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(4)`)?.innerHTML || '';
-    const status = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(5)`)?.innerHTML || '';
-*/
      // Закачиваем разметку полей в единое окно
     contentTarget.innerHTML = `
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-            <tr><td>Имя пользователя</td><td id="modal_user_name">${dataVal.name}</td></tr>
-            <tr><td>Email пользователя</td><td id="modal_user_email">${dataVal.email}</td></tr>
+            <tr><td>Имя пользователя</td><td id="modal_user_name value=">${dataVal.name}</td></tr>
+            <tr><td>Email пользователя</td><td id="modal_user_email value=">${dataVal.email}</td></tr>
             <tr><td>Role пользователя</td><td><input id="modal_user_role" type="text" value="${dataVal.role}"></td></tr>
-            <tr><td>Статус пользователя</td><td id="modal_user_status">${dataVal.user_status}</td></tr>
+            <tr><td>Статус пользователя</td><td id="modal_user_status" value=>${dataVal.user_status}</td></tr>
         </table>
     `;
 }
@@ -710,29 +712,18 @@ else if (currentMode === 'vids') {
     `;
 }
 else if (currentMode === 'flowers') {
-  const idForm = document.getElementById('modal_flower_id') as HTMLInputElement || null;
-  const nameForm = document.getElementById('modal_flower_name') as HTMLInputElement || null;
-  const priceForm = document.getElementById('modal_flower_price') as HTMLInputElement || null;
-  const mKeyWordsFrom = document.getElementById('modal_flower_key') as HTMLInputElement || null;
-  const mDescriptFrom = document.getElementById('modal_flower_mDis') as HTMLInputElement || null;
-  const vidIdFrom = document.getElementById('modal_flower_vid_id') as HTMLInputElement || null;
-  const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null;
-  let id = idForm ? idForm.value : '';  
-  let name = nameForm ? nameForm.value : '';
-  let price = priceForm ? priceForm.value : '';
-  let mKeyWords = mKeyWordsFrom ? mKeyWordsFrom.value : '';
-  let mDescript = mDescriptFrom ? mDescriptFrom.value : '';
-  let vidId = vidIdFrom ? vidIdFrom.value : '';
 
-     // Закачиваем разметку полей в единое окно
     contentTarget.innerHTML = `
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-          <tr id="Itd2"><td>ID</td><td id="modal_flower_id">${id}</td></tr>
-          <tr><td>Вид</td><td><select id="modal_flower_vid_id">${vidId}</select></td></tr>
-          <tr><td>Название</td><td ><input id="modal_flower_name" type="text" value="${name}"></td></tr>
-          <tr><td>Цена</td><td><input id="modal_flower_price" type="text">${price}</td></tr>
-          <tr><td>mKey</td><td><input id="modal_flower_key" type="text">${mKeyWords}<span class="textMeta">Значение key для метатега </span></td></tr>   
-          <tr><td>mDescription </td><td><input id="modal_flower_mDis" type="text">${mDescript}<span class="textMeta">Значение description для метатега </span> </td></tr>   
+          <tr id="Itd2"><td>ID</td><td id="modal_flower_id">${dataVal.id}</td></tr>
+          <tr><td>Вид</td>
+              <td><input id="modal_flower_vid_input" type="text" list="vids_list" value="${dataVal.vidTitle || ''}" placeholder="Начните вводить вид...">
+                    <datalist id="vids_list"></datalist></td></tr>
+          <tr><td>Название</td><td ><input id="modal_flower_name" type="text" value="${dataVal.name}"></td></tr>
+          <tr><td>Цена</td><td><input id="modal_flower_price" type="text" value="${dataVal.price}"></td></tr>
+          <tr><td>Статус</td><td><input id="modal_flower_status" type="text" value="${dataVal.status}"></td></tr>
+          <tr><td>mKey</td><td><input id="modal_flower_key" type="text" value="${dataVal.mKeyWords}"><span class="textMeta">Значение key для метатега </span></td></tr>   
+          <tr><td>mDescription </td><td><input id="modal_flower_mDis" type="text" value="${dataVal.mDescript}"><span class="textMeta">Значение description для метатега </span> </td></tr>   
         </table>
     `;
 }
@@ -784,8 +775,9 @@ if (currentMode === 'users') {
           closeItem(modalViewItem); 
         }  
         else{
-        const mist4 = document.getElementById('modalMistake') as HTMLElement || null; // Ошибка выводится в общую область модалки
-        if (mist4) mist4.innerHTML = data.mes || data.message || '';
+        const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null; // Ошибка выводится в общую область модалки
+        mistakeForm.innerHTML = '';
+        if (mistakeForm) mistakeForm.innerHTML = data.mes || data.message || '';
         }   
     });
 }
@@ -813,8 +805,11 @@ fetch('/api/vid/change',{
             closeItem(modalViewItem);
             }   
           else{
-            const mist4 = document.getElementById('modalMistake') as HTMLElement || null; // Ошибка выводится в общую область модалки
-            if (mist4) mist4.innerHTML = data.mes || data.message || '';
+            const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null; // Ошибка выводится в общую область модалки
+            if (mistakeForm){
+                mistakeForm.innerHTML = '';
+                if (data.mes || data.message) mistakeForm.innerHTML = data.mes || data.message || '';
+            }
           }   
         });
 }
@@ -826,25 +821,23 @@ if (currentMode === 'flowers') {
   const idForm = document.getElementById('modal_flower_id') as HTMLElement || null;
   const nameForm = document.getElementById('modal_flower_name') as HTMLInputElement || null;
   const priceForm = document.getElementById('modal_flower_price') as HTMLInputElement || null;
+  const statusForm = document.getElementById('modal_flower_status') as HTMLInputElement || null;
   const mKeyWordsFrom = document.getElementById('modal_flower_key') as HTMLInputElement || null;
   const mDescriptFrom = document.getElementById('modal_flower_mDis') as HTMLInputElement || null;
-  const vidIdFrom = document.getElementById('modal_flower_vid_id') as HTMLSelectElement || null;
+  const vidNameFrom = document.getElementById('modal_flower_vid_input') as HTMLSelectElement || null;
   const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null;
-/* const selectedText : string='';
-  if (vidIdFrom && vidIdFrom.selectedIndex !== -1) {
-    const selectedOption = vidIdFrom.options[vidIdFrom.selectedIndex]; 
-    const selectedText = selectedOption.text; 
-}*/
+    if(mistakeForm) mistakeForm.innerHTML = '';
 
 fetch('/api/flower/change',{
         method: "PUT",
         //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`},
         headers: {"content-Type": "application/json"},
         body: JSON.stringify({
-          'id':idForm ? idForm.innerHTML : '', 
+          'id': idForm ? Number(idForm.innerHTML) : '', 
           'name':nameForm ? nameForm.value : '', 
-          'price':priceForm ? priceForm.value : '', 
-          'vidId':vidIdFrom ? vidIdFrom.value : '', 
+          'price':priceForm ? Number(priceForm.value) : '', 
+          'status':statusForm ? statusForm.value : '',
+          'vidName':vidNameFrom ? vidNameFrom.value : '', 
           'mKeyWords':mKeyWordsFrom ? mKeyWordsFrom.value : '', 
           'mDescript':mDescriptFrom ? mDescriptFrom.value : ''})
         })
@@ -917,6 +910,7 @@ if (currentMode === 'flowersDescription') {
     const flowerIdEl = document.getElementById('modal_flower_id_hidden');
     const flowerId = flowerIdEl ? parseInt(flowerIdEl.innerHTML) : 0;
     const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null;
+    if(mistakeForm) mistakeForm.innerHTML = '';
 
     const descrRows = document.querySelectorAll('#myModalTableFlowerDis .descr-row');
     const descriptionsData: { id?: number, title: string, description: string }[] = [];
@@ -990,12 +984,12 @@ if (currentMode === 'vids') {
 if (currentMode === 'flowers') { 
    const trId = target.id;
    let trNum0 = trId.replace('butDelete', '');
-   const trNum = Number(parseInt(trNum0) + 1);  
+   const trNum = Number(parseInt(trNum0));  
    const idForm = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)') as HTMLElement || null;
    if (!idForm) return;
    const id = idForm? idForm.innerHTML : '';
    
-   fetch(`/api/flower/delete/${id}`,{
+   fetch(`/api/flower/delete/${trNum}`,{
           method: "DELETE",
           //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}
           headers: {"content-Type": "application/json"}
@@ -1059,8 +1053,11 @@ if (currentMode === 'flowersDescription') {
             // Заставляем модалку перерисоваться актуальными данными из БД
             descItemFlower(event);  
         } else {
-            const mistake = document.getElementById('modalMistake');
-            if (mistake) mistake.innerHTML = data.mes || data.message || 'Ошибка удаления';
+            const mistakeForm = document.getElementById('modalMistake');
+            if (mistakeForm) {
+                mistakeForm.innerHTML = '';
+                if (data.mes || data.message) mistakeForm.innerHTML = data.mes || data.message || 'Ошибка удаления';
+            }   
         }
     });        
 
@@ -1112,19 +1109,16 @@ if (currentMode === 'flowers') {
 contentTarget.innerHTML = `
     <table id="myModalTable" style="margin-top: 25px; width: 100%;">
       <tr id="Itd2"><td>ID</td><td id="modal_flower_id"></td></tr>
-      
-      <!-- Изменено: текстовое поле с привязкой к datalist -->
       <tr>
         <td>Вид</td>
         <td>
             <input id="modal_flower_vid_input" type="text" list="vids_list" placeholder="Начните вводить вид...">
             <datalist id="vids_list"></datalist>
         </td>
-      </tr>
-      
+      </tr>     
       <tr><td>Название</td><td><input id="modal_flower_name" type="text"></td></tr>
-      <!-- Исправлено: значение вставляется внутрь атрибута value, чтобы инпут не был пустым -->
       <tr><td>Цена</td><td><input id="modal_flower_price" type="text"></td></tr>
+      <tr><td>Статус</td><td><input id="modal_flower_status" type="text"></td></tr>
       <tr><td>mKey</td><td><input id="modal_flower_key" type="text"><span class="textMeta">Значение key для метатега </span></td></tr>   
       <tr><td>mDescription</td><td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение description для метатега </span></td></tr>   
     </table>
@@ -1206,7 +1200,7 @@ else if (currentMode === 'flowersDescription') {
 async function addItemSaveUniversal(){
 //const localToken = localStorage.getItem('floweridaKey');
 const mistakeForm = document.getElementById('modalMistake') as HTMLElement || null;
-
+      if(mistakeForm) mistakeForm.innerHTML = '';
 if (currentMode === 'vids') {
   const nameForm = document.getElementById('modal_vid_name') as HTMLInputElement || null;
 
@@ -1236,11 +1230,13 @@ if (currentMode === 'vids') {
 else if (currentMode === 'flowers') {
   const nameForm = document.getElementById('modal_flower_name') as HTMLInputElement || null;
   const priceForm = document.getElementById('modal_flower_price') as HTMLInputElement || null;
+  const statusForm = document.getElementById('modal_flower_status') as HTMLInputElement || null;
   const mKeyWordsFrom = document.getElementById('modal_flower_key') as HTMLInputElement || null;
   const mDescriptFrom = document.getElementById('modal_flower_mDis') as HTMLInputElement || null;
   const vidIdFrom = document.getElementById('modal_flower_vid_input') as HTMLInputElement || null;
   let name = nameForm ? nameForm.value : '';
   let price = priceForm ? priceForm.value : '';
+  let status = statusForm ? statusForm.value : '';
   let mKeyWords = mKeyWordsFrom ? mKeyWordsFrom.value : '';
   let mDescript = mDescriptFrom ? mDescriptFrom.value : '';
   let vidName = vidIdFrom ? vidIdFrom.value : '';
@@ -1253,15 +1249,15 @@ else if (currentMode === 'flowers') {
             method: "POST",
             //headers: {"content-Type": "application/json", "Authorization":  `Bearer ${localToken}`},
             headers: {"content-Type": "application/json"},
-            body: JSON.stringify({'name':name, 'price':price, 'vidName':vidName, 'mKeyWords':mKeyWords, 'mDescript':mDescript})
+            body: JSON.stringify({'name':name, 'price':price, 'status':status,  'vidName':vidName, 'mKeyWords':mKeyWords, 'mDescript':mDescript})
             })
             .then((response) => response.json())
-            .then((data : ApiResponse<FlowerAttributes>) =>{
+            .then((data : FlowerAttributes & ApiResponse) =>{
               if (data.mes || data.message) {
                 if(mistakeForm) mistakeForm.innerHTML = String(data.mes || data.message);
                 return ;
               }
-              if (data.rows && data.rows.length > 0) {
+             if (data && data.id) {
                   correctFlowers(currentPage);                      
                   closeItem(modalViewItem);
                   }
@@ -1304,8 +1300,11 @@ function closeItem(idModal: string): void {
  
 //************************ */
 async function populateVidsDropdown(): Promise<void> {
-    const selectElement = document.getElementById('modal_flower_vid_id') as HTMLSelectElement | null;
-    if (!selectElement) return;
+    const vidInput = document.getElementById('modal_flower_vid_input') as HTMLInputElement | null;
+    const datalist = document.getElementById('vids_list') as HTMLDataListElement | null;
+    
+    // Если на странице нет инпута или даталиста, прерываем выполнение
+    if (!datalist || !vidInput) return;
 
     try {
         // Делаем запрос к вашему API за всеми видами цветов
@@ -1315,30 +1314,49 @@ async function populateVidsDropdown(): Promise<void> {
         });
         
         const data: ApiResponse<VidAttributes> = await response.json();
-        const datalist = document.getElementById('vids_list') as HTMLDataListElement | null;
+        
         if (data.mes || data.message) {
             console.error('Ошибка бэкенда при загрузке видов:', data.mes || data.message);
-            selectElement.innerHTML = '<option value="">Ошибка загрузки</option>';
             return;
         }
 
-        if (datalist && data.rows && data.rows.length > 0) {
-            datalist.innerHTML = '';
-            // Очищаем селект от заглушки "Загрузка..." и добавляем дефолтный пустой вариант
+        // Очищаем datalist от старых подсказок перед заполнением
+        datalist.innerHTML = '';
 
-            // Пробегаемся по видам из БД и генерируем option
+        if (data.rows && data.rows.length > 0) {
+            // Пробегаемся по видам из БД и генерируем option для datalist
             data.rows.forEach((vid) => {
-                const option = document.createElement('option');
-                option.value = String(vid.id); // В value кладем ID вида для связи foreign key
-                option.textContent = vid.name; // Пользователю показываем красивое название
-                selectElement.appendChild(option);
+                if (vid.name) {
+                    const option = document.createElement('option');
+                    // ВАЖНО: записываем именно имя (string). 
+                    // Браузер использует это значение и для фильтрации при вводе, и для отправки.
+                    option.value = vid.name; 
+                    datalist.appendChild(option);
+                }
             });
         } else {
-            selectElement.innerHTML = '<option value="">Виды цветов не найдены</option>';
+            console.log('Виды цветов в базе данных пока отсутствуют');
         }
 
     } catch (err) {
-        console.error('Критическая ошибка сети при получении видов для селекта:', err);
-        selectElement.innerHTML = '<option value="">Ошибка сети</option>';
+        console.error('Критическая ошибка сети при получении видов для datalist:', err);
+    }
+}
+function updatePaginationInterface(): void {
+    const preBtn = document.getElementById('pre') as HTMLButtonElement | null;
+    const nextBtn = document.getElementById('next') as HTMLButtonElement | null;
+
+    if (preBtn) {
+        // Если страница первая — отключаем кнопку "Назад"
+        preBtn.disabled = currentPage === 1;
+        preBtn.style.opacity = currentPage === 1 ? '0.5' : '1';
+        preBtn.style.cursor = currentPage === 1 ? 'not-allowed' : 'pointer';
+    }
+
+    if (nextBtn) {
+        // Если страница последняя — отключаем кнопку "Вперед"
+        nextBtn.disabled = currentPage >= totalPages;
+        nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+        nextBtn.style.cursor = currentPage >= totalPages ? 'not-allowed' : 'pointer';
     }
 }

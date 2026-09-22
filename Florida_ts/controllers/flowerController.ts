@@ -8,17 +8,21 @@ interface CreateFlowerRequestBody {
     name: string,
     price: number,
     vidName: string,
-    vidId?:number,
+    status: string;
     mKeyWords?: string | undefined,
     mDescript?: string | undefined
 };
-interface UpdateFlowerRequestBody extends Partial<CreateFlowerRequestBody> {
+interface UpdateFlowerRequestBody {
     id: number;
+    name?: string;
+    price?: number;
+    status?: string;
+    vidName?: string; 
     vidId: number;
-}
-
-interface DeleteFlowerRequestBody {
-    id: number;
+    vid?: string;
+    Vid?: string;
+    mKeyWords?: string;
+    mDescript?: string;
 }
 
 interface GetAllFlowersQuery {
@@ -35,7 +39,7 @@ class FlowerController{
 
     async create(request: Request<{}, {}, CreateFlowerRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
         try {       
-            const { name, price, vidName, mKeyWords, mDescript } = request.body;
+            const { name, price, status, vidName, mKeyWords, mDescript } = request.body;
 
             if (!vidName || vidName.trim() === "") {
                    return next(ApiError.badRequest('Укажите вид цветка'));
@@ -52,19 +56,26 @@ class FlowerController{
             if (created) {
                 logger.info(`Создан новый вид цветка: ${vidName}`);
             }
+
+            logger.info(`Создали новый цветок: ${name}`);
+
             const flower = await Flowers.create({            
                 name,
                 price,
+                status,
                 vidId: vidElement.id, 
                 mKeyWords,
                 mDescript
             });
+
+            // Перезагружаем объект, чтобы вернуть на фронтенд заполненное виртуальное поле vidName
             await flower.reload({
-                include: [{ model: Vid, as: 'vidInfo', attributes: ['name'] }]
+                include: [{ model: Vid, attributes: ['name'] }]
             });
             return response.status(201).json(flower);
             }
         catch(error: any){
+            console.error(error);
             return next(ApiError.internal('Ошибка сервера при выполнении запроса.'));
                 }
     }
@@ -88,8 +99,7 @@ class FlowerController{
                 // сортировку по цене или ID:
                 order: [['id', 'ASC'],['price', 'ASC'], ['name', 'ASC']],
                  include: [{
-                    model: Vid, 
-                    as: 'vidId',     
+                    model: Vid,     
                     attributes: ['name'] 
                 }],
                 // distinct: true гарантирует корректный подсчет count при JOIN-запросах с пагинацией
@@ -113,7 +123,10 @@ class FlowerController{
         if(isNaN(id))
             return next(ApiError.badRequest('Некорректный формат ID'));
         try {           
-            const flower = await Flowers.findOne({ where: { id } });
+            const flower = await Flowers.findOne({ 
+                where: { id },
+                include: [{ model: Vid, attributes: ['name'] }] // Тоже подтягиваем вид для вывода в карточке
+            });
             
             // Если база ответила успешно, но вернула null — вот теперь товара нет
             if (!flower) {
@@ -127,18 +140,32 @@ class FlowerController{
         }
     }
     async change(request: Request<{}, {}, UpdateFlowerRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
-        const {id, name, price, vidId, mKeyWords, mDescript} = request.body;
+        const { id, name, price, status, vidName, mKeyWords, mDescript } = request.body;
         try{
             if(!id)
                 return next(ApiError.badRequest('Не найден такой цветок'));
 
-            const updateData: Partial<CreateFlowerRequestBody> = {};
+            const updateData: any = {};
             if (name !== undefined) updateData.name = name;
             if (price !== undefined) updateData.price = price;
-            if (vidId !== undefined) updateData.vidId = vidId;
+            if (status !== undefined) updateData.status = status;
             if (mKeyWords !== undefined) updateData.mKeyWords = mKeyWords;
             if (mDescript !== undefined) updateData.mDescript = mDescript;
-
+                console.log('vidName ', vidName);
+            if (vidName !== undefined && vidName.trim() !== "") {
+                const [vidElement, created] = await Vid.findOrCreate({
+                    where: { name: vidName.trim() },
+                    defaults: { name: vidName.trim() }
+                });
+                
+                if (created) {
+                    logger.info(`При обновлении цветка создан новый вид: ${vidName}`);
+                }
+                
+                updateData.vidId = Number(vidElement.id); // Передаем ID найденного/созданного вида
+            }
+            console.log('updateData.vidId ', updateData.vidId, id);
+           // const idNumber = Number(id);
             const [rowsUpdated] = await Flowers.update(updateData, { where: { id } });
             
             if (rowsUpdated === 0) {
@@ -146,11 +173,14 @@ class FlowerController{
             }
             return response.json({ change: 'ok' });               
         }catch(error: any){
+            console.error("=== ОШИБКА ДЕТАЛЬНО ===");
+            console.error(error?.message || error); 
+            console.error("=======================");
                return next(ApiError.internal('Ошибка сервера при обновлении товара'));
         }
     }
 
-    async delete(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction): Promise<Response | void>{
+    async delete(request: Request<GetOneFlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
     try{
         const id = Number(request.params.id);    
         if(isNaN(id))
