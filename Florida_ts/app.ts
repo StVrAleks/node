@@ -69,8 +69,8 @@ app.use(errorHandler);
 const start = async () => {
      try {
         await sequelize.authenticate();
-      // await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
-      //  await sequelize.sync({ alter: true });
+    //   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+    //    await sequelize.sync({ alter: true });
         await sequelize.sync();
       // await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
        //await sequelize.sync({ force: true });

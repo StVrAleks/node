@@ -21,6 +21,17 @@ interface UpdateImgNumRequestBody {
     num: number;
 }
 
+interface IncomingBlock {
+    id?: number | null; // Если новая позиция — id может не быть
+    img: string;
+    num?: string;
+}
+
+interface IncomingImageBlock {
+    id?: number | null; // Для новых картинок id будет null или undefined
+    img: string;        // Имя файла (например, "file-1727000.jpg")
+    num: number;        // Порядковый номер (сортировка)
+}
 
 class ImgController {
 
@@ -42,11 +53,42 @@ class ImgController {
         }
     }
 
+   async update(request: Request<{}, {}, { flowerId: number, descriptions: IncomingBlock[] }>, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { flowerId, descriptions } = request.body;
+
+            if (!flowerId || !Array.isArray(descriptions)) {
+                return next(ApiError.badRequest('Не указан идентификатор цветка или передан неверный формат данных'));
+            }
+
+            // Цикл обработки прилетевших блоков контента
+            for (const block of descriptions) {
+                // Защита: пропускаем пустые строки, если админ случайно добавил пустую форму
+                if (!block.img) continue;
+
+                // МАГИЯ UPSERT: заменяет и UPDATE, и CREATE одновременно
+                await FlowerImgs.upsert({
+                    id: block.id ? Number(block.id) : undefined, 
+                    flowerId: Number(flowerId),
+                    img: block.img,
+                    num: Number(block.num)
+                });
+            }
+
+            logger.info(`/Flowerida_Бэк: Успешно синхронизирована (upsert) группа изображений для цветка с ИД: ${flowerId}`);
+            return response.json({ change: 'ok' });
+
+        } catch (error: any) {
+            logger.error('Ошибка в InfoController.updateBlocks:', error.message);
+            return next(ApiError.internal('Внутренняя ошибка сервера при пакетном сохранении блоков описаний'));
+        }
+    }       
+
     // 2. Получение всех картинок цветка (ИСПРАВЛЕНО под путь /api/imgs/getAll/:flowerId)
     async getAll(request: Request<FlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
-        try {
+      try {
             // ИСПРАВЛЕНО: Читаем flowerId из params, как у вас написано в fetch(`/api/imgs/getAll/\${flowerId}`)
-            const { flowerId } = request.params;
+           const flowerId = Number(request.params.id);
             
             if (!flowerId) {
                 return next(ApiError.badRequest('Параметр flowerId в пути обязателен'));
@@ -73,7 +115,7 @@ class ImgController {
     // 3. Получение одной картинки
     async getOne(request: Request<FlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const id = Number(request.params.id);
+            const id = Number(request.params.flowerId);
 
             if (isNaN(id)) {
                 return next(ApiError.badRequest('Некорректный формат ID изображения')); 
@@ -116,11 +158,25 @@ async saveGalleryGroup(request: Request, response: Response, next: NextFunction)
         const { flowerId, existingImages, newImagesNum } = request.body;
         const files = request.files as Express.Multer.File[] || [];
 
+        console.log("=== ДАННЫЕ В saveGalleryGroup ===");
+        console.log("flowerId:", flowerId);
+        console.log("existingImages (строка):", existingImages);
+
+        if (!flowerId) {
+            return next(ApiError.badRequest('Не передан flowerId'));
+        }
+
         // 1. Обновляем порядок существующих картинок
         if (existingImages) {
-            const oldImgs = JSON.parse(existingImages);
+            // МУЛЬТЕР ПРИСЫЛАЕТ СТРОКУ! Обязательно делаем JSON.parse
+            const oldImgs = JSON.parse(existingImages); 
+            
             for (const img of oldImgs) {
-                await FlowerImgs.update({ num: Number(img.num) }, { where: { id: Number(img.id) } });
+                if (!img.id) continue;
+                await FlowerImgs.update(
+                    { num: Number(img.num) }, 
+                    { where: { id: Number(img.id), flowerId: Number(flowerId) } }
+                );
             }
         }
 
@@ -128,8 +184,6 @@ async saveGalleryGroup(request: Request, response: Response, next: NextFunction)
         if (newImagesNum && files.length > 0) {
             const nums = JSON.parse(newImagesNum);
             for (let i = 0; i < files.length; i++) {
-                // Здесь вызывается ваша утилита нарезки через GraphicsMagick (если есть), 
-                // сохраняющая файл в финальное имя (например, files[i].filename)
                 const finalImgName = files[i].filename; 
 
                 await FlowerImgs.create({
@@ -144,7 +198,39 @@ async saveGalleryGroup(request: Request, response: Response, next: NextFunction)
         return response.json({ change: 'ok' });
     } catch (error: any) {
         logger.error('Ошибка в ImgController.saveGalleryGroup:', error.message);
-        return next(ApiError.internal('Ошибка сервера при групповом сохранении галереи'));
+        // ВАЖНО: если упало, возвращаем 500 ошибку, а не пустой статус 200!
+        return next(ApiError.internal('Внутренняя ошибка сервера при пакетном сохранении галереи'));
+    }
+}
+
+async updateGalleryGroup(request: Request<{}, {}, { flowerId: number, images: IncomingImageBlock[] }>, response: Response, next: NextFunction): Promise<Response | void> {
+    try {
+        const { flowerId, images } = request.body;
+
+        if (!flowerId || !Array.isArray(images)) {
+            return next(ApiError.badRequest('Не указан цветок или передан неверный формат галереи'));
+        }
+
+        // Цикл обработки пачки изображений
+        for (const block of images) {
+            // Защита: если вдруг прилетело пустое имя файла, пропускаем
+            if (!block.img || block.img.trim() === "") continue;
+
+            // Наш любимый UPSERT: если id передан, обновит num. Если id нет — создаст запись.
+            await FlowerImgs.upsert({
+                id: block.id ? Number(block.id) : undefined,
+                flowerId: Number(flowerId),
+                img: block.img.trim(),
+                num: Number(block.num) || 0
+            });
+        }
+
+        logger.info(`/Flowerida_Бэк: Успешно синхронизирована (upsert) галерея из ${images.length} фото для цветка: ${flowerId}`);
+        return response.json({ change: 'ok' });
+
+    } catch (error: any) {
+        logger.error('Ошибка в ImgController.updateGalleryGroup:', error.message);
+        return next(ApiError.internal('Ошибка сервера при пакетном сохранении галереи'));
     }
 }
 

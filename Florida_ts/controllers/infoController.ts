@@ -12,10 +12,8 @@ interface CreateInfoRequestBody {
 interface UpdateInfoRequestBody extends Partial<CreateInfoRequestBody> {
     id: number;
 }
-interface GetAllInfoQuery {
-    flowerId: number,
-    limit?: string,
-    page?: string
+interface GetAllInfoInFlowerParams{
+    id: number
 }
 
 interface ChangeInfoRequestBody {
@@ -29,47 +27,38 @@ type GetOneCategoryParams = ParamsDictionary & {
     id?: string;
 };
 
-
-class InfoController{
-    async create(request: Request<{}, {}, CreateInfoRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
-    try {       
-        const {flowerId, title, description} =  request.body;
-        if(!flowerId || !title)
-            return next(ApiError.badRequest('Не указан цветок или название блока с описанием'));
-
-
-        const inforow = await FlowerInfo.create({flowerId, title, description});
-        logger.info(`/добавили новый блок описания для цветка ${flowerId} с загаловком: ${title}`);
-        return response.status(201).json(inforow);
-        }
-    catch(error: any){
-        logger.error('Ошибка в InfoController.create:', error.message);
-        return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
-        }
-    }
-
-async getAll(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
-    try {
-        // Получаем flowerId напрямую из параметров запроса
-        const { flowerId } = request.query;
-        
-        if (!flowerId) {
-            return next(ApiError.badRequest('Параметр flowerId обязателен'));
-        }
-
-        // Находим абсолютно все описания для конкретного цветка без лимитов и смещений
-        const rows = await FlowerInfo.findAll({
-            where: { flowerId: Number(flowerId) }
-        });
-
-        // Возвращаем клиенту чистый массив строк (как у картинок)
-        return response.json({ rows: rows });
-    } catch (error: any) {
-        logger.error('Ошибка в InfoController.getAll:', error.message);
-        return next(ApiError.internal('Внутренняя ошибка сервера при получении описаний'));
-    }
+interface IncomingBlock {
+    id?: number | null; // Если новая позиция — id может не быть
+    title: string;
+    description?: string;
 }
 
+class InfoController{
+    async getAll(request: Request<GetAllInfoInFlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            // Получаем flowerId напрямую из параметров запроса
+            const flowerId = Number(request.params.id);
+            
+            if (!flowerId) {
+                return next(ApiError.badRequest('Параметр flowerId обязателен'));
+            }
+
+            // Находим абсолютно все описания для конкретного цветка без лимитов и смещений
+            const rows = await FlowerInfo.findAll({
+                where: { flowerId: Number(flowerId) }
+            });
+
+            if(rows.length === 0){        
+                    return response.json({ mes: 'В базе отсутствует описание для этого цветка' });
+                }
+
+            // Возвращаем клиенту чистый массив строк (как у картинок)
+            return response.json({ rows: rows });
+        } catch (error: any) {
+            logger.error('Ошибка в InfoController.getAll:', error.message);
+            return next(ApiError.internal('Внутренняя ошибка сервера при получении описаний'));
+        }
+    }
 
     async getOne(request: Request<GetOneCategoryParams>, response: Response, next: NextFunction): Promise<Response | void>{
         try{
@@ -89,46 +78,27 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
         }
     }
 
-
     async delete(request:  Request<GetOneCategoryParams>, response: Response, next: NextFunction): Promise<Response | void>{
         try{
             const id = Number(request.params.id);    
             if(isNaN(id))
                 return next(ApiError.badRequest('Некорректный формат ID'));
 
+            const infoRow = await FlowerInfo.findOne({ where: { id } });
+            if (!infoRow) {
+                 return next(ApiError.notFound('Описание с таким ID не найдено'));
+            }
+            const flowerId = infoRow.flowerId;
 
-            const deletedRows = await FlowerInfo.destroy({where: {id: id}});
-            if (deletedRows === 0) 
-                return next(ApiError.notFound('Описание с таким ID не найдено'));
-           return response.json({change: 'ok'});           
-        }catch(error:any){
+           const deletedRows = await FlowerInfo.destroy({where: {id: id}});
+           return response.json({change: 'ok', flowerId: flowerId });           
+        } catch(error:any){
             logger.error('Ошибка в InfoController.delete:', error.message);
             return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
         }
         }
 
-    async update(request: Request<{}, {}, ChangeInfoRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
-            try{
-                const {id, flowerId, title, description} = request.body;
-                if(!id || !flowerId)
-                return next(ApiError.badRequest('Не корректно указан идентификатор'));
-
-                const updateData: Partial<CreateInfoRequestBody> = {};
-                if (title !== undefined) updateData.title = title;
-                if (description !== undefined) updateData.description = description;
-
-                const [rowsUpdated] = await FlowerInfo.update(updateData,{where: {id: id}});
-
-                if (rowsUpdated === 0) 
-                    return next(ApiError.notFound('Описание с таким ID не найдено или данные идентичны'));
-
-                    return response.json({change: 'ok'});           
-            }catch(error:any){
-                logger.error('Ошибка в InfoController.update:', error.message);
-                return next(ApiError.internal('Внутренняя ошибка сервера при создании описания'));
-            }
-        }    
-    async updateBlocks(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+    async update(request: Request<{}, {}, { flowerId: number, descriptions: IncomingBlock[] }>, response: Response, next: NextFunction): Promise<Response | void> {
         try {
             const { flowerId, descriptions } = request.body;
 
@@ -138,33 +108,28 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
 
             // Цикл обработки прилетевших блоков контента
             for (const block of descriptions) {
-                if (block.id) {
-                    // Сценарий 1: Запись существует — обновляем только текстовые поля
-                    await FlowerInfo.update(
-                        { 
-                            title: block.title, 
-                            description: block.description
-                        },
-                        { where: { id: Number(block.id), flowerId: Number(flowerId) } }
-                    );
-                } else {
-                    // Сценарий 2: Это новый блок — создаем чистую запись в MySQL
-                    await FlowerInfo.create({
-                        flowerId: Number(flowerId),
-                        title: block.title,
-                        description: block.description
-                    });
-                }
+                // Защита: пропускаем пустые строки, если админ случайно добавил пустую форму
+                if (!block.title || block.title.trim() === "") continue;
+
+                // МАГИЯ UPSERT: заменяет и UPDATE, и CREATE одновременно
+                await FlowerInfo.upsert({
+                    // Если block.id равен null, undefined или 0, Sequelize выполнит INSERT
+                    id: block.id ? Number(block.id) : undefined, 
+                    flowerId: Number(flowerId),
+                    title: block.title.trim(),
+                    description: block.description?.trim() || ''
+                });
             }
 
-            logger.info(`/Flowerida_Бэк: Успешно сохранена группа описаний для цветка с ИД: ${flowerId}`);
+            logger.info(`/Flowerida_Бэк: Успешно синхронизирована (upsert) группа описаний для цветка с ИД: ${flowerId}`);
             return response.json({ change: 'ok' });
 
         } catch (error: any) {
             logger.error('Ошибка в InfoController.updateBlocks:', error.message);
             return next(ApiError.internal('Внутренняя ошибка сервера при пакетном сохранении блоков описаний'));
         }
-    }      
+    }   
+     
 }
 
     export default new InfoController();
