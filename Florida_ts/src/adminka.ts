@@ -1,10 +1,12 @@
 import { ApiResponse, UserAttributes, VidAttributes, FlowerAttributes, FlowerImgsAttributes, FlowerInfoAttributes } from './types.js';
+import { moduleWebPartUser } from '../src/partishional.js';
 // Глобальные переменные для пагинации и режимов админки
 let currentMode: 'flowers' | 'vids' | 'flowersPhoto' | 'flowersDescription' | 'users' = 'users';
 let currentPage: number = 1;
 let totalPages: number = 1;
 const itemsPerPage: number = 9;
 const modalViewItem = 'adminUniversalModal';
+const moduleWebPart  = new  moduleWebPartUser();
 
 document.addEventListener('DOMContentLoaded', () => {
   const cancelBut = document.getElementById('control_modal_cancel');
@@ -451,7 +453,7 @@ function imgItemFlower(event: Event): void {
                 <td>Фото</td>
                 <td class="file-upload-zone">
                     <input type="file" class="new-file-input" id="fileInput_${curLength}"/><br><br>
-                    <input type="button" class="class_control_button action-upload" value="⚙️ Загрузить на сервер" id="uploadBut_${curLength}">
+                    <input type="submit" class="class_control_button action-upload" value="⚙️ Загрузить изображение" id="uploadBut_${curLength}">
                 </td>
             </tr>
             <tr><td>Порядок</td><td><input class="spanFlowerNum" type="text" value="${curLength + 1}"></td></tr>
@@ -521,7 +523,7 @@ if (mainSaveBut) {
 async function uploadSingleFileToServer(e: Event, index: number): Promise<void> {
     const button = e.target as HTMLButtonElement | null;
     if (!button) return;
-
+ console.log('in uploadSingleFileToServer')
     const rowGroup = button.closest('.img-row-block') as HTMLElement | null;
     const fileInput = rowGroup?.querySelector('.new-file-input') as HTMLInputElement | null;
     const uploadZone = rowGroup?.querySelector('.file-upload-zone') as HTMLElement | null;
@@ -535,19 +537,16 @@ async function uploadSingleFileToServer(e: Event, index: number): Promise<void> 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]); // ИСПРАВЛЕНО: передаем конкретный файл!
 
+    console.log(formData);
     uploadZone.innerHTML = '<span style="color: #666; font-size: 13px;">⚙️ Нарезка GM...</span>';
 
-    // Достаем ваш админский токен, так как uploadRouter требует authMiddleware('ADMIN')
-    const localToken = localStorage.getItem('floweridaKey');
-
+   // const localToken = localStorage.getItem('floweridaKey');
     try {
         // Шлем строго на глобальный эндпоинт /uploads согласно вашему uploadRouter
-        const response = await fetch('/uploads', {
+        console.log('api/uploads');
+        const response = await fetch('api/uploads', {
             method: "POST",
-            headers: { 
-                // Передаем токен авторизации Bearer
-                "Authorization": `Bearer ${localToken || ''}` 
-            },
+            /*headers: {  "Authorization": `Bearer ${localToken || ''}` },*/
             body: formData // Браузер сам выставит multipart/form-data
         });
 
@@ -592,7 +591,7 @@ async function addFileUniversal(e: Event, flowerId: number, originalEvent: Event
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]); // Передаем выбранный файл
-
+console.log('formData ', formData);
     // Считаем текущее количество картинок в таблице для инкремента num
     const num: number = document.querySelectorAll('#myModalTableFlowerImg > tr')?.length + 1;
 
@@ -600,19 +599,20 @@ async function addFileUniversal(e: Event, flowerId: number, originalEvent: Event
         status.style.color = '#666';
         status.innerHTML = 'Загрузка...';
     }
-
+ console.log('status');
  //   const localToken = localStorage.getItem('floweridaKey');
 
     try {
         // Шаг 1: Загружаем картинку на бэкенд для нарезки через GraphicsMagick
-        const uploadResponse = await fetch('/uploads', {
+        console.log('/uploads');
+        const uploadResponse = await fetch('api/uploads', {
             method: "POST",
           //  headers: { "Authorization": `Bearer ${localToken}` },
             body: formData
         });
 
         const imageName = await uploadResponse.text();
-
+ console.log('imageName ',imageName);
         // Шаг 2: Создаем запись связи картинки и цветка в базе данных
         const dbResponse = await fetch('/api/imgs/saveGalleryGroup', {
             method: "PUT",
@@ -703,6 +703,12 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
     //const flowerIdSelector = document.querySelector(`#control_table > tr:nth-child(${rowIndex}) > td:nth-child(3)`) as HTMLElement | null;
     //const flowerId = flowerIdSelector ? parseInt(flowerIdSelector.innerHTML) : 0;
   console.log('flowerId ', flowerId, idEl);
+    let editInfo ={
+        title: "",
+        description: "",
+        flowerId: flowerId,
+        id: 0
+    };
     // Прячем ID цветка в шапку модалки для последующего группового сохранения
     const container = document.getElementById('uploadDescrContainer');
     if (container) {
@@ -716,23 +722,25 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
     document.getElementById('modalAddDescriptionBtn')?.addEventListener('click', () => {
         const table = document.getElementById('myModalTableFlowerDis') as HTMLTableElement | null;
         if (!table) return;
-        const curLength = table.querySelectorAll('.descr-row').length;
+        editInfo.id = table.querySelectorAll('.descr-row').length;
 
         const rowGroup = document.createElement("tbody");
         rowGroup.className = 'descr-row'; // Класс-маркер для сбора данных, БЕЗ data-id
-        rowGroup.id = `descrRowLocal_${curLength}`;
-
-        rowGroup.innerHTML = `
+        rowGroup.id = `descrRowLocal_${editInfo.id}`;
+        const webPartForm :  string = moduleWebPart.desription(editInfo);
+      /*  rowGroup.innerHTML = `
             <tr><td>Название блока</td><td><input type="text" class="inputInfoTitle"></td></tr>
             <tr><td>Описание блока</td><td><textarea class="inputInfoText"></textarea></td></tr>
             <tr style="border-bottom: 2px solid grey;">
                 <td><span class="infoIdDiscr" style='opacity:0'></span></td>
                 <td><input type="button" class="class_control_button" id="linkLocal_${curLength}" value='Удалить описание' style="margin-bottom:15px"></td>
             </tr>
-        `;
+        `;*/
+        
+        rowGroup.innerHTML = webPartForm;
         table.appendChild(rowGroup);
         // Локальное удаление формы (так как в БД записи еще нет)
-        document.getElementById(`linkLocal_${curLength}`)?.addEventListener('click', () => rowGroup.remove());
+        document.getElementById(`linkLocal_${editInfo.id}`)?.addEventListener('click', () => rowGroup.remove());
     });
 
     const table = document.getElementById('myModalTableFlowerDis') as HTMLTableElement | null;
@@ -759,8 +767,12 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
                 const rowGroup = document.createElement("tbody");
                 rowGroup.className = 'descr-row';
                 rowGroup.setAttribute('data-id', String(info.id)); // Маркер существующей записи
-
-                rowGroup.innerHTML = `
+                editInfo.title = String(info.title);                
+                editInfo.description = String(info.description) || '';
+                editInfo.id = Number(info.id) || 0;
+                const webPartForm :  string = moduleWebPart.desription(editInfo);
+                rowGroup.innerHTML = webPartForm;
+               /* rowGroup.innerHTML = `
                     <tr>
                         <td>Название блока</td>
                         <td><input type="text" class="inputInfoTitle" value="${info.title}"></td>
@@ -773,7 +785,7 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
                         <td><span class="flowerIdDiscr" style='opacity:0'>${flowerId}</span></td>
                         <td><input type="button" class="class_control_button" id="linkServer_${info.id}" value='Удалить блок' style="margin-bottom:15px"></td>
                     </tr>
-                `;
+                `;*/
                 table.appendChild(rowGroup);
                 
                 // Мгновенное удаление старой записи из БД
@@ -811,10 +823,10 @@ if (currentMode === 'users') {
      // Закачиваем разметку полей в единое окно
     contentTarget.innerHTML = `
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-            <tr><td>Имя пользователя</td><td id="modal_user_name value=">${dataVal.name}</td></tr>
-            <tr><td>Email пользователя</td><td id="modal_user_email value=">${dataVal.email}</td></tr>
+            <tr><td>Имя пользователя</td><td id="modal_user_name">${dataVal.name}</td></tr>
+            <tr><td>Email пользователя</td><td id="modal_user_email">${dataVal.email}</td></tr>
             <tr><td>Role пользователя</td><td><input id="modal_user_role" type="text" value="${dataVal.role}"></td></tr>
-            <tr><td>Статус пользователя</td><td id="modal_user_status" value=>${dataVal.user_status}</td></tr>
+            <tr><td>Статус пользователя</td><td id="modal_user_status">${dataVal.user_status}</td></tr>
         </table>
     `;
 }
@@ -908,7 +920,7 @@ if (currentMode === 'vids') {
   const idForm = document.getElementById('modal_vid_id') as HTMLElement || null;
   const nameForm =  document.getElementById('modal_vid_name') as HTMLInputElement || null;
 
-  if (!idForm || !nameForm) return;
+  if (!nameForm) return;
 
 fetch('/api/vid/change',{
         method: "PUT",
@@ -1248,7 +1260,7 @@ const htmlBlock = `
        <tr>
         <td>Выберите файл</td>
         <td>
-          <input class="newImgInput" type="file" accept="image/*">
+          <input class="newImgInput" id="addImgToForm${curTableLength + 1}" type="file" accept="image/*">
         </td>
        </tr>
        <tr><td>Порядок</td><td><input type="text" class="spanFlowerNum" value="${curTableLength + 1}"></td></tr>
@@ -1257,6 +1269,9 @@ const htmlBlock = `
 `;
 contentTargetPh.insertAdjacentHTML('beforeend', htmlBlock);
 
+document.getElementById('addImgToForm${curTableLength + 1}')?.addEventListener('change', (e: Event) => { 
+    handleFileSelect(event);
+});
     document.getElementById(`modalDelImg${curTableLength + 1}`)?.addEventListener('click', (e: Event) => { 
          deleteItemUniversal(e);
          const tableDel = document.getElementById(`modalTable${curTableLength}`) as HTMLTableElement || null;
@@ -1267,12 +1282,12 @@ contentTargetPh.insertAdjacentHTML('beforeend', htmlBlock);
     const btnAdd = document.getElementById(`modalAddPhotoBtn${curTableLength}`) as HTMLInputElement | null;
     const fileInput = document.getElementById(`modalAddPhotoInput${curTableLength}`) as HTMLInputElement | null;
 
-    if (btnAdd) btnAdd.onclick = () => fileInput?.click();
+    /*if (btnAdd) btnAdd.onclick = () => fileInput?.click();
     if (fileInput) {
         fileInput.onchange = (changeEvent: Event) => {
             addFileUniversal(changeEvent, Number(flowerIDItem || 0), event);
         };
-    }
+    }*/
 }
 //----------Добавление нового описания
 else if (currentMode === 'flowersDescription') {
@@ -1448,52 +1463,95 @@ async function populateVidsDropdown(): Promise<void> {
         console.error('Критическая ошибка сети при получении видов для datalist:', err);
     }
 }
+function handleFileSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('file', file); // 'file' должно совпадать с multer fields
+
+    const localToken = localStorage.getItem('floweridaKey');
+
+    // Направляем строго на загрузчик файлов
+    fetch('/api/uploads', { 
+        method: "POST",
+        headers: { "Authorization": `Bearer ${localToken}` }, // если защищено
+        body: formData
+    })
+    .then(res => res.text()) // Ждем имя файла в виде строки
+    .then(generatedImgName => {
+        if (!generatedImgName) return;
+
+        // Находим контейнер в модалке, куда складываем строки картинок
+        const galleryContainer = document.getElementById('modalDynamicContent'); 
+        const currentRowsCount = document.querySelectorAll('.img-row-block').length;
+
+        // Создаем блок для новой картинки на экране (БЕЗ id, так как в БД её еще нет!)
+        const newBlock = document.createElement('div');
+        newBlock.className = 'img-row-block';
+        newBlock.setAttribute('data-id', ''); // Новая, ID пустой
+        newBlock.setAttribute('data-imgname', generatedImgName); // Запоминаем имя файла!
+
+        newBlock.innerHTML = `
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <img src="/imgStoreMINI/${generatedImgName}" alt="preview" style="width: 50px; height: 50px; margin-right: 10px;">
+                <span>Порядок: </span>
+                <input type="button" value="Удалить" class="class_control_button" id="deleteImg${currentRowsCount + 1}" onclick="this.closest('.img-row-block').remove()">
+            </div>
+        `;
+        galleryContainer?.appendChild(newBlock);
+    })
+    .catch(err => console.error('Ошибка предзагрузки файла:', err));
+    // <input type="text" class="spanFlowerNum" value="${currentRowsCount + 1}" style="width: 40px; margin-left: 5px;">
+}
 function saveWholeGallery(e?: Event) {
-    // Если событие передано, отменяем перезагрузку страницы браузером!
     if (e) e.preventDefault();
 
-    const flowerIdEl = document.getElementById('modal_flower_id_hidden');
-    const flowerId : number = flowerIdEl ? Number(flowerIdEl.innerHTML) : 0;
-    const imagesData: any[] = [];
+    // Предположим, у вас скрытый спан или инпут с ID цветка в модалке
+    const flowerIdEl = document.getElementById('modal_flower_id_hidden') || document.getElementById('modal_flower_id');
+    const flowerId : number = flowerIdEl ? Number(flowerIdEl.innerHTML || (flowerIdEl as HTMLInputElement).value) : 0;
     
-    // Перебираем блоки строк (tbody.img-row-block)
+    const imagesData: any[] = [];
     const blocks = document.querySelectorAll('.img-row-block');
-    console.log(`[Фронтенд] Клик "Сохранить". Найдено элементов на экране: ${blocks.length}`);
     
     blocks.forEach((block, index) => {
         const id = block.getAttribute('data-id'); 
         const imgName = block.getAttribute('data-imgname'); 
+        // Строго приводим к HTMLInputElement, чтобы забрать .value
         const numInput = block.querySelector('.spanFlowerNum') as HTMLInputElement | null;
 
-        if (!imgName) return; 
+        if (!imgName || imgName.trim() === "") return; 
 
         imagesData.push({
-            id: id ? Number(id) : null,
+            // Если ID пустой или отсутствует (новая картинка) — передаем null
+            id: (id && id.trim() !== "") ? Number(id) : null,
             img: imgName.trim(),
             num: numInput ? Number(numInput.value) : (index + 1)
         });
     });
 
     if (imagesData.length === 0) {
-        alert('Нет загруженных картинок для сохранения!');
+        alert('Нет картинок для сохранения!');
         return;
     }
 
-    // Отправляем пакетный JSON
     fetch('/api/imgs/updateGalleryGroup', {
         method: "PUT",
-        headers: { "content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ flowerId: flowerId, images: imagesData })
     })
     .then(res => res.json())
     .then(data => {
         if (data.change === 'ok') {
-            alert('Вся галерея успешно сохранена!');
-            closeItem(modalViewItem); // Закрываем модалку
-            correctFlowers(currentPage); // Обновляем основную таблицу админки
+            alert('Вся галерея успешно синхронизирована в БД!');
+            closeItem('adminUniversalModal'); 
+            correctFlowers(currentPage); 
+        } else {
+            alert('Ошибка сохранения: ' + (data.mes || 'Неизвестная ошибка'));
         }
     })
-    .catch(err => console.error('Ошибка fetch:', err));
+    .catch(err => console.error('Ошибка пакетного fetch:', err));
 }
 
 function sendWholeGalleryToServer(flowerId: number): void {

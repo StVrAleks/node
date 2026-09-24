@@ -211,21 +211,27 @@ async updateGalleryGroup(request: Request<{}, {}, { flowerId: number, images: In
             return next(ApiError.badRequest('Не указан цветок или передан неверный формат галереи'));
         }
 
-        // Цикл обработки пачки изображений
         for (const block of images) {
-            // Защита: если вдруг прилетело пустое имя файла, пропускаем
             if (!block.img || block.img.trim() === "") continue;
 
-            // Наш любимый UPSERT: если id передан, обновит num. Если id нет — создаст запись.
-            await FlowerImgs.upsert({
-                id: block.id ? Number(block.id) : undefined,
+            // Строим чистый объект для базы данных
+            const upsertData: any = {
                 flowerId: Number(flowerId),
                 img: block.img.trim(),
                 num: Number(block.num) || 0
-            });
+            };
+
+            // Если id прилетел с фронта и он валидный — добавляем его. 
+            // Если его нет (null) — Sequelize сам сгенерирует новый автоинкрементный ID.
+            if (block.id !== null && block.id !== undefined && !isNaN(Number(block.id))) {
+                upsertData.id = Number(block.id);
+            }
+
+            // Выполняем UPSERT
+            await FlowerImgs.upsert(upsertData);
         }
 
-        logger.info(`/Flowerida_Бэк: Успешно синхронизирована (upsert) галерея из ${images.length} фото для цветка: ${flowerId}`);
+        logger.info(`/Flowerida_Бэк: Успешно выполнена пакетная синхронизация для цветка ID ${flowerId}`);
         return response.json({ change: 'ok' });
 
     } catch (error: any) {

@@ -5,6 +5,7 @@ import fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import multer from 'multer';
 import gm from 'gm';
+import sharp from 'sharp';
 import authMiddleware from '../middleware/authMiddleware.js';
 import ApiError from '../error/ApiError.js';
 import logger from '../middleware/winston.js';
@@ -15,7 +16,9 @@ const router = Router();
 // Папка во внешнем корне проекта для временных оригиналов
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const publicPathM: string = path.join(__dirname, '..', 'pictures');
+//const publicPathM: string = path.join(__dirname, '..', 'pictures');
+const ROOT_DIR = process.cwd();
+const publicPathM: string = path.join(ROOT_DIR, 'pictures');
 
 // Убедимся, что временная папка существует, чтобы multer не падал
 if (!fs.existsSync(publicPathM)) {
@@ -67,44 +70,30 @@ router.post("/uploads", authMiddleware('ADMIN'), serviceDownFiles, async functio
         const image: string = fileData.filename;
 
         console.log("Processing image via GM...");
-        
-        let oldPath = path.join(__dirname, '..', 'pictures', image);
-        let newPath = path.join(__dirname, '..', 'public', 'imgStoreMINI', image);
-        let newPathBig = path.join(__dirname, '..', 'public', 'imgStore', image);
+
+
+        let oldPath = path.join(ROOT_DIR, 'pictures', image);
+        let newPath = path.join(ROOT_DIR, 'public', 'imgStoreMINI', image);
+        let newPathBig = path.join(ROOT_DIR, 'public', 'imgStore', image);
 
         // Нарезка MINI
-        await new Promise<void>((resolve, reject) => {  
-            gm(oldPath)
-                .resize(200, 200, '!') 
-                .background('#FFF')
-                .write(newPath, function (error: Error | null) {
-                    if (error) {
-                        logger.error('/gm MINI error: ', error.message);
-                        return reject(error);
-                    }
-                    console.log('MINI image ok');
-                    resolve();
-                });
-        });
+        
+        await sharp(oldPath)
+            .resize(200, 200, { fit: 'fill' })
+            .flatten({ background: '#FFFFFF' }) // белый фон вместо .background()
+            .toFile(newPath);
+        console.log('MINI image ok');
 
-        // Нарезка BIG + удаление временного оригинала
-        await new Promise<void>((resolve, reject) => {  
-            gm(oldPath)
-                .resize(400, 600, '!') 
-                .background('#FFF')
-                .write(newPathBig, function (error: Error | null) {
-                    if (error) {
-                        logger.error('/gm BIG error: ', error.message);
-                        return reject(error);
-                    }
-                    console.log('BIG image ok');
-                    fs.unlink(oldPath, (error) => {
-                        if (error) logger.error('/unlink ', error.message);
-                        else console.log('Original temp file deleted');
-                    });
-                    resolve();  
-                });    
-        });
+        // Нарезка BIG
+        await sharp(oldPath)
+            .resize(400, 600, { fit: 'fill' })
+            .flatten({ background: '#FFFFFF' })
+            .toFile(newPathBig);
+        console.log('BIG image ok');
+
+        // Удаление временного оригинала
+        await fsPromises.unlink(oldPath);
+        console.log('Original temp file deleted');
 
         return res.send(image);  
     } catch (error: any) {
@@ -118,8 +107,8 @@ router.post("/deleteImg", authMiddleware('ADMIN'), async function (request: Requ
         const { name } = request.body;
         if (!name) return next(ApiError.internal('Картинка не была удалена: не указано имя файла'));
 
-        let newPath: string = path.join(__dirname, '..', 'public', 'imgStoreMINI', name);
-        let newPathBig: string = path.join(__dirname, '..', 'public', 'imgStore', name);
+        let newPath: string = path.join(ROOT_DIR, 'public', 'imgStoreMINI', name);
+        let newPathBig: string = path.join(ROOT_DIR, 'public', 'imgStore', name);
 
         try {
             await fsPromises.unlink(newPath);
