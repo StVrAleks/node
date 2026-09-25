@@ -209,7 +209,7 @@ const limit = rawLimit > 50 ? 9 : rawLimit; // Защита от выкачив�
 const offset = (page - 1) * limit;
 
 const { rows, count } =  await User.findAndCountAll({
-    attributes: ['name', 'email', 'role', 'user_status'], 
+    attributes: ['id', 'name', 'email', 'role', 'user_status'], 
     limit, offset});
     if(rows.length === 0)
         return next(ApiError.badRequest('Ничего не найдено'));

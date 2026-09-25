@@ -1,5 +1,5 @@
 import { ApiResponse, UserAttributes, VidAttributes, FlowerAttributes, FlowerImgsAttributes, FlowerInfoAttributes } from './types.js';
-import { moduleWebPartUser } from '../src/partishional.js';
+import { moduleWebPartUser } from './components/partishional.js';
 // Глобальные переменные для пагинации и режимов админки
 let currentMode: 'flowers' | 'vids' | 'flowersPhoto' | 'flowersDescription' | 'users' = 'users';
 let currentPage: number = 1;
@@ -29,21 +29,22 @@ if (saveBut) {
         const isEditFlower = flowerIdEl && flowerIdEl.innerHTML !== 'Автоинкремент' && flowerIdEl.innerHTML !== '';
         const isEditVid = vidIdEl && vidIdEl.innerHTML !== '';
         const isEditUser = (currentMode === 'users');
-
+        console.log(isEditFlower, isEditVid, isEditUser);
         if (isEditFlower || isEditVid || isEditUser) {
             console.log('save');
             correctItem(); // Вызываем сохранение изменений
         } 
-        else if(discIdEl){
+        else {
+            console.log('create');
+            addItemSaveUniversal(); // Вызываем создание новой записи
+        }        
+        if(discIdEl){
             correctItem();
         }
         else if(imgsEl){
             saveWholeGallery();
         }        
-        else {
-            console.log('create');
-            addItemSaveUniversal(); // Вызываем создание новой записи
-        }
+
     }, false);
   }
 
@@ -379,6 +380,7 @@ if (table) {
                     });
             table.appendChild(trHead);  
             interface typeData {
+                'id': number;
                 'name': string;
                 'email': string;
                 'role': string;
@@ -399,6 +401,7 @@ if (table) {
                 `;
                 table.appendChild(tr);    
                 const data : typeData={
+                    'id': user.id,
                     'name': user.name,
                     'email': user.email,
                     'role': user.role,
@@ -443,22 +446,15 @@ function imgItemFlower(event: Event): void {
         if (!tableEl) return;
         
         const curLength = tableEl.querySelectorAll('.img-row-block').length;
-        const rowGroup = document.createElement("tbody");
+        let infoImg = {
+            'num': Number(curLength),
+            'flowerId': flowerId
+        };       
+        const rowGroup = document.createElement("tbody");     
         rowGroup.className = 'img-row-block new-image-row'; // Родительский блок строки
         rowGroup.id = `imgRowLocal_${curLength}`;
 
-        rowGroup.innerHTML = `
-            <tr><td>ID цветка</td><td class="spanFlowerId">${flowerId}</td></tr>
-            <tr>
-                <td>Фото</td>
-                <td class="file-upload-zone">
-                    <input type="file" class="new-file-input" id="fileInput_${curLength}"/><br><br>
-                    <input type="submit" class="class_control_button action-upload" value="⚙️ Загрузить изображение" id="uploadBut_${curLength}">
-                </td>
-            </tr>
-            <tr><td>Порядок</td><td><input class="spanFlowerNum" type="text" value="${curLength + 1}"></td></tr>
-            <tr><td></td><td><input type="button" class="class_control_button call-delete" value="Удалить поле" id="delImg_${curLength}"></td></tr>
-        `;
+        rowGroup.innerHTML = moduleWebPart.imgs(infoImg,'New');
         tableEl.appendChild(rowGroup);
 
         document.getElementById(`uploadBut_${curLength}`)?.addEventListener('click', (e) => {
@@ -490,18 +486,7 @@ function imgItemFlower(event: Event): void {
                 rowGroup.setAttribute('data-id', String(imageObj.id));   // Сюда пишется ID
                 rowGroup.setAttribute('data-imgname', imageObj.img);     // Сюда пишется имя файла
 
-                rowGroup.innerHTML = `
-                    <tr><td>ID цветка</td><td class="spanFlowerId">${flowerId}</td></tr>
-                    <tr>
-                        <td>Фото</td>
-                        <td>
-                            <div><img src="/imgStoreMINI/${imageObj.img}" width="60" style="border-radius: 4px;"></div>
-                            <span class="spanName">${imageObj.img}</span>
-                        </td>
-                    </tr>
-                    <tr><td>Порядок</td><td><input class="spanFlowerNum" type="text" value="${imageObj.num}"></td></tr>
-                    <tr><td></td><td><input type="button" class="class_control_button call-delete" value="Удалить из БД" id="delDbImg_${imageObj.id}"></td></tr>
-                `;
+                rowGroup.innerHTML = moduleWebPart.imgs(imageObj, 'Edit');
                 table.appendChild(rowGroup);
                 
                 document.getElementById(`delDbImg_${imageObj.id}`)?.addEventListener('click', () => { 
@@ -706,15 +691,16 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
     let editInfo ={
         title: "",
         description: "",
-        flowerId: flowerId,
+        flowerId: Number(flowerId),
         id: 0
     };
+
     // Прячем ID цветка в шапку модалки для последующего группового сохранения
     const container = document.getElementById('uploadDescrContainer');
     if (container) {
         container.innerHTML = `
             <input type="button" id="modalAddDescriptionBtn" class="class_control_button" value="⊕ Добавить описание" style="background-color: #4caf50; color: white;">
-            <span id="modal_flower_id_hidden" style="display:none">${flowerId}</span>
+            <span id="modal_flower_id_hidden flowerIdDiscr" style="display:none">${flowerId}</span>
         `;
     }
 
@@ -727,15 +713,7 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
         const rowGroup = document.createElement("tbody");
         rowGroup.className = 'descr-row'; // Класс-маркер для сбора данных, БЕЗ data-id
         rowGroup.id = `descrRowLocal_${editInfo.id}`;
-        const webPartForm :  string = moduleWebPart.desription(editInfo);
-      /*  rowGroup.innerHTML = `
-            <tr><td>Название блока</td><td><input type="text" class="inputInfoTitle"></td></tr>
-            <tr><td>Описание блока</td><td><textarea class="inputInfoText"></textarea></td></tr>
-            <tr style="border-bottom: 2px solid grey;">
-                <td><span class="infoIdDiscr" style='opacity:0'></span></td>
-                <td><input type="button" class="class_control_button" id="linkLocal_${curLength}" value='Удалить описание' style="margin-bottom:15px"></td>
-            </tr>
-        `;*/
+        const webPartForm :  string = moduleWebPart.description(editInfo, 'New');
         
         rowGroup.innerHTML = webPartForm;
         table.appendChild(rowGroup);
@@ -770,22 +748,9 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
                 editInfo.title = String(info.title);                
                 editInfo.description = String(info.description) || '';
                 editInfo.id = Number(info.id) || 0;
-                const webPartForm :  string = moduleWebPart.desription(editInfo);
+                //добавили веб-часть
+                const webPartForm :  string = moduleWebPart.description(editInfo, 'Edit');
                 rowGroup.innerHTML = webPartForm;
-               /* rowGroup.innerHTML = `
-                    <tr>
-                        <td>Название блока</td>
-                        <td><input type="text" class="inputInfoTitle" value="${info.title}"></td>
-                    </tr>
-                    <tr>
-                        <td>Описание блока</td>
-                        <td><textarea class="inputInfoText">${info.description}</textarea></td>
-                    </tr>
-                    <tr style="border-bottom: 2px solid grey;">
-                        <td><span class="flowerIdDiscr" style='opacity:0'>${flowerId}</span></td>
-                        <td><input type="button" class="class_control_button" id="linkServer_${info.id}" value='Удалить блок' style="margin-bottom:15px"></td>
-                    </tr>
-                `;*/
                 table.appendChild(rowGroup);
                 
                 // Мгновенное удаление старой записи из БД
@@ -821,30 +786,30 @@ let rowIndex = trNum? parseInt(trNum) : 0;
 //-------------------------------------------------
 if (currentMode === 'users') {
      // Закачиваем разметку полей в единое окно
-    contentTarget.innerHTML = `
+    contentTarget.innerHTML = moduleWebPart.users(dataVal, 'Edit');
+    /*`
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
             <tr><td>Имя пользователя</td><td id="modal_user_name">${dataVal.name}</td></tr>
             <tr><td>Email пользователя</td><td id="modal_user_email">${dataVal.email}</td></tr>
             <tr><td>Role пользователя</td><td><input id="modal_user_role" type="text" value="${dataVal.role}"></td></tr>
             <tr><td>Статус пользователя</td><td id="modal_user_status">${dataVal.user_status}</td></tr>
         </table>
-    `;
+    `;*/
 }
 //-------------------------------------------------
 //-------------------------------------------------
 else if (currentMode === 'vids') {
-
      // Закачиваем разметку полей в единое окно
-    contentTarget.innerHTML = `
-        <table id="myModalTable" style="margin-top: 25px; width: 100%;">
-            <tr><td>ID вида</td><td id="modal_vid_id">${dataVal.id}</td></tr>
-            <tr><td>Название вида</td><td><input type='text' id="modal_vid_name" value="${dataVal.name}"></td></tr>
+     const contentWebPart =  moduleWebPart.vid(dataVal, "Edit");
+     contentTarget.innerHTML = ` <table id="myModalTable" style="margin-top: 25px; width: 100%;">
+            ${contentWebPart}
         </table>
     `;
 }
 else if (currentMode === 'flowers') {
 
-    contentTarget.innerHTML = `
+    contentTarget.innerHTML = moduleWebPart.flower(null,'New');
+    /*`
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
           <tr id="Itd2"><td>ID</td><td id="modal_flower_id">${dataVal.id}</td></tr>
           <tr><td>Вид</td>
@@ -856,13 +821,12 @@ else if (currentMode === 'flowers') {
           <tr><td>mKey</td><td><input id="modal_flower_key" type="text" value="${dataVal.mKeyWords}"><span class="textMeta">Значение key для метатега </span></td></tr>   
           <tr><td>mDescription </td><td><input id="modal_flower_mDis" type="text" value="${dataVal.mDescript}"><span class="textMeta">Значение description для метатега </span> </td></tr>   
         </table>
-    `;
+    `;*/
 }
 else if (currentMode === 'flowersPhoto') {
   contentTarget.innerHTML = `
      <div id="uploadPhotoContainer" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
         
-        <!-- Красивая кнопка, которая будет триггерить скрытый инпут -->
         <input type="button" id="modalAddPhotoPart" class="class_control_button" value="⊕ Добавить раздел с фото" style="background-color: #4caf50; color: white;">
       </div>
      <table id="myModalTableFlowerImg" style="padding-top: 25px; width: 100%;">
@@ -1216,15 +1180,13 @@ if (universalModal) {
 }
 //----------Добавление нового вида
 if (currentMode === 'vids') {
-    contentTarget.innerHTML = `
-        <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-            <tr><td>Название вида</td><td><input id="modal_vid_name" type="text"></td></tr>
-        </table>
-    `;
+    contentTarget.innerHTML = moduleWebPart.vid(null, "New")   
+
 }
 //----------Добавление нового цветка
 if (currentMode === 'flowers') {
-contentTarget.innerHTML = `
+contentTarget.innerHTML = moduleWebPart.flower(null,'New');
+/*`
     <table id="myModalTable" style="margin-top: 25px; width: 100%;">
       <tr id="Itd2"><td>ID</td><td id="modal_flower_id"></td></tr>
       <tr>
@@ -1240,7 +1202,7 @@ contentTarget.innerHTML = `
       <tr><td>mKey</td><td><input id="modal_flower_key" type="text"><span class="textMeta">Значение key для метатега </span></td></tr>   
       <tr><td>mDescription</td><td><input id="modal_flower_mDis" type="text"><span class="textMeta">Значение description для метатега </span></td></tr>   
     </table>
-`;
+`;*/
     await populateVidsDropdown();
 }
 //----------Добавление нового изображения
@@ -1254,17 +1216,10 @@ else if (currentMode === 'flowersPhoto') {
  
  let flowerIDItem : string = '';
  if(flowerId && flowerId.length > 0) flowerIDItem = String(flowerId[0].innerHTML || '');
-const htmlBlock = `
+ const imgWebPart = moduleWebPart.imgs( null,'New');
+ const htmlBlock = `
     <tbody class="image-row new-image-row">
-       <tr><td>ID цветка</td><td class="spanFlowerId">${flowerIDItem}</td></tr>
-       <tr>
-        <td>Выберите файл</td>
-        <td>
-          <input class="newImgInput" id="addImgToForm${curTableLength + 1}" type="file" accept="image/*">
-        </td>
-       </tr>
-       <tr><td>Порядок</td><td><input type="text" class="spanFlowerNum" value="${curTableLength + 1}"></td></tr>
-       <tr><td></td><td><input type="button" class="class_control_button remove-local-row" id="modalDelImg${curTableLength+1} value="Удалить форму"></td></tr>
+       ${imgWebPart}
     </tbody>
 `;
 contentTargetPh.insertAdjacentHTML('beforeend', htmlBlock);
@@ -1292,23 +1247,12 @@ document.getElementById('addImgToForm${curTableLength + 1}')?.addEventListener('
 //----------Добавление нового описания
 else if (currentMode === 'flowersDescription') {
  const flowerId = document.querySelectorAll('#myModalTableFlowerDis > .flowerIdDiscr') as NodeListOf<Element> || null;
- let flowerItem;
- if(flowerId && flowerId.length > 0) flowerItem = flowerId[0].innerHTML || '';
+ let flowerItem = {flowerId : 0};
+ if(flowerId && flowerId.length > 0) flowerItem.flowerId = Number(flowerId[0].innerHTML) || 0;
+ const descWebPart = moduleWebPart.description(flowerItem, 'New');
   contentTarget.innerHTML = `
         <table id="myModalTable" style="padding-top: 25px; width: 100%;">
-                <tr>
-                  <td>ID описываемого цветка</td><td class="id_flower_modal">${flowerItem}</td>
-                </tr> 
-                <tr>
-                  <td>Название блока</td><td><input class="modal_title" type="text" class="inputInfo"></td>
-                </tr> 
-                <tr>
-                  <td>Описание блока</td><td><textarea class="modal_descr" type="text" class="inputInfo"></textarea></td>
-                </tr> 
-                <tr style="border-bottom:'2px solid grey'; padding: '7px 0'; textAlign: 'center'">
-                  <td><span style="opacity:0"></span></td>
-                  <td class="countBlocks"><input type="button" class="class_control_button modal_link"></td>
-                </tr> 
+            ${descWebPart}
         </table>
     `;
     }
