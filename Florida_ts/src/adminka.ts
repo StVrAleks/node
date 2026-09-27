@@ -883,14 +883,16 @@ if (currentMode === 'users') {
 if (currentMode === 'vids') {
   const idForm = document.getElementById('modal_vid_id') as HTMLElement || null;
   const nameForm =  document.getElementById('modal_vid_name') as HTMLInputElement || null;
-
+  let idVal = '', nameVal = '';
+  if(idForm) idVal = idForm.innerHTML;
+  if(nameForm) nameVal = nameForm.value;
   if (!nameForm) return;
 
 fetch('/api/vid/change',{
         method: "PUT",
          headers: {"content-Type": "application/json"},
        // headers: {"content-Type": "application/json", "Authorization":  `Bearer ${localToken}`},
-        body: JSON.stringify({'id':idForm.innerHTML, 'name':nameForm.value})
+        body: JSON.stringify({'id':idVal, 'name':nameVal})
         })
         .then((response) => response.json())
         .then((data: ApiResponse<VidAttributes>) =>{
@@ -1389,12 +1391,9 @@ async function populateVidsDropdown(): Promise<void> {
         datalist.innerHTML = '';
 
         if (data.rows && data.rows.length > 0) {
-            // Пробегаемся по видам из БД и генерируем option для datalist
             data.rows.forEach((vid) => {
                 if (vid.name) {
                     const option = document.createElement('option');
-                    // ВАЖНО: записываем именно имя (string). 
-                    // Браузер использует это значение и для фильтрации при вводе, и для отправки.
                     option.value = vid.name; 
                     datalist.appendChild(option);
                 }

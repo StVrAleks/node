@@ -38,8 +38,7 @@ export interface ImgData {
 }
 
 export class moduleWebPartUser {
-    constructor() {
-        // Конструктор теперь чистый
+    constructor() { 
     }
 
     flower(editInfo: FlowerData | null, status: StatusType): string {
@@ -53,6 +52,7 @@ export class moduleWebPartUser {
             mKeyWords: '',
             mDescript: ''
         };
+        let partID = '';
 
         if (status === 'Edit') {    
             info = {
@@ -64,14 +64,16 @@ export class moduleWebPartUser {
                 mKeyWords: data.mKeyWords || '',
                 mDescript: data.mDescript || ''
             };
+            partID = 
+                `<tr id="Itd2">
+                    <td>ID</td>
+                    <td id="modal_flower_id">${info.id}</td>
+                </tr>`;
         }    
 
         return `  
             <table id="myModalTable" style="margin-top: 25px; width: 100%;">
-                <tr id="Itd2">
-                    <td>ID</td>
-                    <td id="modal_flower_id">${info.id !== null ? info.id : ''}</td>
-                </tr>
+                ${partID}
                 <tr>
                     <td>Вид</td>
                     <td>
@@ -100,17 +102,19 @@ export class moduleWebPartUser {
             id: null as number | null,
             name: ''
         };
+        let partID = '';
 
         if (status === 'Edit') {    
             info = {
                 id: typeof data.id === 'number' ? data.id : null,
                 name: data.name || ''
             };
+            partID = `<tr><td>ID вида</td><td id="modal_vid_id">${info.id}</td></tr>`;
         }
 
         return `
             <table id="myModalTable" style="margin-top: 25px; width: 100%;">
-                <tr><td>ID вида</td><td id="modal_vid_id">${info.id !== null ? info.id : ''}</td></tr>
+                ${partID}
                 <tr><td>Название вида</td><td><input type='text' id="modal_vid_name" value="${info.name}"></td></tr>
             </table>`;
     }

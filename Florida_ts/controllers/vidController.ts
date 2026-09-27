@@ -78,9 +78,9 @@ class VidController {
 
             const [resUpdate] = await Vid.update({name: name},{where: {id: id}});
 
-            if(resUpdate === 0){        
+           /* if(resUpdate === 0){        
                 return next(ApiError.notFound('Вид с таким ID не найден'));
-            }
+            }*/
             return response.json({ change: 'ok' });           
         }catch(error: any){
             return next(ApiError.internal('Ошибка сервера при выполнении запроса'));}

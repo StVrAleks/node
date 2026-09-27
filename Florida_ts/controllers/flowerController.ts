@@ -77,7 +77,7 @@ class FlowerController{
         catch(error: any){
             console.error(error);
             return next(ApiError.internal('Ошибка сервера при выполнении запроса.'));
-                }
+            }
     }
 
     async getAll(request: Request<{}, {}, {}, GetAllFlowersQuery>, response: Response, next: NextFunction): Promise<Response | void>{
