@@ -37,12 +37,12 @@ const Flowers = sequelize.define('flowers', {
     status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'В наличии' },
     vidId: { type: DataTypes.INTEGER, allowNull: false,
         references: {
-            model: 'flower_vid', // Имя таблицы видов в базе данных
+            model: 'flower_vids', // Имя таблицы видов в базе данных
             key: 'id'
         } },
     vidName: {type: DataTypes.VIRTUAL,
          get() {
-            const vidInfo = this.flower_vid || this.Vid || this.vid;
+            const vidInfo = this.flower_vids || this.Vids || this.vids;
             return vidInfo?.name || ''; }
        // get() { return this.flower_vid?.name || '';  }
     },        
@@ -50,7 +50,7 @@ const Flowers = sequelize.define('flowers', {
     mDescript: { type: DataTypes.STRING }
 });
 ;
-const Vid = sequelize.define('flower_vid', {
+const Vid = sequelize.define('flower_vids', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false, unique: true },
 });

@@ -23,15 +23,55 @@ if (saveBut) {
         const vidIdEl = document.getElementById('modal_vid_id');
         const discIdEl = document.getElementById('modalDynamicContent');
         const imgsEl = document.getElementById('uploadPhotoContainer');
-        
+       
         
         // Если в форме есть ID и это не текст "Автоинкремент" — значит, это РЕДАКТИРОВАНИЕ
         const isEditFlower = flowerIdEl && flowerIdEl.innerHTML !== 'Автоинкремент' && flowerIdEl.innerHTML !== '';
         const isEditVid = vidIdEl && vidIdEl.innerHTML !== '';
-        const isEditUser = (currentMode === 'users');
+        const isEditUser = (currentMode === 'users') ? 'false' : null;
         console.log(isEditFlower, isEditVid, isEditUser);
-        if (isEditFlower || isEditVid || isEditUser) {
-            console.log('save');
+
+        if(currentMode === 'users'){
+            console.log('save change');
+            correctItem();        
+        }
+        else if(currentMode === 'vids'){
+            if (isEditVid){
+                console.log('save change');
+                correctItem();        
+            }
+            else{
+                console.log('create');
+                addItemSaveUniversal();                   
+            }    
+       }
+       if(currentMode === 'flowers'){
+            if(isEditFlower){
+                console.log('save change');
+                correctItem();        
+            }
+            else if(!isEditFlower){
+                console.log('create');
+                addItemSaveUniversal();   
+            }        
+       }
+        else if(currentMode === 'flowersPhoto'){
+            if(imgsEl){
+                console.log('save change');
+                saveWholeGallery();   
+            }            
+        }
+        else if(currentMode === 'flowersDescription'){
+            if(discIdEl){
+                console.log('save change');
+                correctItem();   
+            }            
+        }
+
+
+
+      /*  if (isEditFlower || isEditVid || isEditUser) {
+            console.log('save change');
             correctItem(); // Вызываем сохранение изменений
         } 
         else {
@@ -43,7 +83,7 @@ if (saveBut) {
         }
         else if(imgsEl){
             saveWholeGallery();
-        }        
+        }       */ 
 
     }, false);
   }
@@ -700,10 +740,10 @@ async function descItemFlower(event: Event, idEl : number | null): Promise<void>
     if (container) {
         container.innerHTML = `
             <input type="button" id="modalAddDescriptionBtn" class="class_control_button" value="⊕ Добавить описание" style="background-color: #4caf50; color: white;">
-            <span id="modal_flower_id_hidden flowerIdDiscr" style="display:none">${flowerId}</span>
+            <span id="modal_flower_id_hidden" style="display:none">${flowerId}</span>
         `;
     }
-
+//<span id="modal_flower_id_hidden flowerIdDiscr" style="display:none">${flowerId}</span>
     // Обработчик кнопки «Добавить описание» — просто рендерит пустые инпуты локально
     document.getElementById('modalAddDescriptionBtn')?.addEventListener('click', () => {
         const table = document.getElementById('myModalTableFlowerDis') as HTMLTableElement | null;
@@ -837,6 +877,7 @@ else if (currentMode === 'flowersDescription') {
   contentTarget.innerHTML = `
      <div id="uploadDescrContainer" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
          <input type="button" id="modalAddDescriptionBtn" class="class_control_button" value="⊕ Добавить описание" style="background-color: #4caf50; color: white;">    
+         <span id="modal_flower_id_hidden" style="display:none"></span>
       </div>
      <table id="myModalTableFlowerDis" style="padding-top: 25px; width: 100%;">
      </table>
@@ -1248,7 +1289,9 @@ document.getElementById('addImgToForm${curTableLength + 1}')?.addEventListener('
 }
 //----------Добавление нового описания
 else if (currentMode === 'flowersDescription') {
- const flowerId = document.querySelectorAll('#myModalTableFlowerDis > .flowerIdDiscr') as NodeListOf<Element> || null;
+ //const flowerId = document.querySelectorAll('#myModalTableFlowerDis > .flowerIdDiscr') as NodeListOf<Element> || null;
+ const flowerId = document.querySelectorAll('#myModalTableFlowerDis > .modal_flower_id_hidden') as NodeListOf<Element> || null;
+
  let flowerItem = {flowerId : 0};
  if(flowerId && flowerId.length > 0) flowerItem.flowerId = Number(flowerId[0].innerHTML) || 0;
  const descWebPart = moduleWebPart.description(flowerItem, 'New');
