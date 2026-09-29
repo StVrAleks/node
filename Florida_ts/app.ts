@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import router from './routes/index.js'; 
 import viewRouter from './routes/viewRouter.js';
 import errorHandler from './middleware/errorHandlingMiddleware.js'; 
+import authMiddlewareUser  from './middleware/authMiddlewareUser.js';
 import logger from './middleware/winston.js';
 import sequelize from './db.js';
 import './models/models.js'; 
@@ -21,6 +22,8 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(authMiddlewareUser);
 
 const ROOT_DIR = process.cwd(); 
 const publicPath = path.join(ROOT_DIR, 'public');

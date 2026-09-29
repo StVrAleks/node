@@ -142,7 +142,7 @@ Flowers.belongsToMany(User, { through: Favorite, foreignKey: 'flowerId' });
 Flowers.hasMany(FlowerInfo, { foreignKey: 'flowerId' });
 FlowerInfo.belongsTo(Flowers, { foreignKey: 'flowerId' });
 //Flowers.BelongsToMany(FlowerInfo);//, {through: FlowerInfoItem });
-Flowers.hasMany(FlowerImgs, { foreignKey: 'flowerId' });
+Flowers.hasMany(FlowerImgs, { as: 'flower_imgs', foreignKey: 'flowerId' });
 FlowerImgs.belongsTo(Flowers, { foreignKey: 'flowerId' });
 //Favorite.hasOne(Flowers);
 //Flowers.belongsTo(Favorite);

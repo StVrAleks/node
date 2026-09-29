@@ -34,6 +34,7 @@ export interface ImgData {
     num?: number | string;
     nextNum?: number | string;
     flowerId?: number;
+    id?: number;
     img?: string;
 }
 
@@ -171,7 +172,7 @@ export class moduleWebPartUser {
         const idPart = (status === 'Edit' && info.id !== null) ? `id="linkServer_${info.id}"` : "";
 
         return `
-            <tr>
+            <tr class = "flowerIdDiscr">
                 <td>Название блока</td>
                 <td><input type="text" class="inputInfoTitle" value="${info.title}"></td>
             </tr>
@@ -190,32 +191,27 @@ export class moduleWebPartUser {
 
     imgs(editInfo: ImgData | null, status: StatusType): string {
         const data = editInfo || {}; 
-        const isEdit = status === 'Edit';        
+        const isEdit = status === 'New';        
         
         const currentNum = Number(data.num || data.nextNum || 0);
-        const flowerId = typeof data.flowerId === 'number' ? data.flowerId : 0;
         const img = data.img || '';
+        const imgID = data.id || '';
 
         const editpart = isEdit 
             ? `
                 <input type="file" class="new-file-input" id="fileInput_${currentNum}"/><br><br>
-                <input type="submit" class="class_control_button action-upload" value="⚙️ Загрузить изображение" id="uploadBut_${currentNum}">
               `
             : `
                 <div><img src="/imgStoreMINI/${img}" width="60" style="border-radius: 4px;"></div>
                 <span class="spanName">${img}</span>
+                <span class="photoID_${imgID}" style="opacity:0">${imgID}</span>
               `;
 
+        const editpartLink = !isEdit? `delImg_${currentNum}` : `newDelImg_${currentNum}`
         return `
-            <tr><td>ID цветка</td><td class="spanFlowerId">${flowerId}</td></tr>
-            <tr>
-                <td>Фото</td>
-                <td class="file-upload-zone">
-                   ${editpart}
-                </td>
-            </tr>
+            <tr><td>Фото</td><td class="file-upload-zone">${editpart}</td></tr>
             <tr><td>Порядок</td><td><input class="spanFlowerNum" type="text" value="${currentNum + 1}"></td></tr>
-            <tr><td></td><td><input type="button" class="class_control_button call-delete" value="Удалить поле" id="delImg_${currentNum}"></td></tr>
+            <tr><td></td><td><input type="button" class="class_control_button call-delete" value="Удалить изображение" id="${editpartLink}"></td></tr>
         `;    
     }
 }

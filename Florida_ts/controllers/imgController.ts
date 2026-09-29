@@ -28,9 +28,10 @@ interface IncomingBlock {
 }
 
 interface IncomingImageBlock {
-    id?: number | null; // Для новых картинок id будет null или undefined
-    img: string;        // Имя файла (например, "file-1727000.jpg")
-    num: number;        // Порядковый номер (сортировка)
+    id?: number | null; 
+    fileIndex: number; // Лучше сделать number, так как это индекс массива files[fileIdx]
+    img?: string;      // Поле img может быть у старых картинок
+    num: number;  
 }
 
 class ImgController {
@@ -99,7 +100,11 @@ class ImgController {
                 order: [
                     ['num', 'ASC'], 
                     ['id', 'ASC']
-                ]
+                ],
+                include: [
+                    { model: FlowerImgs, as: 'flower_imgs' } 
+            ],
+            distinct: true 
             });
 
             return response.json({
@@ -136,6 +141,7 @@ class ImgController {
     // 4. Удаление картинки
     async delete(request: Request<FlowerParams>, response: Response, next: NextFunction): Promise<Response | void> {
         const id = Number(request.params.id);
+        console.log('del ', id);
         if (isNaN(id)) {
             return next(ApiError.badRequest('Некорректный формат ID'));
         }
@@ -205,7 +211,7 @@ async saveGalleryGroup(request: Request, response: Response, next: NextFunction)
 
 async updateGalleryGroup(request: Request<{}, {}, { flowerId: number, images: IncomingImageBlock[] }>, response: Response, next: NextFunction): Promise<Response | void> {
     try {
-        const { flowerId, images } = request.body;
+        const { flowerId, images } = request.body; // Данные уже спарсены Express.json()
 
         if (!flowerId || !Array.isArray(images)) {
             return next(ApiError.badRequest('Не указан цветок или передан неверный формат галереи'));
@@ -214,15 +220,14 @@ async updateGalleryGroup(request: Request<{}, {}, { flowerId: number, images: In
         for (const block of images) {
             if (!block.img || block.img.trim() === "") continue;
 
-            // Строим чистый объект для базы данных
+            // Строим объект для базы данных
             const upsertData: any = {
                 flowerId: Number(flowerId),
                 img: block.img.trim(),
                 num: Number(block.num) || 0
             };
 
-            // Если id прилетел с фронта и он валидный — добавляем его. 
-            // Если его нет (null) — Sequelize сам сгенерирует новый автоинкрементный ID.
+            // Если это старая картинка — Sequelize обновит её, если null — создаст новую
             if (block.id !== null && block.id !== undefined && !isNaN(Number(block.id))) {
                 upsertData.id = Number(block.id);
             }
@@ -239,7 +244,6 @@ async updateGalleryGroup(request: Request<{}, {}, { flowerId: number, images: In
         return next(ApiError.internal('Ошибка сервера при пакетном сохранении галереи'));
     }
 }
-
 }
 
 

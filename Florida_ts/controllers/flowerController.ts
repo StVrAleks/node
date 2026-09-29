@@ -1,4 +1,4 @@
-import { Flowers, Vid } from '../models/models.js';
+import { Flowers, Vid, FlowerImgs } from '../models/models.js';
 import ApiError from '../error/ApiError.js';
 import logger from '../middleware/winston.js';
 import { Request, Response, NextFunction } from 'express';
@@ -98,11 +98,10 @@ class FlowerController{
                 offset: offset,
                 // сортировку по цене или ID:
                 order: [['id', 'ASC'],['price', 'ASC'], ['name', 'ASC']],
-                 include: [{
-                    model: Vid,     
-                    attributes: ['name'] 
-                }],
-                // distinct: true гарантирует корректный подсчет count при JOIN-запросах с пагинацией
+                 include: [
+                    { model: Vid, attributes: ['name']},
+                    { model: FlowerImgs, as: 'flower_imgs' }
+                ],
                 distinct: true                 
             });
 

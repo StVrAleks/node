@@ -18,32 +18,39 @@ class BasketController {
             attributes: ['phone', 'address'] 
         });
  
- BasketFlower.belongsTo(Flowers, { foreignKey: 'flowerId' });
+        BasketFlower.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
-const [basket] = await Basket.findOrCreate({
-    where: { userId: Number(userId) }
-});
+        const [basket] = await Basket.findOrCreate({
+            where: { userId: Number(userId) }
+        });
 
-// Теперь этот запрос точно выполнится!
-const basketFlowers = await BasketFlower.findAll({
-    where: { basketId: basket.id },
-    include: [{ model: Flowers }]
-});
+        // Теперь этот запрос точно выполнится!
+        const basketFlowers = await BasketFlower.findAll({
+            where: { basketId: basket.id },
+            include: [{ model: Flowers }]
+        });
 
-            if(basketFlowers && basketFlowers.length === 0){
-                return response.json({
-                basketFlowers: [],
-                userProfile: currentUser ? currentUser.toJSON() : null,
-                mes: 'Ваша корзина пуста' // Если фронтенду вдруг понадобится строка сообщения
-                });
-            }
-             
+        if(basketFlowers.length === 0){
+            return response.json({
+            basketFlowers: [],
+            userProfile: currentUser ? currentUser.toJSON() : null,
+            mes: 'Ваша корзина пуста' // Если фронтенду вдруг понадобится строка сообщения
+            });
+        }    
+        if(basketFlowers.length > 0){
+            return response.json({
+            basketFlowers: basketFlowers,
+            userProfile: currentUser ? currentUser.toJSON() : null,
+            mes: 'Содержимое вашей корзины' // Если фронтенду вдруг понадобится строка сообщения
+            });            
+        }
+                
         } catch (error: any) {
             console.error('🔥 КРИТИЧЕСКАЯ ОШИБКА ДЕБАГА BAF_FIND_ALL:', error.message);
-                if (error.stack) console.error(error.stack);
+            if (error.stack) console.error(error.stack);
 
-                logger.error('Ошибка в BasketController.cart:', error.message);
-                return next(ApiError.internal('Ошибка сервера при получении корзины пользователя'));
+            logger.error('Ошибка в BasketController.cart:', error.message);
+            return next(ApiError.internal('Ошибка сервера при получении корзины пользователя'));
         }
     }
 

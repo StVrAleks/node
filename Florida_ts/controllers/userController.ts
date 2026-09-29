@@ -226,8 +226,8 @@ async changeUser(request: Request<{}, {}, changeRequestBody>,  response: Respons
     const {email, role} = request.body;
     try{
         if(!email || !role)
-            return next(ApiError.internal('Пользователь с таким email и паролем не найден'));
-        console.log(email, role);
+            return next(ApiError.internal('Пользователь с таким email и ролью не найден'));
+        console.log('email', email, 'role', role);
                     const [rowsUpdated] = await User.update({ role: role }, { where: { email: email } });
             
             if (rowsUpdated === 0) {
@@ -251,8 +251,6 @@ async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Respo
     try {
         const { emailField, name, phone, address } = request.body;
         
-        // request.user должен быть заполнен вашим authMiddleware после верификации JWT-токена
-        // Извлекаем id или email пользователя
         const userId = (request as any).user?.id; 
         const userEmail = (request as any).user?.email;
 

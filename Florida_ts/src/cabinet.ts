@@ -10,6 +10,28 @@ interface OrderFlowerWithDetails extends OrderFlowerAttributes {
 interface OrderWithItems extends OrderAttributes {
     order_flowers?: OrderFlowerWithDetails[];
 }
+afterLoadPage();
+function afterLoadPage(){
+     const hasCookie = document.cookie.includes('floweridaKey');
+    if (!hasCookie) {
+        window.location.href = '/login';
+        return;
+    }
+
+    // Инициализируем табы личного кабинета
+    initCabinetTabs();
+
+    // Слушаем кнопку сохранения профиля
+    const savePersonData = document.getElementById('save-profile-btn') as HTMLElement;
+  
+    if(savePersonData){
+        savePersonData.addEventListener('click', async(e:Event) => {
+        e.preventDefault(); 
+        console.log('updateCabinetProfile');
+        await updateCabinetProfile();
+    });
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
  const hasCookie = document.cookie.includes('floweridaKey');
@@ -22,9 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initCabinetTabs();
 
     // Слушаем кнопку сохранения профиля
-    const saveProfileBtn = document.getElementById('save-profile-btn');
-    if (saveProfileBtn) {
-        saveProfileBtn.addEventListener('click', updateCabinetProfile);
+    const savePersonData = document.getElementById('save-profile-btn') as HTMLElement;
+  
+    if(savePersonData){
+        savePersonData.addEventListener('click', async(e:Event) => {
+        e.preventDefault(); 
+        console.log('updateCabinetProfile');
+        await updateCabinetProfile();
+    });
     }
 });
 
@@ -61,6 +88,7 @@ function initCabinetTabs(): void {
             }
         });
     });
+
 }
 
 /**
@@ -177,7 +205,7 @@ async function updateCabinetProfile(): Promise<void> {
 
     try {
 const response = await fetch('/api/user/updateProfile', { 
-    method: "PUT", // Метод PUT, как у вас и настроено на бэкенде
+    method: "PUT", 
     headers: {
         "Content-Type": "application/json"
     },

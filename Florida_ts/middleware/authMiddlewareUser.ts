@@ -38,11 +38,13 @@ export default function (role?: string) { // роль можно сделать 
                 return next(ApiError.forbidden('Недостаточно прав доступа'));
             }
 
+            response.locals.user = decoded;
             // 5. Просто передаем управление следующему роутеру. НИКАКИХ response.json() здесь!
             return next();
 
         } catch (er) {
             // Если токен сломан или истек, возвращаем 401 статус
+            response.locals.user = null;
             return response.status(401).json({ message: 'Не авторизован' });
         }
     }

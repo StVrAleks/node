@@ -12,89 +12,91 @@ document.addEventListener('DOMContentLoaded', (): void => {
     // Первичный запуск каталога
     loadCatalog(currentPage);
 
-    function loadCatalog(page: number): void {
-        const url = `/api/flower/getAll?page=${page}&limit=${itemsPerPage}`;
+function loadCatalog(page: number): void {
+    const url = `/api/flower/getAll?page=${page}&limit=${itemsPerPage}`;
 
-        fetch(url, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-        })
-        .then((response) => response.json())
-        .then((data: ApiResponse<IFlowerWithImages>) => {
-            
-            const mist = document.getElementById('mist10') as HTMLElement | null;
-            if (data.mes || data.message) {
-                if (mist) mist.innerHTML = data.mes || data.message || 'Ошибка загрузки';
-                return;
-            }
+    fetch(url, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then((response) => response.json())
+    .then((data: ApiResponse<IFlowerWithImages>) => {
+        
+        const mist = document.getElementById('mist10') as HTMLElement | null;
+        if (data.mes || data.message) {
+            if (mist) mist.innerHTML = data.mes || data.message || 'Ошибка загрузки';
+            return;
+        }
 
-            const catalogContainer = document.getElementById('catalog-products') as HTMLElement | null;
-            if (!catalogContainer) return;
-            
-            catalogContainer.innerHTML = ''; // Очищаем сетку
+        const catalogContainer = document.getElementById('catalog-products') as HTMLElement | null;
+        if (!catalogContainer) return;
+        
+        catalogContainer.innerHTML = ''; // Очищаем сетку
 
-            if (data.rows && data.rows.length > 0) {
-                data.rows.forEach((flower: IFlowerWithImages) => {
+        if (data.rows && data.rows.length > 0) {
+            data.rows.forEach((flower: any) => {
+                console.log('flower ', flower);
+                // ИСПРАВЛЕНО: Безопасно достаем массив картинок, который бэк ПРИСЫЛАЕТ СРАЗУ
+                const flowerImages = flower.flower_imgs; 
+              /*  let mainImgPath: string = 'default.jpg';
+
+                if (flowerImages.length > 0) {
+                    // Ищем картинку, у которой num === 1 (первая по порядку)
+                    const mainImageObject = flowerImages.find((img: any) => Number(img.num) === 1);
                     
-                    let mainImgPath: string = 'default.jpg'; 
-                    const flowerImages = flower.flower_imgs || flower.imgs; 
-                    
-                    if (flowerImages && flowerImages.length > 0) {
-                        const mainImageObject = flowerImages.find((img: FlowerImgsAttributes) => Number(img.num) === 1);
-                        mainImgPath = mainImageObject ? mainImageObject.img : flowerImages[0].img;
-                    }
+                    // Если нашли с num === 1 — берем её, иначе берем самую первую из массива
+                    mainImgPath = mainImageObject ? mainImageObject.img : flowerImages[0].img;
+                }*/
+                const flowerNameImg = flowerImages[0].img || 'default.jpg';
+                const section = document.createElement('section');
+                section.className = 'conteiner_section';
 
-                    const section = document.createElement('section');
-                    section.className = 'conteiner_section';
-
-                    section.innerHTML = `
-                        <div class="card">
-                            <div class="card__top">
-                                <h2 class="title_goods">${flower.name}</h2>
-                                <div class="imgs_goods">
-                                    <img src="/imgStoreMINI/${mainImgPath}" alt="${flower.name}">
-                                </div>
-                            </div>
-                            <div class="card__botoom">
-                                <div class="full_title" data-id="${flower.id}">${flower.name}</div>
-                                <div class="price">${Number(flower.price).toFixed(2)} BYN</div>
-                                <div class="descriptionId">${flower.mDescript || ''}</div>
-                            </div>
-                            <div class="card_control" style="display: flex; align-items: center; gap: 10px; padding: 10px;">
-                                <input type="button" value="Купить" class="cardGood class_control_button" data-id="${flower.id}" style="background-color: #181d19; color: white;">
-                                
-                                <input type="button" class="watch class_control_button" id="watch-${flower.id}" data-id="${flower.id}" value="Подробнее" style="background-color: #4caf50; color: white;">
-                                <input type="button" value="❤" class="like_good wishGood class_control_button" data-id="${flower.id}" style="background-color: #900; color: white;">
+                section.innerHTML = `
+                    <div class="card">
+                        <div class="card__top">
+                            <h2 class="title_goods">${flower.name}</h2>
+                            <div class="imgs_goods">
+                                <img src="/imgStoreMINI/${flowerNameImg}" alt="${flower.name}">
                             </div>
                         </div>
-                    `;
-                    catalogContainer.appendChild(section);
+                        <div class="card__botoom">
+                            <div class="full_title" data-id="${flower.id}">${flower.name}</div>
+                            <div class="price">${Number(flower.price).toFixed(2)} BYN</div>
+                            <div class="descriptionId">${flower.mDescript || ''}</div>
+                        </div>
+                        <div class="card_control" style="display: flex; align-items: center; gap: 10px; padding: 10px;">
+                            <input type="button" value="Купить" class="cardGood class_control_button" data-id="${flower.id}" style="background-color: #181d19; color: white;">
+                            
+                            <input type="button" class="watch class_control_button" id="watch-${flower.id}" data-id="${flower.id}" value="Подробнее" style="background-color: #4caf50; color: white;">
+                            <input type="button" value="❤" class="like_good wishGood class_control_button" data-id="${flower.id}" style="background-color: #900; color: white;">
+                        </div>
+                    </div>
+                `;
+                catalogContainer.appendChild(section);
 
-                    // ИСПРАВЛЕНО: Активируем кнопку "Подробнее" для перехода на карточку букета
-                    document.getElementById(`watch-${flower.id}`)?.addEventListener('click', () => {
-                        window.location.href = `/flower?id=${flower.id}`;
-                    });
-
-                    // Слушатель для кнопки "Купить" (в будущую корзину)
-                    section.querySelector('.cardGood')?.addEventListener('click', () => {
-                        addToBasket(flower.id);
-                    });
-
-                    // Слушатель для кнопки "Лайк" (в Избранное)
-                    section.querySelector('.wishGood')?.addEventListener('click', () => {
-                        toggleFavorite(flower.id);
-                    });
+                // Активируем кнопку "Подробнее"
+                document.getElementById(`watch-${flower.id}`)?.addEventListener('click', () => {
+                    window.location.href = `/flower?id=${flower.id}`;
                 });
 
-                // Рендерим кнопки пагинации на основе общего count из БД
-                renderPagination(data.total || 0, page);
-            } else {
-                catalogContainer.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Цветы не найдены</p>';
-            }
-        })
-        .catch((error) => console.error('Ошибка каталога:', error));
-    }
+                // Слушатель для кнопки "Купить"
+                section.querySelector('.cardGood')?.addEventListener('click', () => {
+                    addToBasket(flower.id);
+                });
 
+                // Слушатель для кнопки "Лайк"
+                section.querySelector('.wishGood')?.addEventListener('click', () => {
+                    toggleFavorite(flower.id);
+                });
+            });
+
+            renderPagination(data.total || 0, page);
+        } else {
+            catalogContainer.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Цветы не найдены</p>';
+        }
+    })
+    .catch((error) => console.error('Ошибка каталога:', error));
+}
     /**
      * Динамическая пагинация под стили catalog.hbs
      */
