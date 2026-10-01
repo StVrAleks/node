@@ -26,20 +26,34 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
             include: [
                 {
                     model: Flowers,
-                    // as: 'flower' // Если в моделях прописан этот alias
+                  //  as: 'Flowers', // Убедитесь, что этот alias совпадает с вашей моделью Favorite.belongsTo(Flowers)
+                    include: [
+                        {
+                            model: FlowerImgs,
+                            as: 'flower_imgs' // Подтягиваем картинки для каталога избранного!
+                        }
+                    ]
                 }
             ],
-            order: [['createdAt', 'DESC']]
+            order: [['createdAt', 'DESC']],
+            distinct: true // Защита от дублирования count при JOIN
         });
 
-        // Маппим данные, чтобы гарантировать фронтенду поле .flower в нижнем регистре
         const sanitizedRows = rows.map((item: any) => {
             const plainItem = item.toJSON();
+            const flowerData = plainItem.flower || plainItem.Flower;
+            
             return {
                 id: plainItem.id,
                 userId: plainItem.userId,
                 flowerId: plainItem.flowerId,
-                flower: plainItem.Flower || plainItem.flower // Защита: подкладываем в оба регистра
+                flower: flowerData ? {
+                    id: flowerData.id,
+                    name: flowerData.name,
+                    price: flowerData.price,
+                    // Гарантируем правильное имя массива картинок на фронте
+                    flower_imgs: flowerData.flower_imgs || flowerData.FlowerImgs || []
+                } : null
             };
         });
 

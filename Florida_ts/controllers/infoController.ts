@@ -1,8 +1,9 @@
-import { FlowerInfo} from '../models/models.js';
+import { FlowerInfo, FlowerInfoAttributes} from '../models/models.js';
 import ApiError from '../error/ApiError.js';
 import logger from '../middleware/winston.js';
 import { Request, Response, NextFunction } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+
 
 interface CreateInfoRequestBody {
     flowerId: number,
@@ -67,7 +68,8 @@ class InfoController{
             if(isNaN(id))
                 return next(ApiError.badRequest('Некорректный формат ID'));  
 
-            const rows = await FlowerInfo.findOne({where: {id}});
+            const rows = await FlowerInfo.findAll({where: {'flowerId' : id}});
+         
             if (!rows) 
                 return next(ApiError.notFound('Описание с таким ID не найдено')); 
             return response.json(rows);

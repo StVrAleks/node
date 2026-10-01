@@ -172,10 +172,7 @@ class FlowerController{
             }
             return response.json({ change: 'ok' });               
         }catch(error: any){
-            console.error("=== ОШИБКА ДЕТАЛЬНО ===");
-            console.error(error?.message || error); 
-            console.error("=======================");
-               return next(ApiError.internal('Ошибка сервера при обновлении товара'));
+            return next(ApiError.internal('Ошибка сервера при обновлении товара'));
         }
     }
 

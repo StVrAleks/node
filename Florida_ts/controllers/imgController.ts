@@ -4,7 +4,6 @@ import logger from '../middleware/winston.js';
 import { Request, Response, NextFunction } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
-// ИСПРАВЛЕНО: Добавили поле num, которое прилетает с фронтенда для сортировки
 interface CreateImgRequestBody {
     flowerId: number;
     img: string;
@@ -94,19 +93,15 @@ class ImgController {
             if (!flowerId) {
                 return next(ApiError.badRequest('Параметр flowerId в пути обязателен'));
             }
-        
             const result = await FlowerImgs.findAndCountAll({
                 where: { flowerId: Number(flowerId) },
                 order: [
                     ['num', 'ASC'], 
                     ['id', 'ASC']
                 ],
-                include: [
-                    { model: FlowerImgs, as: 'flower_imgs' } 
-            ],
             distinct: true 
             });
-
+           
             return response.json({
                 count: result.count,
                 rows: result.rows

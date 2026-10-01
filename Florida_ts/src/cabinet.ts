@@ -12,12 +12,6 @@ interface OrderWithItems extends OrderAttributes {
 }
 afterLoadPage();
 function afterLoadPage(){
-     const hasCookie = document.cookie.includes('floweridaKey');
-    if (!hasCookie) {
-        window.location.href = '/login';
-        return;
-    }
-
     // Инициализируем табы личного кабинета
     initCabinetTabs();
 
@@ -34,12 +28,6 @@ function afterLoadPage(){
 }
 
 document.addEventListener('DOMContentLoaded', () => {
- const hasCookie = document.cookie.includes('floweridaKey');
-    if (!hasCookie) {
-        window.location.href = '/login';
-        return;
-    }
-
     // Инициализируем табы личного кабинета
     initCabinetTabs();
 

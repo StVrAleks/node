@@ -12,6 +12,7 @@ class CabinetController {
             // Данные пользователя из authMiddleware (токен)
             const tokenUser = (request as any).user;
 
+            console.log('tokenUser ', tokenUser);
             // Если middleware по какой-то причине пропустил неавторизованного, отдаем forbidden
             if (!tokenUser || !tokenUser.id) {
                 return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
@@ -21,7 +22,7 @@ class CabinetController {
             const currentUser = await User.findByPk(tokenUser.id, {
                 attributes: ['id', 'name', 'email', 'phone', 'address', 'role'] // Исключаем хеш пароля из соображений безопасности
             });
-
+            console.log('currentUser ', currentUser);
             if (!currentUser) {
                 return next(ApiError.notFound('Пользователь не найден в системе'));
             }

@@ -12,20 +12,25 @@ export default function (role?: string){
 
 return function (request: CustomRequest, response: Response, next: NextFunction){
     try{
+        if (request.method === 'OPTIONS') return next();
         let token: string | null = null;
-        const authHeader = request.headers.authorization;
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            token = authHeader.split(' ')[1];
-        } 
-        // 2. Если заголовка нет, берем из куки floweridaKey (для обычных переходов по ссылкам)
-        else if (request.cookies && request.cookies.floweridaKey) {
-            const cookieValue = request.cookies.floweridaKey;
-            // Убираем префикс Bearer из куки, если он там запечен
-            token = cookieValue.startsWith('Bearer ') ? cookieValue.split(' ')[1] : cookieValue;
+
+        if (request.headers && request.headers.authorization) {
+            const authHeader = request.headers.authorization;
+            if(authHeader.includes(' '))
+                token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+            else if(authHeader.includes('%20'))
+                token = authHeader.startsWith('Bearer%20') ? authHeader.split(' ')[1] : authHeader;
+        } else if (request.cookies && request.cookies.floweridaKey) {
+           let cookieToken = request.cookies.floweridaKey;
+           cookieToken = decodeURIComponent(cookieToken);
+            if (cookieToken.startsWith('Bearer ') || cookieToken.startsWith('Bearer%20')) {
+                token = cookieToken.split(' ')[1] || cookieToken.split('%20')[1];
+            } else {
+                token = cookieToken;
+            }
         }
-
-
-       if (!token) {
+       if (!token || token.trim() === "") {
             // Если браузер запрашивал HTML-страницу, плавно редиректим на страницу входа
             if (request.accepts('html') && request.method === 'GET') {
                 return response.redirect('/login');
@@ -38,9 +43,13 @@ return function (request: CustomRequest, response: Response, next: NextFunction)
             return next(ApiError.forbidden('Нет доступа: недостаточно прав'));
         }
         request.user = decoded;
+        response.locals.user = decoded;
 
         return next();
-        } catch(er){
+        } catch(er: any){
+            if (request.accepts('html') && request.method === 'GET') {
+                return response.redirect('/login');
+            }
             return next(ApiError.forbidden('Не авторизован: неверный или просроченный токен'));
         }
     }

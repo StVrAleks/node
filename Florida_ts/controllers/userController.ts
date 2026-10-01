@@ -138,7 +138,6 @@ async login(request: Request<{}, {}, LoginUserRequestBody>, response: Response, 
 
 async logout(request: Request<{}, {}, {}>, response: Response, next: NextFunction): Promise<Response | void> {
     try {
-        // ИСПРАВЛЕНО: Стираем именно ту куку, которую создавали при логине!
         response.clearCookie('floweridaKey', {
             httpOnly: true,
             secure: false
@@ -247,13 +246,13 @@ async authUser(request : Request<{}, {}, LoginUserRequestBody>,  response: Respo
     }
   }
  
-  async updateProfile(request: Request<{}, {}, UpdateProfileRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
+async updateProfile(request: Request<{}, {}, UpdateProfileRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
     try {
         const { emailField, name, phone, address } = request.body;
         
         const userId = (request as any).user?.id; 
         const userEmail = (request as any).user?.email;
-
+console.log('userId ', userId);
         if (!userId && !userEmail) {
             return next(ApiError.forbidden('Пользователь не авторизован'));
         }

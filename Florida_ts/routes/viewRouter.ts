@@ -17,8 +17,7 @@ const __dirname = path.dirname(__filename);
 
 // Универсальная функция рендеринга лейаута
 function renderWithLayout(viewName: string, viewData: object, request: any, response: any, next: any) {
-    let currentUser : string | jwt.JwtPayload = '';
-    try {
+       try {
         const viewPath = path.join(__dirname, '..', '..', 'views', `${viewName}.hbs`);
         const layoutPath = path.join(__dirname, '..', '..', 'views', 'layouts', 'main.hbs');
 
@@ -28,24 +27,14 @@ function renderWithLayout(viewName: string, viewData: object, request: any, resp
         const viewTemplate = Handlebars.compile(viewString);
         const layoutTemplate = Handlebars.compile(layoutString);
 
-       // let currentUser = null;
-        const cookieToken = request.cookies?.floweridaKey; // Читаем куку
-
-        if (cookieToken && cookieToken.startsWith('Bearer ')) {
-            try {
-                const tokenStr = cookieToken.split(' ')[1];
-                // Расшифровываем токен с помощью вашего секретного ключа из .env
-               currentUser = jwt.verify(tokenStr, process.env.SECRET_KEY || 'secret_fallback');
-            } catch (e) {
-                // Если токен сломан или истек, игнорируем, пользователь останется гостем
-            }
-        }
-       const finalUser = currentUser || request.user || null;
+        // ИСПРАВЛЕНО: Никаких повторных jwt.verify и парсинга кук!
+        // Берем готового пользователя, которого для нас уже подготовил и проверил мидлвар
+        const finalUser = request.user || response.locals.user || null;
 
         const viewHTML = viewTemplate(viewData);
         const finalHTML = layoutTemplate({
             conteiner: viewHTML,
-            user: finalUser // Данные пользователя для шапки сайта
+            user: finalUser // Идеально чистые данные для шапки сайта (Привет, {{user.name}})
         });
 
         return response.send(finalHTML);

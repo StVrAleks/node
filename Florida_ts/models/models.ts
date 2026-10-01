@@ -136,7 +136,7 @@ export interface FlowerInfoAttributes {
     id: number,
     title: string,
     description: string | undefined,
-    flowerId: number
+    flowerId: number,
 };
 
 type FlowerInfoCreationAttributes = Optional<FlowerInfoAttributes, 'id' | 'description'>;
@@ -279,8 +279,8 @@ FlowerInfo.belongsTo(Flowers, { foreignKey: 'flowerId' });
 Flowers.hasMany(FlowerImgs, { foreignKey: 'flowerId' });
 FlowerImgs.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
-Favorite.hasOne(Flowers);
-Flowers.belongsTo(Favorite);
+Flowers.hasMany(Favorite, { foreignKey: 'flowerId' });
+Favorite.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
 // --- 4. ОПИСАНИЕ СВЯЗЕЙ (Обычно внизу файла моделей) ---
 // Связь Пользователь -> Заказы (Запрещаем каскадное удаление заказов при удалении юзера)

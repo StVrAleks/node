@@ -71,21 +71,20 @@ async function loadFavoritesPage(page: number): Promise<void> {
             const flower = favItem.flower;
             if (!flower) return;
 
-            const mainImg = flower.flower_imgs && flower.flower_imgs.length > 0 
-                ? flower.flower_imgs[0].img 
-                : 'default-flower.jpg';
+            // БЕЗОПАСНО: Проверяем наличие массива картинок, который мы добавили на бэке
+            const imgs = flower.flower_imgs || [];
+            const mainImg = imgs.length > 0 ? imgs[0].img : 'default.jpg'; // Ваша дефолтная заглушка
 
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
                 <div class="product-card__image-wrapper">
-                    <img src="/imgStoreMINI/${mainImg}" alt="${flower.name}" class="product-card__img">
+                    <img src="/imgStoreMINI/${mainImg}" alt="${flower.name}" class="product-card__img" style="width:100px; height:100px; object-fit:cover; border-radius:4px;">
                 </div>
                 <div class="product-card__info">
                     <h4 class="product-card__title">${flower.name}</h4>
                     <p class="product-card__price">${Number(flower.price).toFixed(2)} BYN</p>
                     <div class="product-card__actions" style="margin-top: 10px; display: flex; gap: 10px;">
-                        <!-- ИСПРАВЛЕНО: роут приведен в строгое соответствие с вашим viewRouter.ts -->
                         <a href="/flower?id=${flower.id}" class="class_control_button" style="text-decoration:none; text-align:center; background-color:#181d19; color:white; font-size:12px; padding: 5px 10px;">Подробнее</a>
                         <input type="button" class="class_control_button remove-fav-btn" value="✕" data-flower-id="${flower.id}" style="background-color:#900; color:white; padding: 5px 10px;" title="Удалить из избранного">
                     </div>
@@ -96,7 +95,7 @@ async function loadFavoritesPage(page: number): Promise<void> {
             card.querySelector('.remove-fav-btn')?.addEventListener('click', (e) => {
                 const btn = e.target as HTMLInputElement;
                 const flowerId = btn.getAttribute('data-flower-id');
-                if (flowerId) removeLikeGroup(parseInt(flowerId));
+                if (flowerId) removeLikeGroup(parseInt(flowerId, 10));
             });
         });
 
