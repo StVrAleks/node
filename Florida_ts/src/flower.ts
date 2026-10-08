@@ -134,7 +134,7 @@ function initActionButtons(flowerId: number): void {
         const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
 
         try {
-            const response = await fetch('/api/basket/add', {
+            const response = await fetch('/api/basket/addItem', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ flowerId, quantity })

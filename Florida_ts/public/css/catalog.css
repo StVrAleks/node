@@ -1,3 +1,20 @@
+#catalog-products {
+    display: grid !important; /* Перебиваем инлайн-стили */
+    /* Автоматические колонки: минимальная ширина карточки 280px, максимальная - растягивается на всю доступную долю (1fr) */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Расстояние между карточками по вертикали и горизонтали */
+    gap: 20px;
+    /* Внутренние отступы самого контейнера каталога */
+    padding: 20px 0;
+    width: 100%;
+}
+
+/* Стилизация секции карточки, чтобы все плитки были одной высоты */
+.conteiner_section {
+    display: flex;
+    flex-direction: column;
+}
+
 #conteiner{
     width: 100%;
     max-width: 1200px;
@@ -17,27 +34,38 @@
     padding: 75px 0;
 }
 /*card*/    
-.card{
-    width: 225px;
-    min-height: 350px;  
-    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+
+.card {
     display: flex;
     flex-direction: column;
-    border-radius: 4px;
-    position: relative;
-    transition: 0.2s;
+    height: 100%; /* Заставляет карточку растягиваться на всю высоту grid-ячейки */
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card:hover{
-    box-shadow: 4px 8px 16px rgba(123, 187, 5, 0.2);
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     cursor: pointer;
 }
 .card__top{
     flex: 0 0 220px;
 }
-.card__botoom{
-    flex: 1 0 auto;
-    padding: 10px;
+.card__botoom {
+    padding: 12px 12px 4px 12px;
+    flex-grow: 1; /* Этот блок заберет все свободное пространство, толкая кнопки вниз */
+}
+.imgs_goods img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Картинка не деформируется */
+}
+.card_control {
+    margin-top: auto; /* Железный прижим кнопок к нижнему краю карточки */
 }
 .title_goods{
     position: relative;
@@ -94,3 +122,4 @@ div.card_control > svg.icon.icon-wishlist.w-h-{
     cursor: pointer;
     height: 30px;
 }
+

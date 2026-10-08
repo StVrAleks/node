@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { Favorite, Flowers, FlowerImgs } from '../models/models.js';
+import { Favorite, Vid, Flowers, FlowerImgs, BasketFlower, Basket } from '../models/models.js';
 import ApiError from '../error/ApiError.js';
 import logger from '../middleware/winston.js';
 
 interface ToggleFavoriteRequestBody {
     flowerId: number;
+    favorites: boolean;
 }
 
 class FavoriteController {
@@ -12,7 +13,7 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
     try {
         const userId = (request as any).user?.id;
         if (!userId) {
-            return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
+             return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
         }
 
         const page = Number(request.query.page) || 1;
@@ -26,14 +27,14 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
             include: [
                 {
                     model: Flowers,
-                  //  as: 'Flowers', // Убедитесь, что этот alias совпадает с вашей моделью Favorite.belongsTo(Flowers)
                     include: [
                         {
                             model: FlowerImgs,
                             as: 'flower_imgs' // Подтягиваем картинки для каталога избранного!
                         }
                     ]
-                }
+                },
+                
             ],
             order: [['createdAt', 'DESC']],
             distinct: true // Защита от дублирования count при JOIN
@@ -67,6 +68,7 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
         return next(ApiError.internal('Внутренняя ошибка сервера при чтении списка избранного'));
     }
 }
+
     async toggle(request: Request<{}, {}, ToggleFavoriteRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
         try {
             const userId = (request as any).user?.id;
@@ -111,6 +113,82 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
         } catch (error: any) {
             logger.error('Ошибка в FavoriteController.toggle:', error.message);
             return next(ApiError.internal('Внутренняя ошибка сервера при изменении статуса избранного'));
+        }
+    }
+
+    async getAllCategory(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            let { page, limit } = request.query;
+            const currentPage = Number(page) || 1;
+            const currentLimit = Number(limit) || 9;
+            const offset = (currentPage - 1) * currentLimit;
+
+            // 1. Получаем ID текущего пользователя из токена/куки
+            const userId = (request as any).user?.id || null;
+
+            // 2. Ищем ID корзины этого пользователя в базе данных
+            let userBasketId: number | null = null;
+            if (userId) {
+                const basket = await Basket.findOne({ where: { userId: Number(userId) } });
+                if (basket) {
+                    userBasketId = basket.id;
+                }
+            }
+
+            // 3. Делаем один мощный запрос к БД
+            const flowersData = await Flowers.findAndCountAll({
+                limit: currentLimit,
+                offset: offset,
+                include: [
+                    { model: Vid, as: 'flower_vid' },
+                    { model: FlowerImgs, as: 'flower_imgs' },
+                    // Избранное (уже работает)
+                    ...(userId ? [{
+                        model: Favorite,
+                        as: 'favorites',
+                        where: { userId: Number(userId) },
+                        required: false
+                    }] : []),
+                    // ИСПРАВЛЕНО: Подмешиваем строки корзины ТОЛЬКО для корзины текущего юзера
+                    ...(userBasketId ? [{
+                        model: BasketFlower,
+                        as: 'basket_flowers', // Этот алиас мы только что добавили в models.ts
+                        where: { basketId: userBasketId },
+                        required: false // Строго false (LEFT JOIN), чтобы не прятать товары, которых нет в корзине
+                    }] : [])
+                ],
+                distinct: true
+            });
+
+            // 4. Формируем чистый JSON с флагами для фронтенда
+            const sanitizedRows = flowersData.rows.map(flowerInstance => {
+                const flower = flowerInstance.toJSON();
+                
+                // Проверяем статус избранного
+                const isFavorite = !!(flower.favorites && flower.favorites.length > 0);
+                
+                // ИСПРАВЛЕНО: Проверяем статус корзины
+                const isInBasket = !!(flower.basket_flowers && flower.basket_flowers.length > 0);
+
+                // Удаляем сырые массивы связей, чтобы не раздувать трафик
+                delete flower.favorites;
+                delete flower.basket_flowers;
+
+                return {
+                    ...flower,
+                    isFavorite,
+                    isInBasket // Отдаем готовый флаг на фронтенд!
+                };
+            });
+
+            return response.status(200).json({
+                total: flowersData.count,
+                rows: sanitizedRows
+            });
+
+        } catch (error: any) {
+            console.error('Ошибка в FlowerController.getAllCategory:', error);
+            return next(ApiError.internal('Внутренняя ошибка сервера при загрузке каталога'));
         }
     }
 }

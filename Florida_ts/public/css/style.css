@@ -61,7 +61,6 @@
     font-size: 30px;
     font-weight: 900;
 }
-
 .header__logo{
     display: flex;
     flex-direction: row;
@@ -131,41 +130,7 @@ svg.icon-search {
     color: #323232;
 }
 
-.header__icon
- {
-    display: inline-block;
-    vertical-align: middle;
-    font-size: 0;
-    letter-spacing: 0;
-    line-height: 1;
-    width: auto;
-    position: relative;
-}
-.header__group
- {
-    min-width: 46px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #232323
-}
-.cart-count-bubble{
-right: 0;
-    line-height: 15px;
-    min-width: 15px;
-    min-height: 15px;
-    font-size: 10px;
-    width: 15px;
-    height: 15px;
-    position: absolute;
-    background-color: #000000;
-    vertical-align: middle;
-    text-align: center;
-    border-radius: 50%;
-    display: inline-block !important;
-    vertical-align: middle;
-    top: 2px;
-}
+
 .text{
     line-height: 13px;
     font-size: 10px;
@@ -178,10 +143,7 @@ right: 0;
     padding-left: 3px;
     text-transform: capitalize;
 }
-.icon:hover{
-    transition: all 0.3s ease;
-    transform: scale(1.2);
-}
+
 /*footer*/
 footer{
     position: relative;
@@ -224,48 +186,4 @@ footer > img{
     display: block;
     width: 32%;
     height: 39vh;
-}
-/*Panel*/
-#single_line{
-    height: 30px;
-    width: 99vw;
-    display: flex;
-    flex-direction: row;
-    font-weight: 500;
-    padding-top: 10px;
-    font-size: 20px;
-    align-items: center;
-}
-#single_line_catalog{
-    padding: 0 15px;
-}
-#autentif{
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, 40vh);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 150px;
-    width: 32%;/*280px;*/
-}
-.main_button{
-    width: 100%;
-    background-color: #53AE42;
-    border-radius: 10px;
-    height: 40px;
-    color: white;
-    font-weight: 600;
-    font-size: 17px;
-}
-#autorization{
-    width: 40%;
-}
-#registration{
-    width: 70%;
-}
-#guest{
-    width: 100%;
 }

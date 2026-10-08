@@ -59,6 +59,8 @@ app.use('/dist/src', express.static(path.join(ROOT_DIR, 'src', 'dist'), {
 app.use('/images', express.static(path.join(publicPath, 'images')));
 app.use('/imgStoreMINI', express.static(path.join(publicPath, 'imgStoreMINI')));
 app.use('/imgStore', express.static(path.join(publicPath, 'imgStore')));
+
+
 // ==========================================
 // 2. МАРШРУТИЗАЦИЯ API И СТРАНИЦ HBS
 // ==========================================
@@ -69,6 +71,8 @@ app.use('/', viewRouter);
 app.use((req, res, next) => {
   res.status(404).send(`Маршрут ${req.originalUrl} не найден на сервере. Проверьте viewRouter.`);
 });
+
+
 
 // 4. Логгер ошибок
 app.use(errorHandler);

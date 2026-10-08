@@ -75,6 +75,8 @@ export interface FlowerAttributes {
     flower_vid?: { name: string };
     vid?: { name: string };
     Vid?: { name: string };
+    favorites?: boolean[];
+    basket_flowers?: number[] | undefined[];
     mKeyWords?: string | undefined,
     mDescript?: string | undefined
 };
@@ -258,8 +260,8 @@ Basket.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Favorite);
 Favorite.belongsTo(User);
 
-Basket.hasMany(BasketFlower);
-BasketFlower.belongsTo(User);
+Flowers.hasMany(BasketFlower, { foreignKey: 'flowerId', as: 'basket_flowers' });
+BasketFlower.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
 Vid.hasMany(Flowers, { foreignKey: 'vidId' })
 Flowers.belongsTo(Vid, { foreignKey: 'vidId' });
@@ -279,7 +281,7 @@ FlowerInfo.belongsTo(Flowers, { foreignKey: 'flowerId' });
 Flowers.hasMany(FlowerImgs, { foreignKey: 'flowerId' });
 FlowerImgs.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
-Flowers.hasMany(Favorite, { foreignKey: 'flowerId' });
+Flowers.hasMany(Favorite, { foreignKey: 'flowerId', as: 'favorites' });
 Favorite.belongsTo(Flowers, { foreignKey: 'flowerId' });
 
 // --- 4. ОПИСАНИЕ СВЯЗЕЙ (Обычно внизу файла моделей) ---

@@ -12,6 +12,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import checkRole from '../middleware/checkRoleMiddleware.js'; 
 import {User} from '../models/models.js'
 import { fileURLToPath } from 'url';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,21 +21,28 @@ function renderWithLayout(viewName: string, viewData: object, request: any, resp
        try {
         const viewPath = path.join(__dirname, '..', '..', 'views', `${viewName}.hbs`);
         const layoutPath = path.join(__dirname, '..', '..', 'views', 'layouts', 'main.hbs');
+        const iconsPath = path.join(process.cwd(), 'public', 'images', 'icons.svg');
 
         const viewString = fs.readFileSync(viewPath, 'utf8');
         const layoutString = fs.readFileSync(layoutPath, 'utf8');
+        let iconsString = '';
+        if (fs.existsSync(iconsPath)) {
+            iconsString = fs.readFileSync(iconsPath, 'utf8');
+        } else {
+            console.error(`[Error] Файл иконок не найден по пути: ${iconsPath}`);
+        }
 
         const viewTemplate = Handlebars.compile(viewString);
         const layoutTemplate = Handlebars.compile(layoutString);
 
-        // ИСПРАВЛЕНО: Никаких повторных jwt.verify и парсинга кук!
-        // Берем готового пользователя, которого для нас уже подготовил и проверил мидлвар
+        
         const finalUser = request.user || response.locals.user || null;
 
         const viewHTML = viewTemplate(viewData);
         const finalHTML = layoutTemplate({
             conteiner: viewHTML,
-            user: finalUser // Идеально чистые данные для шапки сайта (Привет, {{user.name}})
+            user: finalUser, // Идеально чистые данные для шапки сайта (Привет, {{user.name}})
+            importedIcons: iconsString
         });
 
         return response.send(finalHTML);
@@ -46,6 +54,26 @@ function renderWithLayout(viewName: string, viewData: object, request: any, resp
 // Хелпер сравнения для Handlebars
 Handlebars.registerHelper('ifEquals', function(this: any, arg1: any, arg2: any, options: any) {
     return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
+});
+
+//для иконок
+Handlebars.registerHelper('importIcons', function () {
+    // process.cwd() ВСЕГДА указывает на корень проекта, где лежит папка public
+    const filePath = path.join(process.cwd(), 'public', 'images', 'icons.svg');
+    
+    try {
+        if (fs.existsSync(filePath)) {
+            const svgContent = fs.readFileSync(filePath, 'utf8');
+            // Возвращаем безопасную строку через чистый Handlebars
+            return new Handlebars.SafeString(svgContent);
+        } else {
+            console.error(`[Handlebars Error] Файл спрайта не найден по пути: ${filePath}`);
+            return '';
+        }
+    } catch (err) {
+        console.error("[Handlebars Error] Ошибка чтения файла icons.svg:", err);
+        return '';
+    }
 });
 
 // 1. Главная страница
@@ -103,7 +131,7 @@ router.get(['/adminka', '/adminka.html'], checkRole('ADMIN'), (req, res, next) =
 });
 
 // 8. Каталог товаров
-router.get(['/catalog', '/catalog.html'], (req, res, next) => {
+router.get(['/catalog', '/catalog.html'], (req, res, next) => {   
     renderWithLayout('catalog', { welcom: 'Добро пожаловать в каталог' }, req, res, next);
 });
 
@@ -112,5 +140,6 @@ router.get(['/flower', '/flower.html'], (req, res, next) => {
     const id = req.query.id as string;
     renderWithLayout('flower', { id: id }, req, res, next);
 });
+
 
 export default router;

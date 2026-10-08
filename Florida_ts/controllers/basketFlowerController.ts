@@ -27,7 +27,7 @@ import { Request, Response, NextFunction } from 'express';
         id: string; // В Express все параметры URL всегда строки!
     }
 
-class FlowerController{
+class BasketFlowerController{
 
     async create(request: Request<{}, {}, CreateBasketRequestBody>, response: Response, next: NextFunction): Promise<Response | void>{
     try {       
@@ -132,4 +132,4 @@ class FlowerController{
         }
     }
 }
-    export default new FlowerController();
+    export default new BasketFlowerController();

@@ -7,6 +7,6 @@ import authMiddleware from '../middleware/authMiddleware.js';
 router.get('/cart', authMiddleware(), basketUserController.cart);
 router.delete('/deleteItem', authMiddleware(), basketUserController.deleteItem);
 router.post('/clear', authMiddleware(), basketUserController.clear);
-
+router.post('/addItem', authMiddleware(), basketUserController.addItem);
 
 export default router;
