@@ -7,44 +7,55 @@ import { Request, Response, NextFunction } from 'express';
 class BasketController {
     
     // МЕТОД 1: Возвращает данные корзины для fetch-запросов (JSON) или для SSR
-    async cart(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+async cart(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
         try {
             const userId = (request as any).user?.id;
 
             if (!userId) {
                 return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
             }
-        const currentUser = await User.findByPk(userId, {
-            attributes: ['phone', 'address'] 
-        });
- 
-        BasketFlower.belongsTo(Flowers, { foreignKey: 'flowerId' });
-
-        const [basket] = await Basket.findOrCreate({
-            where: { userId: Number(userId) }
-        });
-
-        // Теперь этот запрос точно выполнится!
-        const basketFlowers = await BasketFlower.findAll({
-            where: { basketId: basket.id },
-            include: [{ model: Flowers }]
-        });
-
-        if(basketFlowers.length === 0){
-            return response.json({
-            basketFlowers: [],
-            userProfile: currentUser ? currentUser.toJSON() : null,
-            mes: 'Ваша корзина пуста' // Если фронтенду вдруг понадобится строка сообщения
+            
+            const currentUser = await User.findByPk(userId, {
+                attributes: ['phone', 'address'] 
             });
-        }    
-        if(basketFlowers.length > 0){
-            return response.json({
-            basketFlowers: basketFlowers,
-            userProfile: currentUser ? currentUser.toJSON() : null,
-            mes: 'Содержимое вашей корзины' // Если фронтенду вдруг понадобится строка сообщения
-            });            
-        }
-                
+     
+            BasketFlower.belongsTo(Flowers, { foreignKey: 'flowerId' });
+
+            const [basket] = await Basket.findOrCreate({
+                where: { userId: Number(userId) }
+            });
+
+            // ИСПРАВЛЕНО: Добавлен глубокий include для подтягивания картинок цветка
+            const basketFlowers = await BasketFlower.findAll({
+                where: { basketId: basket.id },
+                include: [{ 
+                    model: Flowers,
+                    // Вытаскиваем картинки, привязанные к цветку, чтобы они отображались в корзине
+                    include: [{ model: FlowerImgs, as: 'flower_imgs' }] 
+                }]
+            });
+
+            // ИСПРАВЛЕНО: Считаем общее количество товаров в корзине (суммируем поле quantity каждого цветка)
+            const cartCount = basketFlowers.reduce((sum, item: any) => sum + (Number(item.quantity) || 1), 0);
+
+            if (basketFlowers.length === 0) {
+                return response.json({
+                    basketFlowers: [],
+                    userProfile: currentUser ? currentUser.toJSON() : null,
+                    cartCount: 0, // Отдаем ноль для шапки
+                    mes: 'Ваша корзина пуста'
+                });
+            }    
+            
+            if (basketFlowers.length > 0) {
+                return response.json({
+                    basketFlowers: basketFlowers,
+                    userProfile: currentUser ? currentUser.toJSON() : null,
+                    cartCount: cartCount, // <-- ИСПРАВЛЕНО: Теперь шапка на странице корзины получит верные данные!
+                    mes: 'Содержимое вашей корзины'
+                });            
+            }
+                    
         } catch (error: any) {
             console.error('🔥 КРИТИЧЕСКАЯ ОШИБКА ДЕБАГА BAF_FIND_ALL:', error.message);
             if (error.stack) console.error(error.stack);
@@ -129,55 +140,57 @@ class BasketController {
         }
     }   
 
-    async addItem(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
-        try {
-            const userId = (request as any).user?.id;
-            const { flowerId } = request.body; // Получаем ID цветка из тела POST-запроса
+async add(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+    try {
+        const userId = (request as any).user?.id;
+        const { flowerId } = request.body; // quantity больше не нужен, так как это переключатель (1 или 0)
 
-            if (!userId) {
-                return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
-            }
-
-            if (!flowerId || isNaN(Number(flowerId))) {
-                return next(ApiError.badRequest('Не указан или некорректно указан идентификатор flowerId'));
-            }
-
-            // 1. Ищем или автоматически создаем корзину для этого пользователя (как в твоем методе cart)
-            const [basket] = await Basket.findOrCreate({
-                where: { userId: Number(userId) }
-            });
-
-            // 2. Проверяем, есть ли этот цветок уже в этой корзине
-            const existingItem = await BasketFlower.findOne({
-                where: {
-                    basketId: basket.id,
-                    flowerId: Number(flowerId)
-                }
-            });
-
-            if (existingItem) {
-                // Если товар уже есть — увеличиваем количество на 1
-                existingItem.quantity = Number(existingItem.quantity) + 1;
-                await existingItem.save();
-                logger.info(`/Flowerida_Бэк: Увеличили количество товара ID ${flowerId} в корзине ID ${basket.id}`);
-            } else {
-                // Если товара нет — создаем новую запись с количеством 1
-                await BasketFlower.create({
-                    basketId: basket.id,
-                    flowerId: Number(flowerId),
-                    quantity: 1
-                });
-                logger.info(`/Flowerida_Бэк: Добавили новый товар ID ${flowerId} в корзину ID ${basket.id}`);
-            }
-
-            // Возвращаем фронтенду привычный статус 'ok', чтобы сработал твой alert
-            return response.json({ change: 'ok' });
-
-        } catch (error: any) {
-            logger.error('Ошибка в BasketController.addItem:', error.message);
-            return next(ApiError.internal('Внутренняя ошибка сервера при добавлении товара в корзину'));
+        if (!userId) {
+            return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
         }
+
+        // 1. Находим или создаем корзину пользователя
+        const [basket] = await Basket.findOrCreate({
+            where: { userId: Number(userId) }
+        });
+
+        // 2. Проверяем, есть ли уже этот цветок в корзине
+        const existItem = await BasketFlower.findOne({
+            where: { basketId: basket.id, flowerId: Number(flowerId) }
+        });
+
+        let action: 'added' | 'removed';
+
+        if (existItem) {
+            // ВТОРОЙ КЛИК: Цветок уже в корзине — удаляем его!
+            await existItem.destroy();
+            action = 'removed';
+        } else {
+            // ПЕРВЫЙ КЛИК: Цветка нет — добавляем (всего 1 шт.)
+            await BasketFlower.create({
+                basketId: basket.id,
+                flowerId: Number(flowerId),
+                quantity: 1
+            });
+            action = 'added';
+        }
+
+        // 3. Пересчитываем актуальное количество элементов в корзине для динамического обновления счетчика
+        const cartCount = await BasketFlower.count({
+            where: { basketId: basket.id }
+        });
+
+        return response.status(200).json({
+            change: 'ok',
+            action: action, // фронтенд будет знать, что произошло ('added' или 'removed')
+            cartCount: cartCount
+        });
+
+    } catch (error: any) {
+        console.error('Ошибка в basketUserController.addItem:', error.message);
+        return next(ApiError.internal('Ошибка сервера при переключении состояния корзины'));
     }
+}
 
 }
 

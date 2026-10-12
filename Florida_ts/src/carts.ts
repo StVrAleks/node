@@ -41,7 +41,10 @@ async function loadAndFillCart(): Promise<void> {
         }
 
         const result = await response.json();
-        
+        const countBubble = document.querySelector('[data-cart-count]');
+        if (countBubble && result.cartCount !== undefined) {
+            countBubble.textContent = result.cartCount;
+        }
         // Извлекаем данные из нового комбинированного ответа бэкенда
         const basketFlowers = result.basketFlowers || [];
         const profile = result.userProfile;
@@ -82,11 +85,13 @@ async function loadAndFillCart(): Promise<void> {
             const itemPrice = Number(flower.price);
             const itemQty = Number(item.quantity);
             finalTotalPrice += itemPrice * itemQty;
-
+            console.log('flower ', flower);
             // Извлекаем первую мини-картинку из связи flower_imgs
-            const mainImg = flower.flower_imgs && flower.flower_imgs.length > 0 
-                ? flower.flower_imgs[0].img 
-                : 'default-flower.jpg';
+            const flowerData = item.flower || item.Flower; 
+            const imagesArray = flowerData?.flower_imgs || [];
+            // Берем имя первой картинки из вложенного массива, если она есть
+            const mainImg = imagesArray[0]?.img || 'default-flower.jpg'; 
+
 
             const row = document.createElement('div');
             row.className = 'cart-item-row';

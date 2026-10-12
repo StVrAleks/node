@@ -28,11 +28,20 @@ function loadCatalog(page: number): void {
             return;
         }
 
+        const countBubble = document.querySelector('[data-cart-count]');
+            if (countBubble && data.cartCount !== undefined) {
+                countBubble.textContent = String(data.cartCount);
+                
+                // Если элементов > 0, можно динамически показать бабл, если он был скрыт
+                const bubbleWrapper = countBubble.closest('.cart-count-bubble') as HTMLElement;
+                if (bubbleWrapper) {
+                    bubbleWrapper.style.visibility = String(data.cartCount > 0 ? 'visible' : 'hidden');
+                }
+            }
         const catalogContainer = document.getElementById('catalog-products') as HTMLElement | null;
         if (!catalogContainer) return;
         
-        catalogContainer.innerHTML = ''; // Очищаем сетку
-
+        catalogContainer.innerHTML = ''; // Очищаем сетку            
         if (data.rows && data.rows.length > 0) {
             data.rows.forEach((flower: any) => {
                 const flowerImages = flower.flower_imgs; 
@@ -82,8 +91,11 @@ function loadCatalog(page: number): void {
                 });
 
                 // Слушатель для кнопки "Купить"
-                section.querySelector('.cardGood')?.addEventListener('click', () => {
-                    addToBasket(flower.id);
+                const buyBtn = section.querySelector('.cardGood') as HTMLButtonElement | null;
+                buyBtn?.addEventListener('click', () => {
+                    if (buyBtn) {
+                        addToBasket(flower.id, buyBtn); // <-- Передаем кнопку!
+                    }
                 });
 
                 // Слушатель для кнопки "Лайк"
@@ -136,20 +148,46 @@ function renderPagination(totalCount: number, page: number): void {
     /**
      * Добавление в корзину (через автоматические Куки)
      */
-async function addToBasket(flowerId: number): Promise<void> {
+async function addToBasket(flowerId: number, cartBtn: HTMLButtonElement): Promise<void> {
     try {
-        const response = await fetch('/api/basket/addItem', { // Проверьте этот роут на бэкенде
+        const response = await fetch('/api/basketUser/add', { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ flowerId, quantity: 1 })
         });
         const data = await response.json();
-        if (data.change === 'ok' || !data.mes) {
-            alert('Товар успешно добавлен в корзину!');
-        }
-    } catch (e) {
-        console.error(e);
+        if (data.change != 'ok') {
+            alert('Для управления корзиной необходимо авторизоваться!');
+        return;
     }
+        if (data.change === 'ok' || !data.mes) {
+           // alert('Товар успешно добавлен в корзину!');
+           const btnText = cartBtn.querySelector('.btn-text');
+          if (data.action === 'added') {
+            // Товар успешно добавлен
+            cartBtn.classList.add('in-cart');
+            if (btnText) btnText.innerHTML = '✓ Добавлено';
+        } else if (data.action === 'removed') {
+            // Товар успешно удален при повторном клике
+            cartBtn.classList.remove('in-cart');
+            if (btnText) btnText.innerHTML = 'Купить'; // или что у вас было изначально
+        }
+        
+        // Динамически обновляем счётчик в шапке сайта точным серверным значением
+        const countBubble = document.querySelector('[data-cart-count]');
+        if (countBubble && data.cartCount !== undefined) {
+            countBubble.textContent = data.cartCount;
+
+            const bubbleWrapper = countBubble.closest('.cart-count-bubble') as HTMLElement || null;
+            if (bubbleWrapper) {
+                // Прячем бабл, если в корзине стало 0 товаров, и показываем, если > 0
+                bubbleWrapper.style.visibility = String(data.cartCount > 0 ? 'visible' : 'hidden');
+            }
+        }
+    }
+} catch (e) { 
+    console.error('Ошибка при переключении корзины:', e); 
+}
 }
 
     /**

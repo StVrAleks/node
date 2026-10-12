@@ -123,3 +123,10 @@ div.card_control > svg.icon.icon-wishlist.w-h-{
     height: 30px;
 }
 
+.class_control_button.in-cart {
+    background-color: #56C553 !important; /* Наш фирменный зеленый row-цвет */
+    color: white !important;
+}
+.class_control_button.in-cart svg {
+    fill: white !important;
+}

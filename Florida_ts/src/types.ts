@@ -6,6 +6,7 @@ export interface ApiResponse<T = any> {
     message?: string;
     change?: string;
     rows?: T[];
+    cartCount?: number;
 }
 
 export interface UserAttributes {

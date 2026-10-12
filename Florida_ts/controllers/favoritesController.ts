@@ -128,10 +128,14 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
 
             // 2. Ищем ID корзины этого пользователя в базе данных
             let userBasketId: number | null = null;
-            if (userId) {
+            let cartCount : number = 0;
+           if (userId) {
+                // 1. Просто ищем корзину пользователя без всяких инклудов
                 const basket = await Basket.findOne({ where: { userId: Number(userId) } });
                 if (basket) {
                     userBasketId = basket.id;
+                    // 2. Считаем количество записей напрямую в таблице BasketFlower по basketId
+                    cartCount = await BasketFlower.count({ where: { basketId: basket.id } });
                 }
             }
 
@@ -183,7 +187,8 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
 
             return response.status(200).json({
                 total: flowersData.count,
-                rows: sanitizedRows
+                rows: sanitizedRows,
+                cartCount: cartCount
             });
 
         } catch (error: any) {

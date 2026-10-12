@@ -186,6 +186,7 @@ export interface ApiResponse<T = any> {
     message?: string;
     change?: string;
     rows?: T[];
+    cartCount?: number;
 }
 // --- 1. ИНТЕРФЕЙСЫ ДЛЯ ORDER (ЗАКАЗ) ---
 export interface OrderAttributes {
