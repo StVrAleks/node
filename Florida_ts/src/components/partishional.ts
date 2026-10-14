@@ -65,12 +65,14 @@ export class moduleWebPartUser {
                 mKeyWords: data.mKeyWords || '',
                 mDescript: data.mDescript || ''
             };
-            partID = 
+        }    
+        if(info.id){
+                partID = 
                 `<tr id="Itd2">
                     <td>ID</td>
                     <td id="modal_flower_id">${info.id}</td>
                 </tr>`;
-        }    
+        }
 
         return `  
             <table id="myModalTable" style="margin-top: 25px; width: 100%;">

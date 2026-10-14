@@ -761,7 +761,7 @@ else if (currentMode === 'vids') {
 }
 else if (currentMode === 'flowers') {
 
-    contentTarget.innerHTML = moduleWebPart.flower(null,'New');
+    contentTarget.innerHTML = moduleWebPart.flower(dataVal,'Edit');
 }
 else if (currentMode === 'flowersPhoto') {
  let elButtonChange = trId.replace('butChangeImg', '');

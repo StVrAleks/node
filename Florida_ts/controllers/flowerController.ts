@@ -52,7 +52,7 @@ class FlowerController{
                 defaults: { name: vidName.trim() } // Данные для создания, если не найден
             });
             
-            
+            console.log('vidElement ', vidElement);
             if (created) {
                 logger.info(`Создан новый вид цветка: ${vidName}`);
             }
@@ -70,7 +70,7 @@ class FlowerController{
 
             // Перезагружаем объект, чтобы вернуть на фронтенд заполненное виртуальное поле vidName
             await flower.reload({
-                include: [{ model: Vid, attributes: ['name'] }]
+                include: [{ model: Vid, as: 'vid', attributes: ['name'] }] 
             });
             return response.status(201).json(flower);
             }
