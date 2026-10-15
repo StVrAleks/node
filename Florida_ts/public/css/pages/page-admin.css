@@ -1,0 +1,207 @@
+/* ==========================================================================
+   PAGE-ADMIN.CSS (Профессиональный интерфейс панели управления Flowerida)
+   ========================================================================== */
+
+.admin-page-viewport {
+    width: 100%;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+/* --- 1. ПАНЕЛЬ ВЫБОРА РАЗДЕЛОВ --- */
+.admin-sections-panel {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.admin-sections-group {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+}
+
+/* --- Основной контейнер рабочей зоны --- */
+#conteiner_services {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+}
+
+/* --- 2. ЯРКИЙ ВЫДЕЛЕННЫЙ РЯД (Добавление + Пагинация) --- */
+.admin-action-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f1f8f3; /* Нежный светло-зеленый оттенок */
+    border: 1px solid rgba(83, 174, 66, 0.2);
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+}
+
+.add-action-box {
+    display: flex;
+    align-items: center;
+}
+
+/* Стилизация кнопки "+ Добавить" внутри блока из JS */
+.add-action-box input[type="button"],
+.add-action-box button {
+    background-color: #53AE42 !important;
+    color: white !important;
+    font-weight: 700 !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+    cursor: pointer;
+}
+
+/* Спокойная пагинация админки */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#page_indicator {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b4a4d;
+}
+
+/* --- 3. АДАПТИВНАЯ ТАБЛИЦА (Прижата влево, уходит в скролл) --- */
+.admin-table-scroll-viewport {
+    width: 100%;
+    overflow-x: auto; /* Появление горизонтального скролла при избытке контента */
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+}
+
+#control_table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left; /* Максимальная прижатость к левому краю */
+    font-size: 14px;
+}
+
+#control_table th {
+    background-color: #fafafa;
+    color: #181d19;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    padding: 12px 15px;
+    border-bottom: 2px solid #eaeaea;
+}
+
+#control_table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333333;
+}
+
+#control_table tr:nth-child(even) {
+    background-color: #fcfcfc;
+}
+
+#control_table tr:hover {
+    background-color: #f5faf6; /* Подсветка строки ховером */
+}
+
+/* Ссылки управления внутри ячеек */
+.class_control_button {
+    background: none;
+    border: none;
+    color: #d93838;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* --- 4. МОДАЛЬНОЕ ОКНО (Выезд сверху + SharePoint Style) --- */
+.hystmodal {
+    position: fixed;
+    top: 50px; /* Отступ сверху окна */
+    left: 50%;
+    transform: translateX(-50%); /* Центрирование по горизонтали */
+    z-index: 1000;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #cccccc;
+}
+
+/* Ручка для перетаскивания (SharePoint Style) */
+.modal-drag-handler {
+    background-color: #f3f3f3;
+    border-bottom: 1px solid #eaeaea;
+    padding: 10px 15px;
+    cursor: move; /* Курсор в виде крестика перемещения */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.drag-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666666;
+    text-transform: uppercase;
+}
+
+.drag-dots {
+    color: #aaaaaa;
+    letter-spacing: 1px;
+}
+
+.modal-body-content {
+    padding: 20px;
+}
+
+#control_modal {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Стилизация текстовых полей внутри модалки */
+.inputInfo, 
+#modalDynamicContent input[type="text"],
+#modalDynamicContent textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    outline: none;
+}
+
+#modalDynamicContent label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #555;
+}
+
+.mistake {
+    color: #d93838;
+    font-size: 14px;
+    font-weight: 600;
+}

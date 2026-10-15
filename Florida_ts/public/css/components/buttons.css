@@ -1,0 +1,242 @@
+/* ==========================================================================
+   BUTTONS.CSS (Унифицированный глобальный UI-кит проекта Flowerida)
+   ========================================================================== */
+
+/* --- 1. БАЗОВЫЙ СЛОЙ (Сброс стилей, шрифты и единые анимации нажатия) --- */
+.class_control_button,
+.action-btn,
+.cabinet-menu__btn,
+.pagination-btn,
+.btn-ops,
+#exitLogout, 
+#logout,
+#pasLogin, 
+#regLogin,
+#pre, #next,
+#control_modal_cancel,
+#control_modal_save,
+.control_modal_close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Единый отступ для внутренних SVG-иконок */
+    border: 1px solid transparent;
+    border-radius: 6px; /* Единый радиус скругления для всего проекта */
+    font-family: var(--font-body-family), var(--font-main), sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px; /* Сбалансированный базовый паддинг */
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    outline: none;
+    box-sizing: border-box;
+    text-decoration: none;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.1s ease, box-shadow 0.25s ease;
+}
+
+/* Глобальный эффект мягкого клика для абсолютно всех интерактивных кнопок проекта */
+.class_control_button:active,
+.action-btn:active,
+.pagination-btn:active,
+.btn-ops:active,
+#exitLogout:active, 
+#logout:active,
+#pasLogin:active,
+#regLogin:active,
+#pre:active, #next:active,
+#control_modal_cancel:active,
+#control_modal_save:active,
+.control_modal_close:active,
+#pre-fav:active,
+#next-fav:active,
+#numPage-fav:active,
+#control_services input[type="button"]:active,
+.class_control_button:active,
+.action-btn:active,
+.pagination-btn:active,
+.btn-ops:active,
+#checkout-submit-btn:active {
+    transform: scale(0.97) !important;
+}
+
+/* Системное заблокированное состояние */
+.btn-ops:disabled,
+.btn-ops.btn--disabled,
+#pre:disabled, #next:disabled {
+    background-color: #eaeaea !important;
+    border-color: #dddddd !important;
+    color: #999999 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+
+/* --- 2. ФИРМЕННЫЕ ЦВЕТОВЫЕ ГРУППЫ (Кнопки-модификаторы) --- */
+
+/* ГРУППА А (Зелёная палитра: Успех, Подтверждение, Регистрация, Добавление) */
+.btn-success,
+.btn--primary,
+#pasLogin,
+#save-profile-btn,
+#save-password-btn,
+#control_modal_save,
+#checkout-submit-btn,
+#control_services_flower, /* Кнопка "Цветы" в админке */
+#control_services_vid,    /* Кнопка "Виды" в админке */
+#control_services_user,   /* Кнопка "Пользователи" в админке */
+#service_add input[type="button"] {
+    background-color: var(--color-row-green, rgb(86, 197, 83)) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(86, 197, 83, 0.15);
+}
+.btn-success:hover,
+.btn--primary:hover,
+#pasLogin:hover,
+#save-profile-btn:hover,
+#save-password-btn:hover,
+#control_modal_save:hover,
+#pre-fav:hover,           
+#next-fav:hover,
+#checkout-submit-btn:hover,
+#control_services_flower:hover,
+#control_services_vid:hover,
+#control_services_user:hover,
+#service_add input[type="button"]:hover {
+    background-color: #45a049 !important; /* Наш сочный ховер-зелёный */
+    box-shadow: 0 6px 15px rgba(86, 197, 83, 0.25);
+}
+
+/* ГРУППА Б (Тёмная палитра: Премиальная база, В корзину, Личный кабинет, Сохранение) */
+/* ГРУППА Б (Зеленая база личного кабинета, В корзину, Сохранение данных) */
+.btn-dark,
+.btn-cart,
+.btn--secondary,
+/*#save-profile-btn,  /* Явно привязываем ваши ID к зеленой палитре */
+/*#save-password-btn, /* Чтобы они автоматически стали зелеными */
+#checkout-submit-btn {
+    background-color: var(--color-row-green, rgb(86, 197, 83)) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(86, 197, 83, 0.15);
+}
+
+.btn-dark:hover,
+.btn-cart:hover,
+.btn--secondary:hover,
+/*#save-profile-btn:hover,
+#save-password-btn:hover,
+*/#checkout-submit-btn:hover {
+    background-color: #45a049 !important; /* Наш сочный ховер-зелёный */
+    box-shadow: 0 6px 15px rgba(86, 197, 83, 0.25);
+}
+
+/* ГРУППА В (Информационная палитра: Синие кнопки переключения/ссылок) */
+.btn--info,
+#regLogin {
+    background-color: #2196F3 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.15);
+}
+.btn--info:hover,
+#regLogin:hover {
+    background-color: #0b7dda !important;
+    box-shadow: 0 6px 15px rgba(33, 150, 243, 0.25);
+}
+
+/* ГРУППА Г (Нейтральная серая палитра: Отмена, Назад, Пагинация, Выход на главную) */
+.btn-muted,
+.btn--outline,
+.control_modal_close,
+#control_modal_cancel,
+#exitLogout,
+#pre, #next,
+#pre-fav,     /* Теперь здесь */
+#next-fav { 
+    background-color: #f5f5f5 !important;
+    border: 1px solid #d1d3e2 !important;
+    color: #4b4a4d !important;
+    box-shadow: none !important;
+}
+.btn-muted:hover,
+.btn--outline:hover,
+.control_modal_close:hover,
+#control_modal_cancel:hover,
+#exitLogout:hover,
+#pre:hover, #next:hover:not(:disabled),
+#pre-fav:hover,
+#next-fav:hover {
+    background-color: #eef0f4 !important;
+    border-color: #b7b9cc !important;
+    color: #181d19 !important;
+}
+
+/* ГРУППА Д (Опасная красная палитра: Прямой выход из системы, Удаление) */
+.btn--danger,
+#logout {
+    background-color: #d93838 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(217, 56, 56, 0.15);
+}
+.btn--danger:hover,
+#logout:hover {
+    background-color: #b82828 !important;
+    box-shadow: 0 6px 15px rgba(217, 56, 56, 0.25);
+}
+
+
+/* --- 3. ИКОНОЧНЫЕ КНОПКИ-ПЕРЕКЛЮЧАТЕЛИ (Каталог и Избранное) --- */
+.like_good, .btn-fav, .watch, .cardGood {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+/* Состояние "В корзине" (Интеграция с вашим фронтенд JS-переключателем) */
+.in-cart {
+    background-color: var(--color-row-green, rgb(86, 197, 83)) !important;
+    border-color: var(--color-row-green, rgb(86, 197, 83)) !important;
+    color: #ffffff !important;
+}
+
+/* Состояние "Лайкнуто / В избранном" */
+.active-fav,
+.like_good.active,
+.btn-fav.active {
+    background-color: #ffebee !important;
+    border-color: #ffcdd2 !important;
+    color: #990000 !important;
+}
+.active-fav:hover,
+.like_good.active:hover,
+.btn-fav.active:hover {
+    background-color: #ffd2d7 !important;
+    border-color: #ffa3a8 !important;
+}
+
+
+/* --- 4. ВСПОМОГАТЕЛЬНЫЕ СТРУКТУРНЫЕ МОДИФИКАТОРЫ --- */
+.btn--full-width {
+    width: 100% !important;
+}
+
+.btn--small {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    border-radius: 4px !important;
+}
+
+/* Иконки внутри текстовых кнопок */
+.btn-icon, 
+.action-btn svg,
+.btn-ops svg {
+    margin-right: 6px;
+    vertical-align: middle;
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    transition: fill 0.2s ease;
+}

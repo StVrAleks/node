@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 
 // Универсальная функция рендеринга лейаута
 function renderWithLayout(viewName: string, viewData: object, request: any, response: any, next: any) {
-       try {
+    try {
         const viewPath = path.join(__dirname, '..', '..', 'views', `${viewName}.hbs`);
         const layoutPath = path.join(__dirname, '..', '..', 'views', 'layouts', 'main.hbs');
         const iconsPath = path.join(process.cwd(), 'public', 'images', 'icons.svg');
@@ -35,14 +35,24 @@ function renderWithLayout(viewName: string, viewData: object, request: any, resp
         const viewTemplate = Handlebars.compile(viewString);
         const layoutTemplate = Handlebars.compile(layoutString);
 
-        
         const finalUser = request.user || response.locals.user || null;
 
-        const viewHTML = viewTemplate(viewData);
+        // 1. Создаем единый общий контекст данных для ОБОИХ шаблонов
+        // Именно сюда хелпер {{#section}} запишет данные
+        const renderContext = {
+            ...viewData,
+            _sections: {} as Record<string, string>
+        };
+
+        // 2. Рендерим дочерний view с этим контекстом
+        const viewHTML = viewTemplate(renderContext);
+        
+        // 3. Передаем тот же самый контекст (в котором уже появился _sections.css!) в макет
         const finalHTML = layoutTemplate({
             conteiner: viewHTML,
-            user: finalUser, // Идеально чистые данные для шапки сайта (Привет, {{user.name}})
-            importedIcons: iconsString
+            user: finalUser, 
+            importedIcons: iconsString,
+            _sections: renderContext._sections // Передаем собранные секции в макет
         });
 
         return response.send(finalHTML);
@@ -54,6 +64,12 @@ function renderWithLayout(viewName: string, viewData: object, request: any, resp
 // Хелпер сравнения для Handlebars
 Handlebars.registerHelper('ifEquals', function(this: any, arg1: any, arg2: any, options: any) {
     return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('section', function(this: any, name: string, options: any) {
+    if (!this._sections) this._sections = {};
+    this._sections[name] = options.fn(this);
+    return null;
 });
 
 //для иконок

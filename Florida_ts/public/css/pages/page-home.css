@@ -1,0 +1,146 @@
+/* ==========================================================================
+   PAGE-HOME.CSS (Главный экран встречи пользователей проекта Flowerida)
+   ========================================================================== */
+
+/* Полноэкранный контейнер-обертка */
+.hero-wrapper {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 70px); /* Вычитаем примерную высоту шапки, чтобы не было прокрутки */
+    min-height: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Фоновая картинка на весь экран */
+.hero-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Идеально растягивает фото без искажений */
+    filter: brightness(0.65) contrast(1.05); /* Затемняем фото, чтобы кнопки и текст идеально читались */
+    z-index: 1;
+}
+
+/* --- ПАРЯЩАЯ МАТОВАЯ КАРТОЧКА (Эффект Glassmorphism) --- */
+.glass-card {
+    position: relative;
+    z-index: 2; /* Строго поверх картинки */
+    width: 100%;
+    max-width: 460px;
+    padding: 40px 35px;
+    background: rgba(255, 255, 255, 0.85); /* Полупрозрачный белый фон */
+    backdrop-filter: blur(10px); /* Эффект размытия заднего фона (работает в современных браузерах) */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Текстовый блок приветствия */
+.glass-card__header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e231f;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.glass-card__header p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555e56;
+    margin-bottom: 30px;
+}
+
+/* Контейнер для кнопок */
+.glass-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px; /* Удобный отступ между кнопками вместо жестких высот */
+    width: 100%;
+}
+
+/* Изменяем логику кнопок — задаем им иерархию */
+
+/* Главная призывная кнопка (Авторизация) */
+.glass-card__actions .btn-primary {
+    background-color: var(--color-row-green, #53AE42) !important;
+    color: white !important;
+    width: 100% !important;
+    height: 46px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(83, 174, 66, 0.2);
+    transition: all 0.2s ease-in-out !important;
+}
+
+.glass-card__actions .btn-primary:hover {
+    background-color: #459236 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(83, 174, 66, 0.3);
+}
+
+/* Второстепенная кнопка (Регистрация) — делаем её стильной контурной */
+.glass-card__actions .btn-secondary {
+    background: transparent !important;
+    color: var(--color-row-green, #53AE42) !important;
+    border: 2px solid var(--color-row-green, #53AE42) !important;
+    width: 100% !important;
+    height: 46px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.glass-card__actions .btn-secondary:hover {
+    background: rgba(83, 174, 66, 0.08) !important;
+    transform: translateY(-2px);
+}
+
+/* Ссылка «Я просто посмотреть» */
+.btn-guest {
+    background: none !important;
+    border: none !important;
+    color: #667067 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: color 0.2s, text-decoration 0.2s;
+    outline: none;
+    width: fit-content;
+    margin: 5px auto 0 auto;
+}
+
+.btn-guest:hover {
+    color: #1e231f !important;
+    text-decoration: underline;
+}
+
+/* Эффект нажатия для кнопок */
+.glass-card__actions .main_button:active {
+    transform: translateY(0) scale(0.98) !important;
+}
+
+/* Адаптивность под мобильные экраны */
+@media (max-width: 480px) {
+    .glass-card {
+        margin: 0 15px;
+        padding: 30px 20px;
+    }
+    .glass-card__header h1 {
+        font-size: 22px;
+    }
+}

@@ -761,7 +761,7 @@ else if (currentMode === 'vids') {
 }
 else if (currentMode === 'flowers') {
 
-    contentTarget.innerHTML = moduleWebPart.flower(null,'New');
+    contentTarget.innerHTML = moduleWebPart.flower(dataVal, "Edit");
 }
 else if (currentMode === 'flowersPhoto') {
  let elButtonChange = trId.replace('butChangeImg', '');
@@ -1404,3 +1404,58 @@ function updatePaginationInterface(): void {
         nextBtn.style.cursor = currentPage >= totalPages ? 'not-allowed' : 'pointer';
     }
 }
+
+/*
+function makeModalDraggable() {
+    const modal = document.getElementById("adminUniversalModal");
+    const handle = document.getElementById("adminModalHandle");
+    
+    if (!modal || !handle) return;
+
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    handle.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        // Разрешаем тащить только левой кнопкой мыши
+        if (e.button !== 0) return; 
+        
+        e.preventDefault();
+        // Получаем позицию курсора при старте
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        
+        // Вычисляем смещение курсора
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        // Устанавливаем новые координаты окна
+        modal.style.top = (modal.offsetTop - pos2) + "px";
+        modal.style.left = (modal.offsetLeft - pos1) + "px";
+        
+        // Сбрасываем центрирование по умолчанию, чтобы оно не мешало сдвигу
+        modal.style.transform = "none"; 
+    }
+
+    function closeDragElement() {
+        // Очищаем события при отпускании мыши
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+// Вызовите эту функцию один раз при загрузке страницы админки
+document.addEventListener("DOMContentLoaded", () => {
+    makeModalDraggable();
+});*/

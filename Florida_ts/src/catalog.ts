@@ -180,7 +180,6 @@ async function addToBasket(flowerId: number, cartBtn: HTMLButtonElement): Promis
 
             const bubbleWrapper = countBubble.closest('.cart-count-bubble') as HTMLElement || null;
             if (bubbleWrapper) {
-                // Прячем бабл, если в корзине стало 0 товаров, и показываем, если > 0
                 bubbleWrapper.style.visibility = String(data.cartCount > 0 ? 'visible' : 'hidden');
             }
         }
@@ -190,9 +189,6 @@ async function addToBasket(flowerId: number, cartBtn: HTMLButtonElement): Promis
 }
 }
 
-    /**
-     * Переключение лайка в избранном (через автоматические Куки)
-     */
 async function toggleFavorite(flowerId: number, buttonElement: HTMLButtonElement): Promise<void> {
     try {
         const response = await fetch('/api/favorites/toggle', {

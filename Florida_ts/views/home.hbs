@@ -1,16 +1,27 @@
+{{#section 'css'}}
+    <link rel="stylesheet" href="/public/css/pages/page-home.css">
+{{/section}}
 
+<div id="conteiner" class="hero-wrapper">
+    <!-- Фоновое изображение цветочного бутика -->
+    <img id="main_conteiner" src="/images/shop.jpg" alt="Flowerida Shop" class="hero-bg-img">
+    
+    <!-- Парящая карточка приветствия и входа -->
+    <div id="autentif" class="glass-card">
+        <div class="glass-card__header">
+            <h1>Добро пожаловать в Flowerida</h1>
+            <p>Эксклюзивные букеты и растения для вашей идеальной клумбы в г. Могилеве</p>
+        </div>
+        
+        <div class="glass-card__actions">
+            <input id="autorization" class="main_button btn-primary" type="submit" value="Войти в аккаунт">
+            <input id="registration" class="main_button btn-secondary" type="button" value="Создать личный кабинет">
+            <input id="guest" class="btn-guest" type="button" value="Я просто посмотреть ➔">
+        </div>
+    </div>
+</div>
 
-  
-  <div id="conteiner" >
-     <img id='main_conteiner' src="/images/shop.jpg" alt="shops">
-    <div id="autentif">
-        <input id="autorization" class="main_button" type="submit" value="Авторизироваться">
-        <input id="registration" class="main_button" type="button" value="Загеристрироваться">
-        <input id="guest" class="main_button" type="button" value="Я просто посмотреть">
-     </div>
-  </div>
-
-<script  type="module" src="/dist/src/home.js"></script> 
+<script type="module" src="/dist/src/home.js"></script> 
 
        
         

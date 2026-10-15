@@ -1,5 +1,8 @@
 
-
+{{#section 'css'}}
+    <!-- Этот файл скачает только тот, кто открыл карточку цветка -->
+    <link rel="stylesheet" href="/public/css/pages/page-profile.css">
+{{/section}}
   <div id="conteiner" >
      <div id="form-logOut-user">
         <div class = "row">
@@ -19,40 +22,6 @@
     </div>
   </div>
 
-  <style>
-   #form-logOut-user{
-      max-width: 400px;
-      margin: 0;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      position: absolute;
-      left:50%;
-      transform: translate(-50%, 50px);
-    }
-    label, p{
-      font-size: 16px;
-      color: #333;
-      display: block;
-      margin-bottom: 8px;
-    }
-    #exitLogout, #logout{
-      background-color: #4caf50;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    } 
-
-#exitLogout:hover, #logout:hover
-{
-      background-color: #45a049;
-}
-</style>
 
 <script  type="module" src="/dist/src/account.js"></script>    
         

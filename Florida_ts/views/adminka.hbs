@@ -1,74 +1,63 @@
+{{#section 'css'}}
+    <link rel="stylesheet" href="/public/css/pages/page-admin.css">
+{{/section}}
 
-
-  <div id="conteiner" >
-    <div id="conteiner_services">
-     <div id="control_services">
-      <input type="button" id="control_services_flower" value="Цветы">
-      <input type="button" id="control_services_vid"  value="Виды цветов">
-      <input type="button" id="control_services_user" value="Пользователи">
-     </div>
-     <div id="control_div_table">
-      <span id="mist3" class="mistake"></span>
-      <div id="control_admin">
-        <div id="service_add"></div>
-        <div id="pageView pagination-container">
-                <button id="pre"><< Назад</button>
-                <span id="page_indicator">Страница 1 из 1</span>
-                <button id="next">Вперед >></button>
-         <!--   <input type="button" id="pre" class="pageControl" value="<<">
-            <input type="text" id="numPage" value="1" disabled>
-            <input type="button" id="next" class="pageControl" value=">>"> -->
+<div id="conteiner" class="admin-page-viewport">
+    <!-- 1. Верхняя панель переключения разделов -->
+    <header class="admin-sections-panel">
+        <div class="admin-sections-group">
+            <button type="button" id="control_services_flower" class="btn-ops btn--secondary">Цветы</button>
+            <button type="button" id="control_services_vid" class="btn-ops btn--secondary">Виды цветов</button>
+            <button type="button" id="control_services_user" class="btn-ops btn--secondary">Пользователи</button>
         </div>
-       </div>
-        <table id="control_table"></table>
-     </div>
+    </header>
+
+    <div id="conteiner_services">
+        <div id="control_div_table">
+            <span id="mist3" class="mistake"></span>
+            
+            <!-- Яркий выделенный ряд управления: Добавление + Пагинация -->
+            <div id="control_admin" class="admin-action-bar">
+                <div id="service_add" class="add-action-box">
+                    <!-- Сюда JS вставит кнопку "+ Добавить новый цветок" -->
+                </div>
+                
+                <div id="pageView" class="pagination-container pagination-relaxed">
+                    <button id="pre" class="btn-ops btn--outline btn--small"><< Назад</button>
+                    <span id="page_indicator">Страница 1 из 1</span>
+                    <button id="next" class="btn-ops btn--outline btn--small">Вперед >></button>
+                </div>
+            </div>
+
+            <!-- Контейнер для таблицы со скроллом, прижатый влево -->
+            <div class="admin-table-scroll-viewport">
+                <table id="control_table"></table>
+            </div>
+        </div>
     </div> 
-   <!-- ЕДИНСТВЕННОЕ УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО НА ВСЮ АДМИНКУ -->
-<div class="hystmodal" id="adminUniversalModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 2000;">
-  <div class="hystmodal__window" style="background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 100%;">  
-      <span id="modalMistake" class="mistake"></span>
-      
-      <!-- Сюда функция showChange динамически зальет нужную таблицу полей -->
-      <div id="modalDynamicContent"></div>
-      
-      <div id="control_modal" style="padding-top: 20px; text-align: right;">
-        <!-- Общие кнопки управления -->
-        <input type="button" id="control_modal_save"  value="Сохранить">
-        <input type="button" id="control_modal_cancel" class="control_modal_close" value="Отменить">
-      </div>
-  </div>
 </div>
 
+<!-- ЕДИНСТВЕННОЕ УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО С ЗОНОЙ ДЛЯ ПЕРЕТАСКИВАНИЯ -->
+<div class="hystmodal" id="adminUniversalModal" style="display: none;">
+    <div class="hystmodal__window">  
+        <!-- Шапка окна, за которую можно будет перетаскивать (как в SharePoint) -->
+        <div class="modal-drag-handler" id="adminModalHandle">
+            <span class="drag-title">🗔 Управление элементом</span>
+            <div class="drag-dots">•••</div>
+        </div>
 
-<style>
-/* Фоновая темная подложка, закрывающая весь экран */
-.admin-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* полупрозрачный черный */
-    display: none; /* по умолчанию скрыто */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* чтобы быть точно поверх таблиц */
-}
+        <div class="modal-body-content">
+            <span id="modalMistake" class="mistake"></span>
+            
+            <!-- Динамические поля -->
+            <div id="modalDynamicContent"></div>
+            
+            <div id="control_modal">
+                <input type="button" id="control_modal_save" class="btn-ops btn--primary" value="Сохранить">
+                <input type="button" id="control_modal_cancel" class="btn-ops btn--outline control_modal_close" value="Отменить">
+            </div>
+        </div>
+    </div>
+</div>
 
-/* Окно по центру */
-.admin-modal-overlay.active {
-    display: flex; /* показываем, когда добавим класс active */
-}
-
-.admin-modal-window {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    max-width: 500px;
-    width: 100%;
-}
-</style>
-
-<script  type="module" src ='/dist/src/adminka.js'></script>    
-        
+<script type="module" src="/dist/src/adminka.js"></script>

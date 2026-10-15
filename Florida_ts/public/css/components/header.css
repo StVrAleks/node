@@ -1,0 +1,441 @@
+/* Контейнеры и группы иконок в шапке */
+.header{
+   display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    font-size: 30px;
+    font-weight: 900;
+}
+.header__logo{
+    display: flex;
+    flex-direction: row;
+    width: 320px;
+    height: 50px;
+    font-size: 47px;
+}
+
+.header-single-line{
+     padding-top: 15px; 
+     padding-bottom: 0px; 
+     background-color: #ffffff; 
+     --header-text-transform: capitalize;
+}
+.search__button {
+    min-width: inherit;
+    text-overflow: unset;
+    padding: 1px 10px 4px;
+    border-radius: 0;
+    min-height: 30px;
+    background: transparent;
+    box-shadow: none;
+    border: 0;
+    background-color: #f9f9f9;
+}
+.userActivites{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+}
+/*поиск*/
+.field {
+    display: flex;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    background: #f9f9f9;
+    color: #323232;
+    --search-icon-color: #323232;
+    border-radius: 0px;
+    --spacing-l-r: 0px;
+    padding-top: 15px;
+    padding-bottom: 0px;
+    background-color: #ffffff;
+    --header-text-transform: capitalize;    
+}
+.search__input{
+    font-size: calc(var(--font-body-size) + 2px);
+    width: calc(100% - 50px);
+    padding: 10px 18px;
+    background-color: transparent;
+    border: 0;
+}
+.field__input{
+    flex-grow: 1;
+    background-color: #f9f9f9;
+    padding-top: 15px;
+    padding-bottom: 0px;
+    height: auto;
+}
+svg.icon-search {
+    width: 20px;
+    height: 26px;
+    transform: none;
+    position: relative;
+    top: 1px;
+    margin: 0 6px 0 0;
+    color: #323232;
+}
+
+
+.text{
+    line-height: 13px;
+    font-size: 10px;
+    color: #ffffff;
+    align-items: center;
+    display: inline-block !important;
+    vertical-align: middle;
+    box-sizing: inherit;
+    padding-top: 1px;
+    padding-left: 3px;
+    text-transform: capitalize;
+}
+
+.header__group {
+    min-width: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #232323;
+}
+
+.header__icon {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 0;
+    letter-spacing: 0;
+    line-height: 1;
+    width: auto;
+    position: relative;
+}
+
+/* Количество товаров в корзине */
+.cart-count-bubble {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 10px;
+    line-height: 15px;
+    vertical-align: middle;
+    text-align: center;
+    border-radius: 50%;
+    display: inline-block !important;
+}
+
+/* Навигационная панель под шапкой */
+#single_line {
+    height: 30px;
+    width: 99vw;
+    display: flex;
+    flex-direction: row;
+    font-weight: 500;
+    padding-top: 10px;
+    font-size: 20px;
+    align-items: center;
+}
+
+#single_line_catalog {
+    padding: 0 15px;
+}
+
+#single_line_admin {
+    padding: 0 15px;
+}
+
+.main-navigation-bar {
+    width: 100%;
+    background-color: #ffffff; /* Чистый белый фон */
+    border-top: 1px solid #eaeaea;
+    border-bottom: 1px solid #eaeaea; /* Деликатные разделительные линии */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    position: relative;
+    z-index: 10;
+}
+
+/* Ограничитель ширины в тон контенту сайта */
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Линейный горизонтальный контейнер для ссылок */
+.nav-links-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0; /* Разделение контролируется паддингами ссылок */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Оформление ссылок навигации */
+.nav-link-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px; /* Удобная зона клика */
+    color: #4b4a4d; /* Приглушенный графитовый цвет в тон вашим иконкам */
+    text-decoration: none;
+    font-family: var(--font-body-family), "DIN Next", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase; /* Строгий классический вид меню */
+    letter-spacing: 0.05em;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+/* Плавный индикатор (полоска) снизу при наведении */
+.nav-link-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 3px;
+    background-color: #53AE42; /* Фирменный сочный зеленый Flowerida */
+    transform: scaleX(0); /* По умолчанию скрыта */
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 3px 3px 0 0;
+}
+
+/* Эффекты при наведении */
+.nav-link-item:hover {
+    color: #181d19; /* Текст становится контрастнее */
+}
+
+.nav-link-item:hover::after {
+    transform: scaleX(1); /* Полоска красиво выезжает из центра */
+}
+
+/* Особенный стиль для Админки, чтобы она визуально выделялась */
+.nav-item--admin .nav-link-item {
+    color: #888888; /* Изначально более спокойный цвет */
+}
+
+.nav-item--admin .nav-link-item:hover {
+    color: #d93838; /* При наведении загорается предупреждающим красным */
+}
+
+.nav-item--admin .nav-link-item::after {
+    background-color: #d93838; /* Линия под админкой тоже становится красной */
+}
+
+/* Мобильная адаптивность */
+@media (max-width: 768px) {
+    .nav-link-item {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+}
+
+/* ==========================================================================
+   HEADER SINGLE LINE (Адаптивная шапка интернет-магазина Flowerida)
+   ========================================================================== */
+
+.header-single-line {
+    width: 100%;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    padding: 15px 0;
+    position: relative;
+    z-index: 100;
+}
+
+/* Главный флекс-ряд */
+.header-main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* --- 1. ЛОГОТИП --- */
+.header-logo-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.header-logo-img {
+    display: block;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.header-logo-block:hover .header-logo-img {
+    transform: rotate(15deg); /* Фирменное легкое покачивание цветка */
+}
+
+.header-logo-text {
+    font-family: var(--font-heading-family), "DIN Next", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #181d19;
+    letter-spacing: 0.5px;
+}
+
+/* --- 2. ПОИСКОВАЯ СТРОКА --- */
+.search-form-block {
+    flex-grow: 1;
+    max-width: 500px; /* Чтобы поиск не растягивался во всю ширь на мониторах */
+}
+
+.search-field-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-field {
+    width: 100%;
+    padding: 10px 15px 10px 45px; /* Освобождаем место слева под иконку лупы */
+    border: 1px solid #e0e0e0;
+    border-radius: 20px; /* Приятная округлая форма */
+    font-size: 14px;
+    outline: none;
+    background-color: #f7f7f7;
+    transition: all 0.2s ease;
+}
+
+.search-input-field:focus {
+    background-color: #ffffff;
+    border-color: #53AE42;
+    box-shadow: 0 0 0 3px rgba(83, 174, 66, 0.1);
+}
+
+.search-submit-btn {
+    position: absolute;
+    left: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-submit-btn .icon-search {
+    width: 16px;
+    height: 16px;
+    fill: #777777;
+}
+
+/* --- 3. БЛОК АКТИВНОСТИ ПОЛЬЗОВАТЕЛЯ (userActivites) --- */
+.userActivites {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px; /* Отступы между Профилем, Избранным и Корзиной */
+    flex-shrink: 0;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+}
+
+.activity-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #4b4a4d;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+    position: relative;
+}
+
+.activity-link:hover {
+    color: #53AE42; /* Подсветка зеленым при наведении */
+}
+
+/* Унифицированный размер иконок в шапке */
+.activity-link .icon {
+    width: 22px;
+    height: 22px;
+    fill: currentColor; /* Иконка наследует hover-цвет текста автоматически! */
+}
+
+/* Баббл счетчика корзины */
+.cart-link-container {
+    position: relative;
+}
+
+.cart-count-bubble {
+    position: absolute;
+    top: -6px;
+    right: -10px; /* Сдвигаем на угол иконки */
+    background-color: #53AE42;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    box-shadow: 0 2px 5px rgba(83, 174, 66, 0.3);
+}
+
+/* --- 4. ЖЕСТКАЯ МОБИЛЬНАЯ АДАПТИВНОСТЬ (Breakpoints) --- */
+
+@media (max-width: 992px) {
+    /* На планшетах прячем текстовые подписи, оставляя понятные иконки */
+    .activity-text {
+        display: none; 
+    }
+    .userActivites {
+        gap: 25px; /* Увеличиваем расстояние между иконками для удобства тапа пальцем */
+    }
+}
+
+@media (max-width: 768px) {
+    /* На смартфонах перестраиваем шапку в два ряда, чтобы поиск не сжимался в точку */
+    .header-main-container {
+        flex-wrap: wrap;
+        padding: 0 15px;
+        gap: 15px;
+    }
+
+    /* Логотип и иконки остаются на первом ряду */
+    .header-logo-block {
+        order: 1;
+    }
+    .userActivites {
+        order: 2;
+    }
+
+    /* Поисковая строка падает на второй ряд и занимает 100% ширины */
+    .search-form-block {
+        order: 3;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .header-logo-text {
+        font-size: 18px; /* Чуть компактнее текст логотипа */
+    }
+}

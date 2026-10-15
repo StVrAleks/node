@@ -1,0 +1,180 @@
+/* ==========================================================================
+   PAGE-FAVORITES.CSS (Страница избранных товаров интернет-магазина Flowerida)
+   ========================================================================== */
+
+/* Контейнер страницы */
+.catalog-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 15px;
+}
+
+/* Заголовок страницы */
+.catalog-container h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #181d19;
+    margin-bottom: 25px;
+    border-bottom: 2px solid rgba(83, 174, 66, 0.15); /* Деликатная зеленая линия */
+    padding-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* Сообщения об ошибках или пустом списке */
+#favorites-error-msg {
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    grid-column: 1 / -1;
+    margin: 20px 0;
+    color: #d93838;
+}
+
+/* --- 1. СЕТКА ТОВАРОВ (Идентична основному каталогу) --- */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Контейнер-секция карточки товара */
+.conteiner_section {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px; /* Единый радиус проекта */
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.conteiner_section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* Верхняя часть карточки (Заголовок вида и изображение) */
+.card__top {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #fafafa;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.title_goods {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #555555;
+    letter-spacing: 0.8px;
+}
+
+.imgs_goods {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.imgs_goods img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.conteiner_section:hover .imgs_goods img {
+    transform: scale(1.05);
+}
+
+/* Нижняя часть карточки (Название цветка и цена) */
+.card__botoom {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+}
+
+.full_title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #232323;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.full_title:hover {
+    color: var(--color-row-green, #53AE42);
+}
+
+.price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #181d19;
+}
+
+/* Панель управления на карточке */
+.card_control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
+    gap: 10px;
+}
+
+/* --- 2. БЛОК ПАГИНАЦИИ --- */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+/* Инпут номера страницы */
+#numPage-fav {
+    width: 50px;
+    height: 38px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    color: #181d19;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid #d1d3e2;
+    border-radius: 6px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+#numPage-fav:focus {
+    border-color: var(--color-row-green, #53AE42);
+    box-shadow: 0 0 0 3px rgba(83, 174, 66, 0.15);
+}
+#numPage-fav:focus {
+    border-color: #b7b9cc;
+    box-shadow: 0 0 0 3px rgba(183, 185, 204, 0.2);
+}
+/* Адаптивность сетки под мобильные телефоны */
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .pagination-container {
+        gap: 8px;
+    }
+}

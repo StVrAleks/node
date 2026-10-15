@@ -1,0 +1,339 @@
+/* ==========================================================================
+   PAGE-CART.CSS (Страница корзины и оформления доставки букетов)
+   ========================================================================== */
+
+/* Заголовок страницы */
+.cart-page-wrapper h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #232323;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* --- 1. СПИСОК ТОВАРОВ В КОРЗИНЕ (Генерируется динамически через JS) --- */
+.cart-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Карточка отдельного букета/цветка в корзине */
+.cart-item-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cart-item-row:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Контейнер для вашей миниатюры цветка */
+.cart-item__img-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    flex-shrink: 0;
+    margin-right: 20px;
+    border: 1px solid #eee;
+}
+
+.cart-item__img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Важное свойство, чтобы миниатюры не искажались */
+}
+
+/* Информационный блок товара */
+.cart-item__info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cart-item__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #232323;
+}
+
+.cart-item__vid {
+    font-size: 13px;
+    color: #888;
+}
+
+/* Блок цены и управления количеством */
+.cart-item__control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 25px;
+    margin-left: 20px;
+}
+
+.cart-item__price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #232323;
+    white-space: nowrap;
+}
+
+/* Кнопка мгновенного удаления (крестик или иконка) */
+.cart-item__remove-btn {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s ease, color 0.2s ease;
+    line-height: 1;
+}
+
+.cart-item__remove-btn:hover {
+    color: #d9363e;
+    transform: scale(1.15);
+}
+
+/* --- 2. БЛОК ИТОГОВОЙ СУММЫ --- */
+.cart-total-score {
+    border-top: 2px solid #232323;
+    padding-top: 15px;
+    color: #232323;
+}
+
+#cart-final-total-price {
+    color: var(--color-row-green, #53AE42); /* Подсветка итоговой цены вашим зеленым */
+    font-size: 22px;
+}
+
+/* --- 3. ФОРМА ОФОРМЛЕНИЯ ЗАКАЗА И ДОСТАВКИ --- */
+.checkout-form-container {
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+/* ==========================================================================
+   PAGE-CART.CSS (Страница корзины и оформления доставки букетов)
+   ========================================================================== */
+
+.cart-page-wrapper {
+    max-width: 800px; /* Сужаем контейнер для более аккуратного вида */
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+/* Заголовок страницы */
+.cart-page-wrapper h3 {
+    font-size: 20px; /* Немного уменьшили */
+    font-weight: 600;
+    color: #232323;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(83, 174, 66, 0.15);
+    padding-bottom: 8px;
+}
+
+/* --- 1. СПИСОК ТОВАРОВ В КОРЗИНЕ (Умеренное сжатие) --- */
+.cart-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Уменьшили шаг между карточками с 15px до 10px */
+}
+
+/* Карточка отдельного букета */
+.cart-item-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 15px; /* Уменьшили вертикальный паддинг с 15px до 10px */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cart-item-row:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+/* Контейнер миниатюры цветка */
+.cart-item__img-wrapper {
+    width: 60px; /* Сжали изображение с 80px до 60px */
+    height: 60px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    flex-shrink: 0;
+    margin-right: 15px;
+    border: 1px solid #eee;
+}
+
+.cart-item__img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Информационный блок товара */
+.cart-item__info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px; /* Плотнее расположение строк */
+}
+
+.cart-item__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #232323;
+}
+
+.cart-item__vid {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Блок цены и управления количеством */
+.cart-item__control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin-left: 15px;
+}
+
+.cart-item__price {
+    font-size: 15px;
+    font-weight: 700;
+    color: #232323;
+    white-space: nowrap;
+}
+
+/* Кнопка мгновенного удаления */
+.cart-item__remove-btn {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 3px;
+    transition: transform 0.2s ease, color 0.2s ease;
+    line-height: 1;
+}
+.cart-item__remove-btn:hover {
+    color: #d9363e;
+    transform: scale(1.15);
+}
+
+/* --- 2. БЛОК ИТОГОВОЙ СУММЫ --- */
+#total-box {
+    text-align: right;
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#cart-final-total-price {
+    color: var(--color-row-green, #53AE42);
+    font-size: 20px;
+}
+
+/* --- 3. ФОРМА ОФОРМЛЕНИЯ ЗАКАЗА И ДОСТАВКИ (Сильное сжатие) --- */
+#checkout-form {
+    background-color: #fcfcfc;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    padding: 15px; /* Уменьшили паддинг с 20px до 15px */
+    border-radius: 6px;
+    margin-top: 15px;
+}
+
+.checkout-form-container h3 {
+    font-size: 15px; /* Сжали размер шрифта заголовка */
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.form-field {
+    margin-bottom: 8px; /* Сильно уменьшили отступ между полями с 15px до 8px */
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 3px;
+    font-weight: 600;
+    font-size: 12px; /* Компактные подписи полей */
+    color: #555555;
+}
+
+.form-field input {
+    width: 100%;
+    padding: 8px 10px; /* Уменьшили внутренние отступы инпутов с 10px до 8px */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field input:focus {
+    border-color: var(--color-row-green, #53AE42) !important;
+    box-shadow: 0 0 0 3px rgba(83, 174, 66, 0.15);
+}
+
+/* --- 4. АДАПТИВНОСТЬ --- */
+@media (max-width: 576px) {
+    .cart-item-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        position: relative;
+    }
+    .cart-item__img-wrapper {
+        margin-right: 0;
+        width: 100%;
+        height: 120px;
+    }
+    .cart-item__control {
+        margin-left: 0;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .cart-item__remove-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+}
+
+/* Стили для вывода ошибок */
+#cart-error-msg {
+    color: #ff4d4f;
+    margin-bottom: 12px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}

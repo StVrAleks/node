@@ -1,0 +1,87 @@
+footer {
+    width: 100%;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eaeaea;
+    margin-top: 60px;
+    position: relative;
+    overflow: hidden;
+    padding: 40px 0 10px 0; /* Оптимальные аккуратные отступы подвала */
+}
+
+/* Контейнер карточки контактов */
+#footer_contact {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    z-index: 5;
+}
+
+/* Растягиваем объединенную SVG-графику на весь размер блока */
+.footer-blend-svg {
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: calc(100% - 40px);
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Контент карточки парит над графикой */
+.footer-card-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    padding: 35px 50px 55px 50px;
+}
+
+/* Типографика и элементы */
+.footer-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #232323;
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #333333;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: #53AE42;
+}
+
+.footer-link .icon {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+}
+
+/* Адаптивность для мобильных телефонов */
+@media (max-width: 768px) {
+    .footer-card-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 30px;
+        padding: 25px;
+    }
+    .footer-info, .footer-social {
+        align-items: center;
+    }
+}

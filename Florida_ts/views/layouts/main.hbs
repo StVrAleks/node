@@ -3,9 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <title>Flowerida - цветы для клумбы</title>
-    <link rel="stylesheet"  href="/public/css/style.css">
-    <link rel="stylesheet"  href="/public/css/adminka.css">
-    <link rel="stylesheet"  href="/public/css/product-description.css">
+    <link rel="stylesheet" href="/public/css/common/main.css">
+    <link rel="stylesheet" href="/public/css/components/buttons.css">
+
+<!-- Затем шапка и подвал -->
+    <link rel="stylesheet" href="/public/css/components/header.css">
+    <link rel="stylesheet" href="/public/css/components/footer.css">
+    {{{_sections.css}}}
     <link rel="icon" type="image/png" sizes="64x64" href="/public/images/favicon.png">
     <meta name="keywords" content="FLOWERIDA, цветы, растения, клумбы, декор, луковицы, семена, корневище" />
     <meta name="description" content="FLOWERIDA - интернет-магазин по продаже живых цветов, семян, луковиц и много другого. Все, что нужно для красивой клумбы." />
@@ -13,106 +17,162 @@
 <body>
  {{{importedIcons}}}
 <header class="header header-single-line">
+    <div class="header-main-container size--5">
+        
+        <!-- 1. БЛОК ЛОГОТИПА -->
+        <div class="header-logo-block">
+            <a href="/" class="header__heading-link">
+                <img src="/images/favicon.png" alt="Flowerida" width="40" height="40" class="header-logo-img">
+            </a> 
+            <span class="header-logo-text">Flowerida</span>
+        </div>
+        
+        <!-- 2. БЛОК ПОИСКА -->
+        <form action="/search" method="get" role="search" class="search-form-block">
+            <div class="search-field-wrapper">
+                <button class="search-submit-btn" aria-label="Search">
+                    <svg role="img" class="icon icon-search">
+                        <use href="#icon-search"></use>
+                    </svg>
+                </button>
+                <input class="search-input-field" id="Search-In-Modal-Single" type="search" name="q" placeholder="Поиск цветов..." autocomplete="off">
+            </div>
+        </form>
 
-        <div class="header-single-line__content size--5">
-            <div class="header-single-line__item header-single-line__item--logo">
-                <div class="header__logo text-left clearfix">
-                    <div class="header__heading">
-                         <a href="/" class="header__heading-link focus-inset">
-                         <img src="/images/favicon.png" alt="Flowerida" srcset="/images/favicon.png" width="50" height="50" class="header__heading-logo motion-reduce">
-                        </a> 
-                    </div>
-                    <div> Flowerida</div>
+        <!-- 3. БЛОК АКТИВНОСТИ ПОЛЬЗОВАТЕЛЯ -->
+        <div class="userActivites">
+            <!-- Профиль/Вход -->
+            <div class="activity-item">
+                {{#if user}}
+                <a href="/cabinet" class="activity-link" title="Личный кабинет">
+                    <svg class="icon icon-account"><use href="#icon-user"></use></svg>
+                    <span class="activity-text">Привет, {{user.name}}</span>
+                </a>
+                {{else}}
+                <a href="/login" class="activity-link" title="Войти">
+                    <svg class="icon icon-account"><use href="#icon-user"></use></svg>
+                    <span class="activity-text">Войти</span>
+                </a>
+                {{/if}}                    
+            </div>
+
+            <!-- Избранное -->
+            <div class="activity-item">
+                <a href="/favorites" class="activity-link" title="Избранное">
+                    <svg role="img" class="icon icon-wishlist"><use href="#icon-favorites"></use></svg>
+                    <span class="activity-text">Избранное</span>
+                </a>
+            </div>
+
+            <!-- Корзина -->
+            <div class="activity-item">
+                <a href="/cart" class="activity-link cart-link-container" data-cart-sidebar="" title="Корзина">
+                    <svg class="icon icon-cart"><use href="#icon-cart"></use></svg>
+                    <span class="activity-text">Корзина</span>
+                    <div class="cart-count-bubble">
+                        <span data-cart-count="">{{cartCount}}</span>
+                    </div> 
+                </a>
+            </div>           
+        </div>  
+
+    </div>
+</header>      
+
+
+
+<main class="main-content-viewport">
+<nav id="single_line" class="main-navigation-bar">
+    <div class="nav-container size--5">
+        <ul class="nav-links-list">
+            <li class="nav-item">
+                <a href="/catalog" class="nav-link-item">
+                    <span class="nav-link-text">Каталог товаров</span>
+                </a>
+            </li>
+            
+            {{#ifEquals user.role "ADMIN"}}
+            <li class="nav-item nav-item--admin">
+                <a href="/adminka" class="nav-link-item">
+                    <span class="nav-link-text">Панель администратора</span>
+                </a>
+            </li>
+            {{/ifEquals}}
+        </ul>
+    </div>
+</nav>
+
+
+   {{{ conteiner }}}
+</main>
+<footer>
+    <div id="footer_contact">
+        <!-- Объединенная SVG-подложка -->
+        <svg class="footer-blend-svg" viewBox="0 0 1200 300" preserveAspectRatio="none">
+            <defs>
+                <!-- Матовое стекло: плавно растворяется к низу -->
+                <linearGradient id="glassGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+                    <stop offset="60%" stop-color="#ffffff" stop-opacity="0.35" />
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+                </linearGradient>
+
+                <!-- Мягкая маска для травы: обрезает и растворяет её строго по направлению роста (сверху вниз) -->
+                <linearGradient id="grassMaskGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.0" />
+                    <stop offset="35%" stop-color="#ffffff" stop-opacity="0.6" />
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="1.0" />
+                </linearGradient>
+                <mask id="grassMask">
+                    <rect width="1200" height="300" fill="url(#grassMaskGrad)" />
+                </mask>
+            </defs>
+
+            <!-- ТРАВА: preserveAspectRatio="xMidYBottom slice" обрезает картинку по верху, 
+                 сохраняя пропорции травинок и растягивая их на всю ширину подвала -->
+            <image href="/images/footer_bg.png" x="0" y="30" width="1200" height="270" 
+                   preserveAspectRatio="xMidYBottom slice" mask="url(#grassMask)" />
+
+            <!-- Слой матового стекла поверх травы -->
+            <rect x="0" y="0" width="1200" height="210" fill="url(#glassGrad)" rx="20" ry="20" />
+        </svg>
+
+        <!-- Текстовое содержимое карточки -->
+        <div class="footer-card-content">
+            <div class="footer-info">
+                <div class="footer-title">Магазин FLOWERIDA</div>
+                <div class="footer-address">г. Могилев, ул. Первомайская, 1</div>
+                
+                <div class="footer-phone-block">
+                    <a href="tel:+375291111111" class="footer-link">
+                        <svg class="icon icon-footer-phone"><use href="#icon-phone"></use></svg>
+                        <span>+375 (29) 111-11-11</span>
+                    </a>
+                </div>
+                <div class="footer-email-block">
+                    <a href="mailto:mail@flowerida.by" class="footer-link">
+                        <svg class="icon icon-footer-email"><use href="#icon-mail"></use></svg>
+                        <span>mail@flowerida.by</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-social">
+                <div class="footer-title">Мы в соцсетях</div>
+                <div class="social-icons-row">
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-link-item" aria-label="Instagram">
+                        <svg class="icon icon-social"><use href="#icon-instagram"></use></svg>
+                    </a>
+                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-link-item" aria-label="Twitter">
+                        <svg class="icon icon-social"><use href="#icon-twitter"></use></svg>
+                    </a>
+                    <a href="https://telegram.org" target="_blank" rel="noopener noreferrer" class="social-link-item" aria-label="Telegram">
+                        <svg class="icon icon-social"><use href="#icon-telegram"></use></svg>
+                    </a>
                 </div>
             </div>
         </div>
-        
-        <form action="/search" method="get" role="search" class="search search-modal__form">
-            <div class="field">
-                <button class="button search__button field__button focus-inset" aria-label="Search">
-                    <svg role="img" class="icon icon-search" style="display: inline-block;">
-                        <use href="#icon-search"></use></svg>
-                </button>
-                <input class="search__input field__input form-input-placeholder" id="Search-In-Modal-Single" type="search" name="q" value="" placeholder="Search" autocomplete="off" role="combobox" aria-expanded="false" aria-owns="predictive-search-results-list" aria-controls="predictive-search-results-list" aria-haspopup="listbox" aria-autocomplete="list" autocorrect="off" autocapitalize="off" spellcheck="false">
-                <input type="hidden" name="options[prefix]" value="last">
-                <input type="hidden" name="type" value="product">
-
-            </div>
-        <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
-    </form>
-<div class="userActivites">
-    <div class="header-single-line__item header-single-line__item--customer">
-        <div class="header__iconItem header__group">
-            {{#if user}}
-            <a href="/cabinet" class="header__icon header__icon--account link link--text">
-            <svg class="icon icon-account" width="18px" height="50px">
-                <use href="#icon-user"></use>
-            </svg>
-                <span class="customer-links">Привет, {{user.name}}</span>
-            </a>
-            {{else}}
-                <a href="/login" class="header__icon header__icon--account link link--text">
-                <svg class="icon icon-account" width="18px" height="50px">
-                    <use href="#icon-user"></use></svg>
-                <span class="customer-links">Sign In</span>
-                </a>
-            {{/if}}                    
-        </div>
     </div>
-
-    <div class="header-single-line__item header-single-line__item--wishlist">
-        <div class="header__iconItem header__group">
-            <a href="/favorites" class="header__icon header__icon--wishlist link link--text focus-inset">
-            <svg role="img" class="icon icon-wishlist w-h-" width="18px" height="50px">
-                <use href="#icon-favorites"></use>
-            </svg>
-                <span class="wishlist-text">Wish Lists</span>
-            </a>
-        </div>
-    </div>
-    <div class="header-single-line__item header-single-line__item--cart">
-        <div class="header__iconItem header__group " style="--color: #232323; --cart-bg-item: #000000; --cart-color-item: #ffffff; --cart-item-font-size: 14px">
-            <a href="/cart" class="header__icon header__icon--cart link link--text focus-inset cart-icon-bubble" data-cart-sidebar="">
-                <svg  class="icon icon-cart  stroke-w-5" width="18px" height="50px">
-                    <use href="#icon-cart"></use>
-                </svg>
-                <span class="cart-text">Cart</span>
-                <div class="cart-count-bubble">
-                    <span class="text" aria-hidden="true" data-cart-count="">{{cartCount}}</span>
-                    <span class="visually-hidden" style="visibility: hidden; font-size:3px;">0 items</span>
-                </div> 
-            </a>
-        </div>
-    </div>           
- </div>        
-
-
-</header>
-<div id="single_line">
-    <div id="single_line_catalog">
-        <a href="/catalog">⋙ Каталог</a>
-        
-     </div>
-    {{#ifEquals user.role "ADMIN"}}
-    <div id="single_line_admin">
-        <a href="/adminka"> ⋙ Админка</a>
-    </div>
-    {{/ifEquals}}
-</div>
-   {{{ conteiner }}}
-
-<footer>
-    <div id="footer_contact">
-        <div style="padding-left: 20px;">
-            <div>Магазин FLOWERIDA</div>
-            <div>г. Могилев ул.Первомайская,1</div>
-        </div>
-        <div style="padding-right: 20px;">
-            <div>т. +375-29-111-11-11</div>
-            <div>Почта: mail@flowerida.by</div>
-        </div>
-    </div>
-    <img src="/images/footer_bg.png" alt="footerBackground">
 </footer>
 
 </body>
