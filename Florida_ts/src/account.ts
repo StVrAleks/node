@@ -8,6 +8,7 @@ interface IAuthResponse {
     mes?: string;
     authUser?: IAuthUser;
 }
+
 const localToken: string | null = localStorage.getItem('floweridaKey');
 const exitLogout = document.getElementById('exitLogout') as HTMLElement | null;
 if(exitLogout)
