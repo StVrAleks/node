@@ -252,7 +252,6 @@ async updateProfile(request: Request<{}, {}, UpdateProfileRequestBody>, response
         
         const userId = (request as any).user?.id; 
         const userEmail = (request as any).user?.email;
-console.log('userId ', userId);
         if (!userId && !userEmail) {
             return next(ApiError.forbidden('Пользователь не авторизован'));
         }

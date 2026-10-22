@@ -72,11 +72,8 @@ app.use((req, res, next) => {
   res.status(404).send(`Маршрут ${req.originalUrl} не найден на сервере. Проверьте viewRouter.`);
 });
 
-
-
 // 4. Логгер ошибок
 app.use(errorHandler);
-
 const start = async () => {
      try {
         await sequelize.authenticate();
