@@ -1,28 +1,31 @@
 import { ApiResponse, FlowerAttributes } from './types.js';
-/*
+
 let flowerData: {
-    wrapper: HTMLElement;
-}
+    wrapper: HTMLElement| null,
+    divImg: HTMLElement,
+    descrContainer: HTMLElement,
+    minusBtn: HTMLElement,
+    plusBtn: HTMLElement,
+    qtyInput: HTMLInputElement | null,
+    cartBtn: HTMLElement,
+    favBtn: HTMLElement
+} | null;
+
+import { QuantitySelector  } from './modules/product/product-ui.js'
 
 export async function initFlowerModule(): Promise<void> {
     flowerData = {
-        wrapper:  document.querySelector('.product-page-wrapper') as HTMLElement,
-        logOutUserEmail: document.getElementById('logOutUserEmail') as HTMLElement,
-        mist2: document.getElementById('mist2') as HTMLElement,
-        exitLogout: document.getElementById('exitLogout') as HTMLElement,
-        logout: document.getElementById('logout') as HTMLElement
+        wrapper:  document.querySelector('.product-page-wrapper') as HTMLElement | null,
+        divImg: document.getElementById('imgsFl') as HTMLElement,
+        descrContainer: document.getElementById('descr') as HTMLElement,
+        minusBtn: document.getElementById('qty-minus') as HTMLElement,
+        plusBtn: document.getElementById('qty-plus') as HTMLElement,
+        qtyInput: document.getElementById('product-qty') as HTMLInputElement | null,
+        cartBtn: document.getElementById('add-to-cart-btn') as HTMLElement,
+        favBtn: document.getElementById('fav-toggle-btn') as HTMLElement
     };
 
-  accountData.exitLogout.addEventListener('click', (event: Event): void => { window.location.href = '/home.html'; });  
-  accountData.logout.addEventListener('click', async(event: Event): Promise<void> => {logoutUserFunc();});
-
-  authUserFunc();
-}*/
-
-
-document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
-    const wrapper = document.querySelector('.product-page-wrapper') as HTMLElement | null;
-    const idFl = wrapper ? wrapper.dataset.flowerId : null;
+   const idFl = flowerData.wrapper ? flowerData.wrapper.dataset.flowerId : null;
 
     if (!idFl) {
         console.error('Критическая ошибка: ID цветка не найден в разметке.');
@@ -37,11 +40,21 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     ]);
 
     // Инициализируем селектор количества
-    initQuantitySelector();
+  //  initQuantitySelector();
 
     // Настраиваем клик кнопок
     initActionButtons(Number(idFl));
-});
+
+     const quantitySelector = new QuantitySelector(flowerData?.wrapper, {
+        min: 1,
+        max: 100, // Ограничим, например, до 20 букетов в одни руки
+        onChange: (newValue) => {
+            
+            // Сюда мы позже добавим вызов функции пересчета итоговой стоимости:
+            // updateTotalPrice(newValue);
+        }
+    });
+}
 
 /* Загрузка данных цветка */
 async function loadMainFlowerData(idFl: string): Promise<void> {
@@ -61,8 +74,7 @@ async function loadMainFlowerData(idFl: string): Promise<void> {
 
 /* Загрузка изображений */
 async function loadFlowerImages(idFl: string): Promise<void> {
-    const divImg = document.getElementById('imgsFl');
-    if (!divImg) return;
+    if (!flowerData?.divImg) return;
 
     try {
         const response = await fetch(`/api/imgs/getAll/${idFl}`, { method: "GET" });
@@ -73,7 +85,7 @@ async function loadFlowerImages(idFl: string): Promise<void> {
                 const img = document.createElement("img");  
                 img.src = `/imgStore/${row.img}`;
                 img.alt = "Фото букета";
-                divImg.appendChild(img);
+                flowerData?.divImg.appendChild(img);
             });
         }
     } catch (err) { console.error(err); }
@@ -81,8 +93,7 @@ async function loadFlowerImages(idFl: string): Promise<void> {
 
 /* Загрузка описания */
 async function loadFlowerDescription(idFl: string): Promise<void> {
-    const descrContainer = document.getElementById('descr');
-    if (!descrContainer) return;
+    if (!flowerData?.descrContainer) return;
 
     try {
         const response = await fetch(`/api/info/getOne/${idFl}`, { method: "GET" });
@@ -95,7 +106,7 @@ async function loadFlowerDescription(idFl: string): Promise<void> {
             
             // 1. Создаем заголовок описания (если в БД пусто — пишем дефолтное "О букете")
             const divTitle = document.createElement("div");  
-            divTitle.innerHTML = data.title && data.title.trim() !== "" ? data.title : "Характеристики букета";
+            divTitle.textContent = data.title && data.title.trim() !== "" ? data.title : "Характеристики букета";
             divTitle.className = 'descrStyle';
 
             // 2. Создаем блок самого текста описания
@@ -108,23 +119,23 @@ async function loadFlowerDescription(idFl: string): Promise<void> {
             divDesc.style.color = '#444';
 
             // Очищаем контейнер перед добавлением (на случай повторных вызовов)
-            descrContainer.innerHTML = '';
+            flowerData.descrContainer.textContent = '';
             
             // Вставляем элементы в DOM
-            descrContainer.appendChild(divTitle);   
-            descrContainer.appendChild(divDesc);                         
+            flowerData?.descrContainer.appendChild(divTitle);   
+            flowerData?.descrContainer.appendChild(divDesc);                         
         } else {
             // Если бэк вернул пустоту или ошибку 404
-            descrContainer.innerHTML = '<p style="color: #666; font-style: italic;">Описание к этому товару еще не добавлено.</p>';
+            flowerData.descrContainer.textContent = '<p style="color: #666; font-style: italic;">Описание к этому товару еще не добавлено.</p>';
         }
     } catch (err) {
         console.error('Ошибка при получении описания товара на фронтенде:', err);
-        descrContainer.innerHTML = '<p style="color: red;">Не удалось загрузить описание товара.</p>';
+        flowerData.descrContainer.textContent = '<p style="color: red;">Не удалось загрузить описание товара.</p>';
     }
 }
 
 /* Логика изменения количества (+ / -) */
-function initQuantitySelector(): void {
+/*function initQuantitySelector(): void {
     const minusBtn = document.getElementById('qty-minus');
     const plusBtn = document.getElementById('qty-plus');
     const qtyInput = document.getElementById('product-qty') as HTMLInputElement | null;
@@ -140,7 +151,7 @@ function initQuantitySelector(): void {
         let val = parseInt(qtyInput.value) || 1;
         qtyInput.value = String(val + 1);
     });
-}
+}*/
 
 /* Управление кнопками Корзины и Избранного */
 function initActionButtons(flowerId: number): void {
@@ -163,7 +174,7 @@ function initActionButtons(flowerId: number): void {
                 // Визуально меняем статус кнопки
                 cartBtn.classList.add('in-cart');
                 const btnText = cartBtn.querySelector('.btn-text');
-                if (btnText) btnText.innerHTML = '✓ Добавлено';
+                if (btnText) btnText.textContent = '✓ Добавлено';
                 alert('Товар успешно добавлен в корзину!');
             }
         } catch (e) { console.error(e); }

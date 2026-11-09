@@ -7,13 +7,13 @@ let accountData:{
 } | null = null;
 
 export async function initAccountModule(): Promise<void> {
-    accountData = {
-        logOutUserName: document.getElementById('logOutUserName') as HTMLElement,
-        logOutUserEmail: document.getElementById('logOutUserEmail') as HTMLElement,
-        mist2: document.getElementById('mist2') as HTMLElement,
-        exitLogout: document.getElementById('exitLogout') as HTMLElement,
-        logout: document.getElementById('logout') as HTMLElement
-    };
+accountData = {
+    logOutUserName: document.getElementById('logOutUserName') as HTMLElement,
+    logOutUserEmail: document.getElementById('logOutUserEmail') as HTMLElement,
+    mist2: document.getElementById('mist2') as HTMLElement,
+    exitLogout: document.getElementById('exitLogout') as HTMLElement,
+    logout: document.getElementById('logout') as HTMLElement
+};
 
   accountData.exitLogout.addEventListener('click', (event: Event): void => { window.location.href = '/home.html'; });  
   accountData.logout.addEventListener('click', async(event: Event): Promise<void> => {logoutUserFunc();});

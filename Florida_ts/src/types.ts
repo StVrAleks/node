@@ -71,3 +71,37 @@ export interface OrderFlowerAttributes {
     quantity: number;
     price: number; // Фиксируем цену на момент покупки!
 }
+/*````````````````````````````````````````````````````````````````````*/
+/*``````````card product flower```````````````````````````````````````*/
+export interface AddToCartPayload {
+    flowerId: number;
+    quantity: number;
+}
+
+export interface AddToCartResponse {
+    success: boolean;
+    change?: string;
+    mes?: string;
+}
+
+export interface FlowerImageRow {
+    id: number;
+    img: string;
+}
+
+export interface FlowerImagesResponse {
+    rows: FlowerImageRow[];
+}
+
+export interface FlowerDescriptionResponse {
+    title?: string;
+    description?: string;
+}
+
+export interface FlowerCacheResponse {
+    title?: string;
+    status?: string;
+    flower_vid?: {name?:string};
+    name?: string;
+    price?: string;
+};

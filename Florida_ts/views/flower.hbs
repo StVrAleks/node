@@ -1,6 +1,7 @@
 {{#section 'css'}}
     <!-- Этот файл скачает только тот, кто открыл карточку цветка -->
     <link rel="stylesheet" href="/public/css/pages/page-flower.css">
+    
 {{/section}}
 
 <div id="conteiner" class="container-center">
@@ -33,7 +34,7 @@
             <div class="product-actions-box">
                 <div class="quantity-selector">
                     <button type="button" class="qty-btn" id="qty-minus">−</button>
-                    <input type="number" id="product-qty" value="1" min="1" readonly>
+                    <input type="number" id="product-qty" value="1" min="1">
                     <button type="button" class="qty-btn" id="qty-plus">+</button>
                 </div>
 
@@ -47,9 +48,11 @@
 
                 <!-- Кнопка Избранного -->
                 <button type="button" id="fav-toggle-btn" class="action-btn btn-fav" title="Добавить в избранное">
-                    <svg class="btn-icon icon-heart" width="18px" height="50px">
+                <!--    <svg class="btn-icon icon-heart" width="18px" height="50px">
                         <use href="#icon-favorites"></use>
-                    </svg>
+                    </svg>-->
+                    <svg role="img" class="icon icon-wishlist"><use href="#icon-favorites"></use></svg>
+                    <span class="activity-text">Избранное</span>
                 </button>
             </div>
 
@@ -62,5 +65,8 @@
 
     </div>
 </div>
-
+<!--
 <script type="module" src="/dist/src/flower.js"></script>
+-->
+
+<script type="module" src="/dist/src/main.js"></script>
