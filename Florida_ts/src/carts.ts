@@ -105,7 +105,7 @@ async function loadAndFillCart(): Promise<void> {
                     <h4 style="margin: 0; font-size: 16px;">${flower.name}</h4>
                 </div>
                 <div style="flex-shrink: 0; text-align: right; min-width: 90px;">
-                    <span class="price_item_in_cart" style="font-weight: bold;">${itemPrice.toFixed(2)} BYN</span>
+                    <span style="font-weight: bold;">${itemPrice.toFixed(2)} BYN</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <input type="number" 

@@ -1,4 +1,4 @@
-import { FlowerImagesResponse, FlowerDescriptionResponse, FlowerCacheResponse,  AddToCartPayload, AddToCartResponse } from '../../types.js'; 
+import { FlowerImagesResponse, FlowerDescriptionResponse, FlowerCacheResponse,  AddToCartPayload, AddToCartResponse, FavoriteResponse } from '../../types.js'; 
 
 export class ProductApiService {
     private readonly baseUrl: string = '/api';
@@ -61,12 +61,34 @@ export class ProductApiService {
     }
 
     public async addToCart(payload: AddToCartPayload): Promise<AddToCartResponse> {
-        const response = await fetch(`${this.baseUrl}/basketUser/addItem`, {
+        const response = await fetch(`${this.baseUrl}/basketUser/add`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
         if (!response.ok) throw new Error(`[API] Ошибка корзины: ${response.status}`);
         return await response.json() as AddToCartResponse;
+    }
+
+    public async toggleFavorite(flowerId: number): Promise<FavoriteResponse> {
+        const response = await fetch(`${this.baseUrl}/favorites/toggle`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ flowerId })
+        });
+         if (!response.ok) throw new Error(`[API] Ошибка избранного: ${response.status}`);
+        
+        return await response.json() as FavoriteResponse;
+    }
+
+    public async checkFavorite(flowerId: number): Promise<FavoriteResponse> {
+        const response = await fetch(`${this.baseUrl}/favorites/check/${flowerId}`, {
+        method: "GET"
+        });
+        if (!response.ok) {
+                return { isFavorite: false } as FavoriteResponse;
+            }
+        
+        return await response.json() as FavoriteResponse;
     }
 }

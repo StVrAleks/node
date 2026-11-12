@@ -82,6 +82,8 @@ export interface AddToCartResponse {
     success: boolean;
     change?: string;
     mes?: string;
+    cartCount: number | null;
+    action: string;
 }
 
 export interface FlowerImageRow {
@@ -105,3 +107,8 @@ export interface FlowerCacheResponse {
     name?: string;
     price?: string;
 };
+
+export interface FavoriteResponse{
+    change: string;
+    isFavorite: boolean;
+}

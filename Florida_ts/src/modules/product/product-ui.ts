@@ -10,7 +10,7 @@ export class QuantitySelector {
     private readonly input: HTMLInputElement;
     private readonly minusBtn: HTMLButtonElement | null;
     private readonly plusBtn: HTMLButtonElement | null;
-    
+   
     private readonly min: number;
     private readonly max: number;
     private readonly onChange?: (newValue: number) => void;
@@ -22,38 +22,28 @@ export class QuantitySelector {
 
         this.container = container;
 
-        // Ищем элементы через data-атрибуты локально ВНУТРИ контейнера, а не по всему документу!
         this.input = this.container.querySelector('#product-qty') as HTMLInputElement;
-        this.minusBtn = this.container.querySelector('#qty-minus') as HTMLButtonElement;
-        this.plusBtn = this.container.querySelector('#qty-plus') as HTMLButtonElement;
-
+        this.minusBtn = this.container.querySelector('#qty-minus') as HTMLButtonElement | null;
+        this.plusBtn = this.container.querySelector('#qty-plus') as HTMLButtonElement | null;
+        
         if (!this.input) {
-            throw new Error('[QuantitySelector] Элемент инпута [data-qty] не найден внутри контейнера._PRODUCT_UI');
+            throw new Error('[QuantitySelector] Элемент инпута #product-qty не найден внутри контейнера.');
         }
 
-        // Конфигурация ограничений
         this.min = options.min ?? 1;
-        this.max = options.max ?? 99; // Защита от дурака / спама
+        this.max = options.max ?? 99;
         this.onChange = options.onChange;
 
-        // Устанавливаем начальное значение
         const initialValue = options.initial ?? (parseInt(this.input.value, 10) || this.min);
-        console.log('initialValue ', initialValue);
         this.setValue(initialValue);
         this.initEvents();
     }
 
-    /**
-     * Инициализация обработчиков событий
-     */
     private initEvents(): void {
         this.minusBtn?.addEventListener('click', () => this.handleDecrement());
         this.plusBtn?.addEventListener('click', () => this.handleIncrement());
-        
-        // Важнейший хук: отслеживаем ручной ввод пользователя
         this.input.addEventListener('change', () => this.handleInputChange());
-        
-        // Запрещаем ввод нецифровых символов на лету
+
         this.input.addEventListener('keydown', (e: KeyboardEvent) => {
             if (['e', 'E', '+', '-', ',', '.'].includes(e.key)) {
                 e.preventDefault();
@@ -74,43 +64,24 @@ export class QuantitySelector {
         this.setValue(parsedValue);
     }
 
-    /**
-     * Возвращает текущее валидное число
-     */
     public getValue(): number {
         return parseInt(this.input.value, 10) || this.min;
     }
 
-    /**
-     * Централизованный метод изменения значения с жесткой валидацией
-     */
     public setValue(value: number): void {
-        let validatedValue = value;
+        let validatedValue = isNaN(value) ? this.min : value;
 
-        // Если прилетел NaN (например, стерли всё из инпута)
-        if (isNaN(validatedValue)) {
-            validatedValue = this.min;
-        }
-
-        // Проверка жестких границ
         if (validatedValue < this.min) validatedValue = this.min;
         if (validatedValue > this.max) validatedValue = this.max;
 
-        // Обновляем DOM
         this.input.value = String(validatedValue);
-
-        // Управляем доступностью кнопок (визуальный фидбек для пользователя)
         this.toggleButtonStates(validatedValue);
 
-        // Вызываем callback, чтобы product-main.ts или калькулятор цены узнали об изменениях
         if (this.onChange) {
             this.onChange(validatedValue);
         }
     }
 
-    /**
-     * Блокирует кнопки, если достигнут лимит
-     */
     private toggleButtonStates(currentValue: number): void {
         if (this.minusBtn) {
             this.minusBtn.disabled = currentValue <= this.min;
@@ -118,5 +89,68 @@ export class QuantitySelector {
         if (this.plusBtn) {
             this.plusBtn.disabled = currentValue >= this.max;
         }
+    }
+}
+
+export class ProductSlider {
+    private readonly container: HTMLElement;
+    private readonly slides: HTMLImageElement[];
+    private currentIndex: number = 0;
+
+    constructor(container: HTMLElement) {
+        this.container = container;
+        this.slides = Array.from(this.container.querySelectorAll('img'));
+
+        // Если картинок 0 или 1 — кнопки навигации не нужны
+        if (this.slides.length <= 1) return;
+
+        this.initSlider();
+    }
+
+    private initSlider(): void {
+        this.container.style.position = 'relative';
+
+        // Показываем только первый слайд
+        this.updateSlides();
+
+        // Создаём кнопки Влево / Вправо
+        const prevBtn = this.createNavButton('‹', 'slider-btn slider-prev', 'left: 10px;');
+        const nextBtn = this.createNavButton('›', 'slider-btn slider-next', 'right: 10px;');
+
+        prevBtn.addEventListener('click', () => this.prev());
+        nextBtn.addEventListener('click', () => this.next());
+
+        this.container.appendChild(prevBtn);
+        this.container.appendChild(nextBtn);
+    }
+
+    private createNavButton(text: string, className: string, posStyle: string): HTMLButtonElement {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = text;
+        btn.className = className;
+        btn.style.cssText = `
+            position: absolute; top: 50%; transform: translateY(-50%); ${posStyle}
+            background: rgba(255, 255, 255, 0.8); border: 1px solid #ddd;
+            border-radius: 50%; width: 36px; height: 36px; font-size: 20px;
+            cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;
+        `;
+        return btn;
+    }
+
+    private updateSlides(): void {
+        this.slides.forEach((img, index) => {
+            img.style.display = index === this.currentIndex ? 'block' : 'none';
+        });
+    }
+
+    public next(): void {
+        this.currentIndex = (this.currentIndex + 1) % this.slides.length;
+        this.updateSlides();
+    }
+
+    public prev(): void {
+        this.currentIndex = (this.currentIndex - 1 + this.slides.length) % this.slides.length;
+        this.updateSlides();
     }
 }

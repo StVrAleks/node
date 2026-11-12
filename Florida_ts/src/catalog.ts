@@ -43,75 +43,76 @@ function loadCatalog(page: number): void {
         
         catalogContainer.innerHTML = ''; // Очищаем сетку            
         if (data.rows && data.rows.length > 0) {
-            data.rows.forEach((flower: any) => {
-                const flowerImages = flower.flower_imgs; 
-                console.log('flowerImages ', flower);
-                const favoritaStyle : string = flower.isFavorite ? 'active' : '';
-                const flowerNameImg = flowerImages[0]?.img || 'default.jpg';
-                const section = document.createElement('section');
-                section.className = 'conteiner_section';
+data.rows.forEach((flower: any) => {
+    const flowerImages = flower.flower_imgs || [];
+    const flowerNameImg = flowerImages[0]?.img || 'default.jpg';
 
-                section.innerHTML = `
-                    <div class="card">
-                        <div class="card__top">
-                            <h2 class="title_goods">${flower.flower_vid?.name}</h2>
-                            <div class="imgs_goods">
-                                <img src="/imgStoreMINI/${flowerNameImg}" alt="${flower.name}">
-                            </div>
-                        </div>
-                        <div class="card__botoom">
-                            <div class="full_title" data-id="${flower.id}">${flower.name}</div>
-                            <div class="price">${Number(flower.price).toFixed(2)} BYN</div>
-                        </div>
-                        <div class="card_control" style="display: flex; align-items: center; gap: 10px; padding: 10px;">                          
-                            <button type="button" class="cardGood class_control_button icon icon-cart .btn-cart.in-cart" data-id="${flower.id}" title="Купить">
-                                <svg class="icon icon-catalog-cart" width="20" height="20">
-                                    <use xlink:href="#icon-cart" href="#icon-cart"></use>
-                                </svg>
-                            </button>
+    // 1. Вычисляем классы и иконки на основе флагов с бэкенда
+    const favoritaStyle: string = flower.isFavorite ? 'active' : '';
+    const favIconHref: string = flower.isFavorite ? '#icon-favorites-filled' : '#icon-favorites';
+    const cartStyle: string = flower.isInBasket ? 'in-cart' : '';
 
-                            <button type="button" class="watch class_control_button icon icon-btn" id="watch-${flower.id}" data-id="${flower.id}" title="Подробнее">
-                                <svg class="icon icon-catalog-watch" width="20" height="20">
-                                    <use xlink:href="#icon-eye" href="#icon-eye"></use>
-                                </svg>
-                            </button>                           
-                           
-                            <button type="button" class="like_good ${favoritaStyle} wishGood class_control_button icon icon-wishlist" data-id="${flower.id}" title="Добавить в избранное">
-                                <svg class="icon icon-catalog-heart" width="18" height="20">
-                                    <use href="#icon-favorites"></use>
-                                </svg>
-                            </button>    
-                        </div>
-                    </div>
-                `;
-                catalogContainer.appendChild(section);
-                // Активируем кнопку "Подробнее"
-                document.getElementById(`watch-${flower.id}`)?.addEventListener('click', () => {
-                    window.location.href = `/flower?id=${flower.id}`;
-                });
+    const section = document.createElement('section');
+    section.className = 'conteiner_section';
 
-                // Слушатель для кнопки "Купить"
-                const buyBtn = section.querySelector('.cardGood') as HTMLButtonElement | null;
-                buyBtn?.addEventListener('click', () => {
-                    if (buyBtn) {
-                        addToBasket(flower.id, buyBtn); // <-- Передаем кнопку!
-                    }
-                });
+    section.innerHTML = `
+        <div class="card">
+            <div class="card__top">
+                <h2 class="title_goods">${flower.flower_vid?.name || ''}</h2>
+                <div class="imgs_goods">
+                    <img src="/imgStoreMINI/${flowerNameImg}" alt="${flower.name}">
+                </div>
+            </div>
+            <div class="card__botoom">
+                <div class="full_title" data-id="${flower.id}">${flower.name}</div>
+                <div class="price">${Number(flower.price).toFixed(2)} BYN</div>
+            </div>
+            <div class="card_control" style="display: flex; align-items: center; gap: 10px; padding: 10px;">                          
+                <button type="button" class="cardGood class_control_button ${cartStyle}" data-id="${flower.id}" title="${flower.isInBasket ? 'Убрать из корзины' : 'Купить'}">
+                    <svg viewBox="0 0 24 24" class="btn-icon">
+                        <use href="#icon-cart"></use>
+                    </svg>
+                </button>
 
-                // Слушатель для кнопки "Лайк"
-              /*  section.querySelector('.wishGood')?.addEventListener('click', () => {
-                    toggleFavorite(flower.id);
-                });*/
-                const likeBtn = section.querySelector('.wishGood') as HTMLButtonElement | null;
-                likeBtn?.addEventListener('click', () => {
-                    if (likeBtn) {
-                        toggleFavorite(flower.id, likeBtn);
-                    }
-                });
+                <button type="button" class="watch class_control_button" id="watch-${flower.id}" data-id="${flower.id}" title="Подробнее">
+                    <svg viewBox="0 0 24 24" class="btn-icon">
+                        <use href="#icon-eye"></use>
+                    </svg>
+                </button>
 
-            });
+                <button type="button" class="like_good ${favoritaStyle} wishGood class_control_button" data-id="${flower.id}" title="${flower.isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}">
+                    <svg viewBox="0 0 24 24" class="btn-icon">
+                        <use href="${favIconHref}"></use>
+                    </svg>
+                </button>  
+            </div>
+        </div>
+    `;
+    catalogContainer.appendChild(section);
 
-            renderPagination(data.total || 0, page);
+    // Активируем кнопку "Подробнее"
+    document.getElementById(`watch-${flower.id}`)?.addEventListener('click', () => {
+        window.location.href = `/flower?id=${flower.id}`;
+    });
+
+    // Слушатель для кнопки "Купить"
+    const buyBtn = section.querySelector('.cardGood') as HTMLButtonElement | null;
+    buyBtn?.addEventListener('click', () => {
+        if (buyBtn) {
+            addToBasket(flower.id, buyBtn);
+        }
+    });
+
+    // Слушатель для кнопки "Избранное"
+    const likeBtn = section.querySelector('.wishGood') as HTMLButtonElement | null;
+    likeBtn?.addEventListener('click', () => {
+        if (likeBtn) {
+            toggleFavorite(flower.id, likeBtn);
+        }
+    });
+});
+
+        renderPagination(data.total || 0, page);
         } else {
             catalogContainer.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Цветы не найдены</p>';
         }
@@ -189,23 +190,37 @@ async function addToBasket(flowerId: number, cartBtn: HTMLButtonElement): Promis
 }
 }
 
-async function toggleFavorite(flowerId: number, buttonElement: HTMLButtonElement): Promise<void> {
+async function toggleFavorite(flowerId: number, btnElement: HTMLButtonElement): Promise<void> {
+    if (btnElement.disabled) return;
+    btnElement.disabled = true;
+
     try {
         const response = await fetch('/api/favorites/toggle', {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ flowerId })
         });
+
         const data = await response.json();
-        if (data.change === 'ok' || !data.mes) {
-            if (data.isFavorite) {
-                buttonElement.classList.add('active');
-            } else {
-                buttonElement.classList.remove('active');
+
+        if (response.ok && data.change === 'ok') {
+            const isFav = Boolean(data.isFavorite);
+
+            // 1. Переключаем класс фона кнопки
+            btnElement.classList.toggle('active', isFav);
+            btnElement.title = isFav ? 'Убрать из избранного' : 'Добавить в избранное';
+
+            // 2. Переключаем сплошную и контурную иконку обратно!
+            const useEl = btnElement.querySelector('use');
+            if (useEl) {
+                const iconId = isFav ? '#icon-favorites-filled' : '#icon-favorites';
+                useEl.setAttribute('href', iconId);
             }
         }
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        console.error('Ошибка при изменении избранного в каталоге:', error);
+    } finally {
+        btnElement.disabled = false;
     }
 }
 });

@@ -9,65 +9,65 @@ interface ToggleFavoriteRequestBody {
 }
 
 class FavoriteController {
-async getAll(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
-    try {
-        const userId = (request as any).user?.id;
-        if (!userId) {
-             return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
-        }
+    async getAll(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const userId = (request as any).user?.id;
+            if (!userId) {
+                return next(ApiError.forbidden('Доступ запрещен: требуется авторизация'));
+            }
 
-        const page = Number(request.query.page) || 1;
-        const limit = Number(request.query.limit) || 9;
-        const offset = (page - 1) * limit;
+            const page = Number(request.query.page) || 1;
+            const limit = Number(request.query.limit) || 9;
+            const offset = (page - 1) * limit;
 
-        const { count, rows } = await Favorite.findAndCountAll({
-            where: { userId },
-            limit,
-            offset,
-            include: [
-                {
-                    model: Flowers,
-                    include: [
-                        {
-                            model: FlowerImgs,
-                            as: 'flower_imgs' // Подтягиваем картинки для каталога избранного!
-                        }
-                    ]
-                },
+            const { count, rows } = await Favorite.findAndCountAll({
+                where: { userId },
+                limit,
+                offset,
+                include: [
+                    {
+                        model: Flowers,
+                        include: [
+                            {
+                                model: FlowerImgs,
+                                as: 'flower_imgs' // Подтягиваем картинки для каталога избранного!
+                            }
+                        ]
+                    },
+                    
+                ],
+                order: [['createdAt', 'DESC']],
+                distinct: true // Защита от дублирования count при JOIN
+            });
+
+            const sanitizedRows = rows.map((item: any) => {
+                const plainItem = item.toJSON();
+                const flowerData = plainItem.flower || plainItem.Flower;
                 
-            ],
-            order: [['createdAt', 'DESC']],
-            distinct: true // Защита от дублирования count при JOIN
-        });
+                return {
+                    id: plainItem.id,
+                    userId: plainItem.userId,
+                    flowerId: plainItem.flowerId,
+                    flower: flowerData ? {
+                        id: flowerData.id,
+                        name: flowerData.name,
+                        price: flowerData.price,
+                        // Гарантируем правильное имя массива картинок на фронте
+                        flower_imgs: flowerData.flower_imgs || flowerData.FlowerImgs || []
+                    } : null
+                };
+            });
 
-        const sanitizedRows = rows.map((item: any) => {
-            const plainItem = item.toJSON();
-            const flowerData = plainItem.flower || plainItem.Flower;
-            
-            return {
-                id: plainItem.id,
-                userId: plainItem.userId,
-                flowerId: plainItem.flowerId,
-                flower: flowerData ? {
-                    id: flowerData.id,
-                    name: flowerData.name,
-                    price: flowerData.price,
-                    // Гарантируем правильное имя массива картинок на фронте
-                    flower_imgs: flowerData.flower_imgs || flowerData.FlowerImgs || []
-                } : null
-            };
-        });
+            return response.json({
+                count: count,
+                rows: sanitizedRows
+            });
 
-        return response.json({
-            count: count,
-            rows: sanitizedRows
-        });
-
-    } catch (error: any) {
-        logger.error('Ошибка в FavoriteController.getAll:', error.message);
-        return next(ApiError.internal('Внутренняя ошибка сервера при чтении списка избранного'));
+        } catch (error: any) {
+            logger.error('Ошибка в FavoriteController.getAll:', error.message);
+            return next(ApiError.internal('Внутренняя ошибка сервера при чтении списка избранного'));
+        }
     }
-}
 
     async toggle(request: Request<{}, {}, ToggleFavoriteRequestBody>, response: Response, next: NextFunction): Promise<Response | void> {
         try {
@@ -129,7 +129,7 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
             // 2. Ищем ID корзины этого пользователя в базе данных
             let userBasketId: number | null = null;
             let cartCount : number = 0;
-           if (userId) {
+            if (userId) {
                 // 1. Просто ищем корзину пользователя без всяких инклудов
                 const basket = await Basket.findOne({ where: { userId: Number(userId) } });
                 if (basket) {
@@ -194,6 +194,32 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
         } catch (error: any) {
             console.error('Ошибка в FlowerController.getAllCategory:', error);
             return next(ApiError.internal('Внутренняя ошибка сервера при загрузке каталога'));
+        }
+    }
+
+    async check(request: Request, response: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const userId = (request as any).user?.id;
+            const { flowerId } = request.params;
+
+            // Если пользователь не авторизован — товар точно не в избранном
+            if (!userId) {
+                return response.status(200).json({ isFavorite: false });
+            }
+
+            const existItem = await Favorite.findOne({
+                where: {
+                    userId: Number(userId),
+                    flowerId: Number(flowerId)
+                }
+            });
+
+            return response.status(200).json({
+                isFavorite: Boolean(existItem)
+            });
+        } catch (error: any) {
+            console.error('Ошибка в favoritesController.check:', error.message);
+            return next(ApiError.internal('Ошибка сервера при проверке статуса избранного'));
         }
     }
 }

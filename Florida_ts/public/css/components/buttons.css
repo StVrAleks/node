@@ -114,8 +114,6 @@
 .btn-dark,
 .btn-cart,
 .btn--secondary,
-/*#save-profile-btn,  /* Явно привязываем ваши ID к зеленой палитре */
-/*#save-password-btn, /* Чтобы они автоматически стали зелеными */
 #checkout-submit-btn {
     background-color: var(--color-row-green, rgb(86, 197, 83)) !important;
     color: #ffffff !important;
@@ -125,8 +123,6 @@
 .btn-dark:hover,
 .btn-cart:hover,
 .btn--secondary:hover,
-/*#save-profile-btn:hover,
-#save-password-btn:hover,
 */#checkout-submit-btn:hover {
     background-color: #45a049 !important; /* Наш сочный ховер-зелёный */
     box-shadow: 0 6px 15px rgba(86, 197, 83, 0.25);
@@ -185,24 +181,80 @@
     box-shadow: 0 6px 15px rgba(217, 56, 56, 0.25);
 }
 
-
-/* --- 3. ИКОНОЧНЫЕ КНОПКИ-ПЕРЕКЛЮЧАТЕЛИ (Каталог и Избранное) --- */
-.like_good, .btn-fav, .watch, .cardGood {
+/*===================================================================================*/
+/* Состояние "В корзине" (Интеграция с вашим фронтенд JS-переключателем) */
+/*===================================================================================*/
+/* --- 3. ИКОНОЧНЫЕ КНОПКИ-ПЕРЕКЛЮЧАТЕЛИ (Каталог, Карточка товара, Корзина) --- */
+.like_good,
+.btn-fav,
+.watch,
+.cardGood {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid #ddd;
     border-radius: 6px;
     background-color: #ffffff;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
-/* Состояние "В корзине" (Интеграция с вашим фронтенд JS-переключателем) */
-.in-cart {
+/* Кнопка "В корзину" (и в каталоге, и на странице товара) */
+.cardGood svg {
+    fill: #181d19;
+    transition: fill 0.2s ease;
+}
+.cardGood:hover {
+    background-color: rgb(86, 197, 83);
+    border-color: rgb(86, 197, 83);
+}
+.cardGood:hover svg {
+    fill: #ffffff;
+}
+
+/* Состояние "В корзине" (Зелёная заливка и белая иконка/текст) */
+.in-cart,
+.cardGood.in-cart,
+.btn-cart.in-cart {
     background-color: var(--color-row-green, rgb(86, 197, 83)) !important;
     border-color: var(--color-row-green, rgb(86, 197, 83)) !important;
     color: #ffffff !important;
 }
+.in-cart svg {
+    fill: #ffffff !important;
+}
 
-/* Состояние "Лайкнуто / В избранном" */
+/* Кнопка "Подробнее" (Глазик в каталоге) */
+.watch svg {
+    fill: #4caf50;
+    transition: fill 0.2s ease;
+}
+.watch:hover {
+    background-color: #181d19;
+    border-color: #181d19;
+}
+.watch:hover svg {
+    fill: #ffffff;
+}
+
+/* Кнопка "Избранное" (Единый стиль для каталога, карточки и корзины) */
+.btn-fav svg,
+.like_good svg {
+    fill: #990000;
+    stroke: none !important;
+    transition: fill 0.2s ease, transform 0.2s ease;
+}
+.btn-fav:hover svg,
+.like_good:hover svg {
+    transform: scale(1.08);
+}
+
+.btn-fav:hover,
+.like_good:hover {
+    background-color: #fff5f5 !important;
+    border-color: #ffcdd2 !important;
+}
 .active-fav,
 .like_good.active,
 .btn-fav.active {
@@ -217,8 +269,51 @@
     border-color: #ffa3a8 !important;
 }
 
+.active-fav svg,
+.like_good.active svg,
+.btn-fav.active svg {
+    fill: #990000 !important;
+    stroke: none !important;
+}
 
-/* --- 4. ВСПОМОГАТЕЛЬНЫЕ СТРУКТУРНЫЕ МОДИФИКАТОРЫ --- */
+/* --- 4. РАЗМЕРЫ И ИКОНКИ --- */
+/* Единый размер и центрирование для всех SVG внутри кнопок */
+.btn-icon,
+.action-btn svg,
+.btn-ops svg,
+.class_control_button svg,
+.btn-fav svg {
+    width: 18px;
+    height: 18px;
+    margin: 0 !important;
+    flex-shrink: 0;
+    display: block;
+}
+
+/* Модификатор компактных кнопок для карточек каталога */
+.cardGood,
+.like_good,
+.watch {
+    height: 36px;
+    width: 100%;
+    padding: 0;
+}
+
+/* Модификатор кнопок на странице карточки товара (вровень со счётчиком 40px) */
+.product-actions-box .btn-cart {
+    height: 40px;
+    padding: 0 28px;
+    gap: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.product-actions-box .btn-fav {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+}
+
 .btn--full-width {
     width: 100% !important;
 }
@@ -227,16 +322,4 @@
     padding: 6px 12px !important;
     font-size: 13px !important;
     border-radius: 4px !important;
-}
-
-/* Иконки внутри текстовых кнопок */
-.btn-icon, 
-.action-btn svg,
-.btn-ops svg {
-    margin-right: 6px;
-    vertical-align: middle;
-    width: 16px;
-    height: 16px;
-    fill: currentColor;
-    transition: fill 0.2s ease;
 }

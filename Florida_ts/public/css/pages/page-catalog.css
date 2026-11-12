@@ -101,22 +101,6 @@
     gap: 8px;
 }
 
-/* Здесь убраны все border, border-radius и transition — они прилетят из UI-кита! */
-.cardGood, .like_good, .watch {
-    height: 36px;
-    width: 100%; 
-}
-
-.icon-catalog-cart { fill: #181d19; }
-.icon-catalog-watch { fill: #4caf50; }
-.icon-catalog-heart { fill: #990000; }
-
-.cardGood:hover { background-color: #181d19; border-color: #181d19; }
-.cardGood:hover .icon-catalog-cart { fill: #ffffff; }
-
-.watch:hover { background-color: #4caf50; border-color: #4caf50; }
-.watch:hover .icon-catalog-watch { fill: #ffffff; }
-
 /* Пагинация */
 #pagination-container {
     display: flex;
@@ -125,3 +109,5 @@
     padding: 40px 0;
     width: 100%;
 }
+
+
