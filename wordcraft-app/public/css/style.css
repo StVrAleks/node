@@ -1,0 +1,210 @@
+:root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --success: #10b981;
+    --danger: #ef4444;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Шапка */
+.top-bar {
+    background: var(--card);
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo { font-size: 20px; font-weight: 800; color: var(--primary); cursor: pointer; }
+.header-controls { display: flex; align-items: center; gap: 12px; }
+.score-badge { background: #fef3c7; color: #b45309; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 15px; }
+.icon-btn { background: none; border: none; font-size: 22px; cursor: pointer; }
+
+/* Экраны */
+.screen { display: none; padding: 18px; flex: 1; flex-direction: column; gap: 16px; }
+.screen.active { display: flex; }
+
+.section-header, .nav-row, .game-header { display: flex; justify-content: space-between; align-items: center; }
+
+/* Кнопки */
+button { font-family: inherit; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: transform 0.1s; }
+button:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: white; padding: 12px 18px; font-size: 16px; }
+.btn-small { padding: 8px 14px; font-size: 14px; }
+.btn-large { width: 100%; padding: 16px; font-size: 18px; }
+.btn-success { background: var(--success); color: white; }
+.btn-secondary { background: var(--border); color: var(--text); padding: 12px 18px; }
+.btn-back { background: none; color: var(--primary); font-size: 16px; padding: 4px 0; }
+.btn-danger-text { background: none; color: var(--danger); font-size: 14px; }
+
+/* Карточки списков и слов */
+.cards-list, .words-list { display: flex; flex-direction: column; gap: 10px; }
+.list-card {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+.list-info h3 { font-size: 17px; margin-bottom: 4px; }
+.list-info span { font-size: 13px; color: var(--muted); }
+.lang-badge { font-size: 24px; }
+
+.card-form { background: var(--card); padding: 16px; border-radius: 16px; display: flex; flex-direction: column; gap: 10px; }
+input, select {
+    width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px;
+}
+
+.word-item {
+    background: var(--card); padding: 12px 16px; border-radius: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.word-item small { display: block; color: var(--muted); }
+.btn-del-word { background: #fee2e2; color: var(--danger); width: 32px; height: 32px; border-radius: 8px; }
+
+/* Игровые элементы */
+.progress-bar-bg { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; }
+.game-area { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
+
+.task-card {
+    background: var(--card); padding: 28px 20px; border-radius: 20px; text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;
+}
+.task-type { font-size: 13px; text-transform: uppercase; color: var(--primary); font-weight: 700; margin-bottom: 10px; }
+.task-word { font-size: 30px; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; }
+.task-hint { font-size: 16px; color: var(--muted); }
+
+/* Варианты ответа (Тесты) */
+.options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.option-btn {
+    background: var(--card); border: 2px solid var(--border); padding: 16px;
+    font-size: 18px; color: var(--text); text-align: center;
+}
+.option-btn.correct { background: #d1fae5; border-color: var(--success); color: #065f46; }
+.option-btn.wrong { background: #fee2e2; border-color: var(--danger); color: #991b1b; }
+
+/* Россыпь букв (Анаграмма) */
+.answer-slots {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+    min-height: 52px; padding: 10px; background: #eef2ff; border-radius: 14px; margin-bottom: 20px;
+}
+.letter-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.letter-tile {
+    width: 46px; height: 50px; background: var(--card); border: 2px solid var(--primary);
+    color: var(--primary); font-size: 22px; font-weight: 700; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; user-select: none;
+}
+.letter-tile.used { opacity: 0.25; pointer-events: none; }
+.letter-tile.placed { background: var(--primary); color: white; }
+
+/* Итоги и модалка */
+.result-card { background: var(--card); padding: 30px 20px; border-radius: 24px; text-align: center; margin-top: 20px; }
+.trophy-icon { font-size: 64px; margin-bottom: 12px; }
+.stats-box { background: var(--bg); padding: 16px; border-radius: 14px; margin: 20px 0; display: flex; justify-content: space-around; }
+
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+.modal.open { display: flex; }
+.modal-content { background: var(--card); padding: 24px; border-radius: 20px; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Таймер */
+.timer-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: -6px;
+}
+.timer-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.timer-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--primary);
+    transition: width 0.1s linear, background-color 0.3s;
+}
+.timer-bar-fill.danger {
+    background: var(--danger);
+}
+.timer-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 28px;
+    text-align: right;
+}
+.timer-text.danger {
+    color: var(--danger);
+}
+/* Кнопки на экране завершения раунда */
+.result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+/* Имя игрока и таблица рекордов */
+.btn-player {
+    background: #eef2ff;
+    color: var(--primary);
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+.leader-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 12px;
+    font-size: 15px;
+}
+.leader-row.me {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    font-weight: 700;
+}
