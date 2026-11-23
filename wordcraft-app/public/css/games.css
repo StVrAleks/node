@@ -1,0 +1,148 @@
+/* --- АДАПТАЦИЯ ПОД КОМПЬЮТЕР (ДЕСКТОП) --- */
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 960px;
+        margin: 24px auto;
+        min-height: calc(100vh - 48px);
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .screen {
+        padding: 28px 36px;
+    }
+
+    /* Сетка словарей в 2-3 колонки */
+    .cards-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 16px;
+    }
+
+    /* Варианты ответа в тестах в 2 колонки вместо длинного столбика */
+    .options-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .option-btn:hover {
+        border-color: var(--primary);
+        background: #eef2ff;
+    }
+
+    .letter-tile {
+        width: 56px;
+        height: 60px;
+        font-size: 26px;
+        cursor: pointer;
+    }
+
+    .letter-tile:hover:not(.used) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15);
+    }
+}
+/* Клеточки "кроссворда" для сборки слова */
+.crossword-slot {
+    width: 44px;
+    height: 48px;
+    background: var(--card);
+    border: 2px dashed #a5b4fc;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary);
+    transition: all 0.15s;
+}
+
+.crossword-slot.active {
+    border: 2px solid var(--primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.crossword-slot.filled {
+    border: 2px solid var(--success);
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.crossword-slot.error {
+    border: 2px solid var(--danger) !important;
+    background: #fee2e2 !important;
+    color: var(--danger);
+    animation: slotShake 0.35s ease;
+}
+
+@keyframes slotShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Подсказки клавиш 1-4 на ПК */
+.key-hint {
+    display: inline-block;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-right: 6px;
+    border: 1px solid var(--border);
+}
+
+/* Режим "Соотнеси пары" (2 столбика) */
+.match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex: 1;
+}
+
+.match-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.match-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    padding: 14px 12px;
+    font-size: 16px;
+    color: var(--text);
+    text-align: center;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.match-card:hover:not(.matched) {
+    border-color: var(--primary);
+}
+
+.match-card.selected {
+    border-color: var(--primary);
+    background: #eef2ff;
+    color: var(--primary);
+}
+
+.match-card.wrong {
+    border-color: var(--danger);
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.match-card.matched {
+    border-color: var(--success);
+    background: #d1fae5;
+    color: #065f46;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+}

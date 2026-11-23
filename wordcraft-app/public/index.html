@@ -2,11 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WordCraft — Учим слова</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#4f46e5">
+    <link rel="stylesheet" href="/css/games.css">    
+    <link rel="manifest" href="/manifest.json">    
+
 </head>
 <body>
     <div class="app-container">
@@ -14,97 +15,119 @@
         <header class="top-bar">
             <div class="logo" onclick="App.showScreen('home')">WordCraft</div>
             <div class="header-controls">
-                <button class="btn-player" onclick="App.askPlayerName()" title="Сменить имя">
-                    👤 <span id="player-name-display">Гость</span>
+                <button class="btn-player" onclick="App.askPlayerName()">
+                    👤 <span id="player-name-display">Ввести имя</span>
                 </button>
                 <button class="icon-btn" onclick="App.openLeaderboard()" title="Таблица рекордов">🏆</button>
                 <div class="score-badge">⭐ <span id="total-score">0</span></div>
-                <button id="mute-btn" class="icon-btn" onclick="App.toggleMute()">🔊</button>
+                <button class="icon-btn" id="mute-btn" onclick="App.toggleMute()">🔊</button>
             </div>
         </header>
 
-        <!-- ЭКРАН 1: Списки слов -->
+        <!-- ЭКРАН 1: Главная (Списки слов) -->
         <main id="screen-home" class="screen active">
             <div class="section-header">
                 <h2>Мои списки</h2>
                 <button class="btn-primary btn-small" onclick="App.openNewListModal()">+ Список</button>
             </div>
-            <div id="lists-container" class="cards-list">
-                <!-- Сюда JS загрузит списки -->
-            </div>
+            <div class="cards-list" id="lists-container"></div>
         </main>
 
-        <!-- ЭКРАН 2: Просмотр и добавление слов в список -->
-        <main id="screen-words" class="screen">
+        <!-- ЭКРАН 2: Внутри списка слов -->
+        <section id="screen-words" class="screen">
             <div class="nav-row">
                 <button class="btn-back" onclick="App.showScreen('home')">← Назад</button>
                 <button class="btn-danger-text" onclick="App.deleteCurrentList()">Удалить список</button>
             </div>
-            <h2 id="current-list-title">Название списка</h2>
-            
-            <button id="start-game-btn" class="btn-success btn-large" onclick="App.startTraining()">
+
+            <div class="section-header">
+                <h2 id="current-list-title">Название списка</h2>
+            </div>
+
+            <button class="btn-primary btn-large btn-success" id="start-game-btn" onclick="App.startTraining()">
                 ▶ Начать тренировку
             </button>
 
-            <!-- Форма добавления слова -->
-            <form id="add-word-form" class="card-form">
+            <form class="card-form" id="add-word-form">
                 <h3>Добавить новое слово</h3>
-                <input type="text" id="input-word" placeholder="Слово (например: винегрет)" required autocomplete="off" autocorrect="off" autocapitalize="off">
-                <input type="text" id="input-translation" placeholder="Перевод (только для английского)" autocomplete="off">
-                <input type="text" id="input-masked" placeholder="С пропуском (необязательно: в_негрет)" autocomplete="off">
-                <input type="text" id="input-wrong" placeholder="Частая ошибка (необязательно: венигрет)" autocomplete="off">
+                <input type="text" id="input-word" placeholder="Слово" required autocomplete="off">
+                <input type="text" id="input-translation" placeholder="Перевод (например: яблоко)" autocomplete="off">
+                <input type="text" id="input-masked" placeholder="Слово с пропуском (необязательно, напр. в_негрет)" autocomplete="off">
+                <input type="text" id="input-wrong" placeholder="Неправильный вариант для теста (напр. венегрет)" autocomplete="off">
                 <button type="submit" class="btn-primary">Добавить в список</button>
             </form>
 
-            <div id="words-container" class="words-list">
-                <!-- Сюда JS загрузит слова -->
-            </div>
-        </main>
+            <div class="words-list" id="words-container"></div>
+        </section>
 
-        <!-- ЭКРАН 3: Игровая зона -->
-        <main id="screen-game" class="screen">
+        <!-- ЭКРАН 3: Игровой процесс -->
+        <section id="screen-game" class="screen">
             <div class="game-header">
-                <button class="btn-back" onclick="App.confirmExitGame()">✕ Выйти</button>
-                <div class="progress-text" id="game-progress">1 / 10</div>
-                <div class="session-score">+<span id="session-score">0</span></div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn-secondary btn-small" id="pause-btn" onclick="App.togglePause()">⏸ Пауза</button>
+                    <button class="btn-danger-text" onclick="App.exitGame()">✕ Выйти</button>
+                </div>
+                <span id="game-progress" style="font-weight: 700;">1 / 10</span>
+                <span class="score-badge">+ <span id="session-score">0</span></span>
             </div>
-            <div class="progress-bar-bg"><div id="progress-fill" class="progress-bar-fill"></div></div>
-                        
-            <!-- Полоска таймера -->
+
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+
             <div class="timer-container">
-                <div class="timer-bar-bg"><div id="timer-fill" class="timer-bar-fill"></div></div>
-                <span id="timer-text" class="timer-text">15с</span>
+                <div class="timer-bar-bg">
+                    <div class="timer-bar-fill" id="timer-fill"></div>
+                </div>
+                <span class="timer-text" id="timer-text">15с</span>
             </div>
 
-            
-            <div id="game-area" class="game-area">
-                <!-- Сюда Games.js будет рендерить задания -->
+            <!-- Оверлей паузы -->
+            <div id="pause-overlay" class="task-card" style="display: none; margin-top: 20px;">
+                <div class="trophy-icon">⏸️</div>
+                <h2 style="margin-bottom: 8px;">Игра на паузе</h2>
+                <p style="color: var(--muted); margin-bottom: 20px;">Таймер остановлен. Нажмите «Продолжить» или пробел.</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn-primary" onclick="App.togglePause()">▶ Продолжить</button>
+                    <button class="btn-secondary" onclick="App.exitGame()">Выйти в словарь</button>
+                </div>
             </div>
-        </main>
 
-        <!-- ЭКРАН 4: Итоги и поздравление -->
-        <main id="screen-result" class="screen">
+            <!-- Контейнер для карточек заданий -->
+            <div class="game-area" id="game-area"></div>
+        </section>
+
+        <!-- ЭКРАН 4: Итоги раунда -->
+        <section id="screen-result" class="screen">
             <div class="result-card">
                 <div class="trophy-icon">🏆</div>
                 <h2 id="result-title">Отлично!</h2>
-                <p id="result-message">Вы успешно прошли раунд.</p>
+                <p id="result-message" style="color: var(--muted); margin-top: 8px;">Вы успешно прошли раунд.</p>
+
                 <div class="stats-box">
-                    <div>Точность: <strong id="result-percent">100%</strong></div>
-                    <div>За раунд: <strong>+<span id="result-points">0</span> ⭐</strong></div>
+                    <div>
+                        <small style="color: var(--muted); display: block;">Точность</small>
+                        <strong id="result-percent" style="font-size: 22px;">100%</strong>
+                    </div>
+                    <div>
+                        <small style="color: var(--muted); display: block;">За раунд</small>
+                        <strong style="font-size: 22px; color: #b45309;">+ <span id="result-points">0</span> ⭐</strong>
+                    </div>
                 </div>
+
                 <div class="result-actions">
-                    <button class="btn-success btn-large" onclick="App.startTraining()">▶ Продолжить</button>
+                    <button class="btn-primary btn-large" onclick="App.startTraining()">▶ Продолжить</button>
                     <button class="btn-secondary btn-large" onclick="App.showScreen('words')">Выход к списку</button>
                 </div>
             </div>
-        </main>
+        </section>
     </div>
 
-    <!-- Модальное окно создания списка -->
-    <div id="modal-new-list" class="modal">
+    <!-- Модалка создания списка -->
+    <div class="modal" id="modal-new-list">
         <div class="modal-content">
             <h3>Новый список слов</h3>
-            <input type="text" id="new-list-title" placeholder="Название (например: 5 класс)">
+            <input type="text" id="new-list-title" placeholder="Название (например: Еда или Словарные 5 класс)">
             <select id="new-list-lang">
                 <option value="ru">🇷🇺 Русский язык (орфография)</option>
                 <option value="en">🇬🇧 Английский язык (с переводом)</option>
@@ -115,18 +138,19 @@
             </div>
         </div>
     </div>
-       <!-- Модальное окно таблицы рекордов -->
-    <div id="modal-leaderboard" class="modal">
+
+    <!-- Модалка таблицы рекордов -->
+    <div class="modal" id="modal-leaderboard">
         <div class="modal-content">
             <h3>🏆 Таблица рекордов</h3>
-            <div id="leaderboard-list" class="leaderboard-list">
-                <!-- Сюда загрузятся лидеры -->
-            </div>
+            <div class="leaderboard-list" id="leaderboard-list"></div>
             <div class="modal-actions">
-                <button class="btn-primary" style="width: 100%;" onclick="App.closeLeaderboard()">Закрыть</button>
+                <button class="btn-primary" onclick="App.closeLeaderboard()">Закрыть</button>
             </div>
         </div>
     </div>
+
+
 
     <script src="js/feedback.js"></script>
     <script src="js/games.js"></script>

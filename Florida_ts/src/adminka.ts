@@ -1041,12 +1041,15 @@ if (currentMode === 'vids') {
 //-----Удаляем flowers---------------------------------------------
 if (currentMode === 'flowers') { 
    const trId = target.id;
+  //    console.log('itrId  ', trId);
    let trNum0 = trId.replace('butDelete', '');
    const trNum = Number(parseInt(trNum0));  
-   const idForm = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)') as HTMLElement || null;
+   //const idForm = document.querySelector('#control_table > tr:nth-child('+trNum+') > td:nth-child(3)') as HTMLElement || null;
+   const idForm = document.querySelector(`#control_table tr > td:nth-child(1) > input[id="${trId}"]`) as HTMLElement || null;
+  //  console.log('idForm ', idForm);
    if (!idForm) return;
    const id = idForm? idForm.innerHTML : '';
-   
+  // console.log('id ', id, trNum);
    fetch(`/api/flower/delete/${trNum}`,{
           method: "DELETE",
           //headers: {"content-Type": "application/json", "Authorization": `Bearer ${localToken}`}

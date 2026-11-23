@@ -70,7 +70,7 @@ class FlowerController{
 
             // Перезагружаем объект, чтобы вернуть на фронтенд заполненное виртуальное поле vidName
             await flower.reload({
-                include: [{ model: Vid, as: 'vid', attributes: ['name'] }] 
+                include: [{ model: Vid, as: 'flower_vid', attributes: ['name'] }] 
             });
             return response.status(201).json(flower);
             }
