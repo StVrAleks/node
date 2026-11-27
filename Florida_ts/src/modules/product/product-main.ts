@@ -2,6 +2,8 @@
 import { ProductApiService } from './product-api.js';
 import { QuantitySelector, ProductSlider } from './product-ui.js';
 import { FavoriteResponse } from '../../types.js'; 
+import { eventBus } from '../../core/event-bus.js';
+
 // Описываем интерфейс элементов внутри контроллера
 interface FlowerElements {
     wrapper: HTMLElement;
@@ -147,8 +149,11 @@ private async loadProductData(idFl: string): Promise<void> {
 
             // Обновляем счётчик в шапке
             const countBubble = document.querySelector('[data-cart-count]');
-            if (countBubble && data.cartCount !== undefined) {
+           /* if (countBubble && data.cartCount !== undefined) {
                 countBubble.textContent = String(data.cartCount);
+            }*/
+           if (data.cartCount !== undefined) {
+            eventBus.emit('cart:updated', { count: Number(data.cartCount) });
             }
         }
     } catch (e) {

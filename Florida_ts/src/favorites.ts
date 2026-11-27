@@ -58,7 +58,7 @@ async function loadFavoritesPage(page: number): Promise<void> {
         }
 
         grid.innerHTML = '';
- console.log('data.rows ', data.rows);
+ //console.log('data.rows ', data.rows);
         if (!data.rows || data.rows.length === 0) {
             grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding: 40px;">Список избранного пуст. Нажмите сердечко на карточках товаров в каталоге!</p>';
             if (pageInput) pageInput.value = '1';

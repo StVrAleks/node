@@ -1,0 +1,110 @@
+/controllers
+	-basketFlowerController.ts
+	-basketUserController.ts
+	-cabinetController.ts
+	-favoritesController.ts
+	-FavoriteSSRController.ts
+	-flowerController.ts
+	-imgController.ts
+	-infoController.ts
+	-order.ts
+	-product.controller.ts
+	-userController.ts
+	-vidController.ts
+/error
+	-ApiError.ts
+/middleware	
+	-authMiddleware.ts
+	-authMiddlewareUser.ts
+	-checkRoleMiddleware.ts
+	-errorHandlingMiddleware.ts
+	-winston.ts
+/models
+	-models.js
+	-models.ts
+/public
+	/css
+		/common
+			-main.css
+		/components
+			-buttons.css
+			-footer.css
+			-header.css
+			-modals.css
+		/pages
+			-page-admin.css
+			-page-cart.css
+			-page-catalog.css
+			-page-favorites.css
+			-page-flower.css
+			-page-home.css
+			-page-profile.css
+	/html
+		main_page.html
+	/images
+	/imgStore
+	/imgStoreMINI
+/routes
+	-basketFlower.ts
+	-basketUser.ts
+	-favorites.ts
+	-flower.ts
+	-imgs.ts
+	-index.ts
+	-info.ts
+	-order.ts
+	-uploadRouter.ts
+	-user.ts
+	-vid.ts
+	-viewRouter.ts
+/service
+	-user_mail.ts
+/src
+	/core
+		-event-bus.ts
+	/components
+		-partishional.ts
+	/modules
+		/header
+			-header.module.ts
+		/product
+			-product-api.ts
+			-product-main.ts
+			-product-ui.ts
+		-account.modules.ts	
+		-home.modules.ts
+		-login.modules.ts
+		-registration.module.ts
+	-adminka.ts	
+	-cabinet.ts
+	-carts.ts
+	-catalog.ts
+	-favorites.ts
+	-flower.ts
+	-main.ts
+	-orders.ts
+	-tsconfig.json
+	-types.ts
+/views
+	/layouts
+		-main.hbs
+	-account.hbs
+	-adminka.hbs
+	-cabinet.hbs
+	-cart.hbs
+	-catalog.hbs
+	-favorites.hbs
+	-flower.hbs
+	-home.hbs
+	-login.hbs
+	-registration.hbs
+-.env
+-.gitignore
+-app.ts
+-core.env.js
+-core.state.js
+-db.js
+-db.ts
+-package-lock.json
+-package.json
+-tsconfig.json
